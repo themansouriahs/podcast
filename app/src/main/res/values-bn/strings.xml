@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <!--For playing media on another device, like a chromecast-->
+  <!--When downloading and parsing the content of a feed-->
+  <!--Search engine for searching for new podcasts-->
+  <!--log_submit_activity-->
+  <!--Widget-->
+  <!--Used for displaying the download progress of a file. Example: "1.2 MB of 53 MB" (the unit, MB, is handled by the framework)
+    When the progress is 0 (we have not started downloading) we should just show the total file size. Example "53 MB"-->
+  <!--In the context: "4 new [episodes]"-->
+  <!--Feed Activity-->
+  <!--Used for 1.1X speed-->
+  <!--The audio engine has an option to remove periods of silence in an audio file.-->
+</resources>

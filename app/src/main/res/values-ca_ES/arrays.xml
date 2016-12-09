@@ -6,14 +6,14 @@
     <item>2 GB</item>
     <item>3 GB</item>
     <item>5 GB</item>
-    <item>Ilimitado</item>
+    <item>Il·limitat</item>
   </string-array>
   <string-array name="pref_player_seek_entries">
-    <item>5 segundos</item>
-    <item>10 segundos</item>
-    <item>20 segundos</item>
-    <item>30 segundos</item>
-    <item>1 minuto</item>
+    <item>5 segons</item>
+    <item>10 segons</item>
+    <item>20 segons</item>
+    <item>30 segons</item>
+    <item>1 minut</item>
   </string-array>
   <string-array name="pref_player_seek_entries_values">
     <item>5</item>
@@ -23,19 +23,15 @@
     <item>60</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries">
-    <item>Automático</item>
-    <item>Modo lista</item>
-    <item>2 columnas</item>
-    <item>3 columnas</item>
+    <item>Automàtic</item>
+    <item>Mode llista</item>
+    <item>2 columnes</item>
+    <item>3 columnes</item>
   </string-array>
   <string-array name="pref_theme_entries">
-    <item>Claro (por defecto)</item>
-    <item>Oscuro</item>
-    <item>Automático (Día/Noche)</item>
-  </string-array>
-  <string-array name="playlist_sort_order">
-    <item>Ordenar por más recientes</item>
-    <item>Ordenar por más antiguos</item>
+    <item>Clar (per defecte)</item>
+    <item>Obscur</item>
+    <item>Automàtic (Día/Nit)</item>
   </string-array>
   <string-array name="entries_webservices_discovery_engine">
     <item>gPodder</item>

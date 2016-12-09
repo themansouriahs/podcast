@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="app_name">SoundWaves</string>
-  <string name="unsubscribe">Abmelden</string>
+  <string name="unsubscribe">Deabbonieren</string>
   <string name="pref_only_wifi_description">Mit Download warten, bis WLAN verfügbar ist</string>
   <string name="pref_only_wifi_title">Nur über WLAN herunterladen</string>
   <string name="pref_dark_theme">Dunklen Hintergrund für höheren Kontrast aktivieren</string>
   <string name="pref_dark_theme_title">Hintergrund</string>
   <string name="pref_download_on_update_title">Automatisch herunterladen</string>
-  <string name="pref_download_on_update_description">Neue Episoden automatisch herunterladen</string>
+  <string name="pref_download_on_update_description">Neue Folgen automatisch herunterladen</string>
   <string name="pref_downloaded_expire_description">%s</string>
-  <string name="pref_downloaded_expire_title">Speicher für heruntergeladene Episoden</string>
+  <string name="pref_downloaded_expire_title">Speicher für heruntergeladene Folgen</string>
   <string name="dialog_title_add_sub">Podcast hinzufügen</string>
   <string name="dialog_message_add_sub">Bitte geben Sie eine URL ein:</string>
   <string name="title_section3">Wiedergabeliste</string>
@@ -17,7 +17,7 @@
   <string name="title_section1">Abonnements</string>
   <string name="hello_world">Hallo Welt!</string>
   <string name="menu_settings">Einstellungen</string>
-  <string name="menu_downloading">Download Manager</string>
+  <string name="menu_downloading">Downloadmanager</string>
   <string name="title_activity_swipe">SoundWaves</string>
   <string name="menu_download_all">Alle herunterladen</string>
   <string name="menu_clear_playlist">Playlist leeren</string>
@@ -31,10 +31,10 @@
   <string name="drawer_close">Schliessen</string>
   <string name="pref_stream_proxy_title">Während des Streamings herunterladen</string>
   <string name="pref_stream_proxy">Dies kann etwas mehr Zeit Pufferung erfordern</string>
-  <string name="episode_title">Titel der Episode</string>
-  <string name="episode_description">Beschreibung der Episode</string>
+  <string name="episode_title">Titel der Folge</string>
+  <string name="episode_description">Beschreibung der Folge</string>
   <string name="pref_continuously_playing">Endlos-Wiedergabe</string>
-  <string name="pref_continuously_playing_description">Nach dem Ende einer Episode die nächste automatisch abspielen</string>
+  <string name="pref_continuously_playing_description">Nach dem Ende einer Folge die nächste automatisch abspielen</string>
   <string name="preferences_category_help">Mitmachen</string>
   <string name="preferences_category_ui">Benutzeroberfläche</string>
   <string name="preferences_category_player">Player</string>
@@ -63,7 +63,7 @@
   <string name="pref_help_static_field_description">Sie können auf vielerlei Art helfen: Programmieren, Übersetzen, UI, Icons/Grafik, Erstellen einer Webseite usw. Schauen Sie auf der Projektseite auf GitHub nach (github.com/bottiger/SoundWaves) oder schicken Sie mir eine E-Mail: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Ohne Titel :(</string>
   <string name="podcast_title_unknown">Unbekannter Podcast-Titel</string>
-  <string name="subscription_instruction">Füge neue Podcasts hinzu, indem du die Entdecken-Seite rechts nutzt.\n\nDu kannst in den Einstellungen auch eine OPML-Datei importieren oder mit gPodder synchronisieren</string>
+  <string name="subscription_instruction">Fügen Sie neue Podcasts hinzu, indem Sie die Entdecken-Seite rechts nutzen.\n\nSie können in den Einstellungen auch eine OPML-Datei importieren oder mit gPodder synchronisieren</string>
   <string name="filter_show_listened">Bereits gespielte anzeigen</string>
   <string name="auto_start_next">Automatisch nächste starten</string>
   <string name="drawer_playlist_filters">Filter</string>
@@ -82,10 +82,10 @@
   <string name="pref_network_category_storage_title">Speicher</string>
   <string name="pref_network_category_storage_experimental">Experimentell</string>
   <string name="pref_delete_when_finished_title">Nach der Wiedergabe löschen</string>
-  <string name="pref_delete_when_finished_description">Episoden nach vollständiger Wiedergabe automatisch löschen</string>
+  <string name="pref_delete_when_finished_description">Folgen nach vollständiger Wiedergabe automatisch löschen</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Besetzung</string>
-  <string name="bulk_download_instructions">Alle passenden Episoden herunterladen</string>
+  <string name="bulk_download_instructions">Alle passenden Folgen herunterladen</string>
   <string name="bulk_download_day">Veröffentlicht innerhalb der letzten 24 Stunden</string>
   <string name="bulk_download_week">Diese Woche veröffentlicht</string>
   <string name="bulk_download_month">Diesen Monat veröffentlicht</string>
@@ -113,23 +113,24 @@
   <string name="pref_webservices_dialog_title">Podcast-Suchmaschine</string>
   <string name="pref_webservices_discovery_title">Podcast-Suchmaschine</string>
   <string name="pref_webservices_discovery_description">Webdienste für die Suche nach Podcasts benutzen</string>
-  <string name="playlist_filter_introducion">Automatisch die letzten Episoden folgender Serie in die Wiedergabeliste einfügen</string>
+  <string name="playlist_filter_introducion">Automatisch die letzten Folgen folgender Serie in die Wiedergabeliste einfügen</string>
   <string name="playlist_filter_none">Nichts einfügen</string>
   <string name="playlist_empty">Die Widergabeliste ist leer :(</string>
   <string name="playlist_empty_title">Wiedergabeliste-Modus auswählen</string>
   <string name="playlist_empty_text_top">Nehmen Sie sich einen Moment Zeit, um darüber nachzudenken, wie Sie die App nutzen möchten</string>
   <string name="playlist_empty_text_bottom">Sie können das Verhalten der Wiedergabeliste anpassen, indem Sie das Symbol mit den drei kleinen Balken in der oberen Leiste antippen.</string>
-  <string name="playlist_empty_mode_one">Episoden manuell in die Wiedergabelite einfügen</string>
-  <string name="playlist_empty_mode_two">Neueste Episoden</string>
-  <string name="playlist_empty_mode_one_desc">Die Wiedergabeliste wird nur Episoden enthalten, die manuell hinzugefügt wurden </string>
-  <string name="playlist_empty_mode_two_desc">Die Wiedergabeliste wird automatisch mit den neuesten Episoden befüllt. Sie können ausgewählte Episoden manuell hinzufügen.</string>
-  <string name="playlist_episode_dismissed">Episode entfernt</string>
+  <string name="playlist_empty_mode_one">Folgen manuell in die Wiedergabelite einfügen</string>
+  <string name="playlist_empty_mode_two">Neueste Folgen</string>
+  <string name="playlist_empty_mode_one_desc">Die Wiedergabeliste wird nur Folgen enthalten, die manuell hinzugefügt wurden </string>
+  <string name="playlist_empty_mode_two_desc">Die Wiedergabeliste wird automatisch mit den neuesten Folgen befüllt. Sie können ausgewählte Folgen manuell hinzufügen.</string>
+  <string name="playlist_episode_dismissed">Folge entfernt</string>
   <string name="playlist_episode_dismissed_undo">Rückgängig</string>
   <string name="playlist_context_menu_playnext">Nächste</string>
   <string name="download_aborted_snackbar">Fehler beim Herunterladen: %s</string>
   <string name="subscription_subtitle_updated_at">aktualisiert</string>
   <string name="filter_show_only_downloaded">Nur heruntergeladene</string>
   <string name="action_filter">Wiedergabeliste filtern</string>
+  <string name="snackbar_change">Ändern</string>
   <string name="apply_filters">Filter anwenden</string>
   <string name="pref_gpodder_support_title">gPodder</string>
   <string name="gpodder_username">Benutzername</string>
@@ -141,20 +142,22 @@
   <string name="generic_test_credentials_failed">Test fehlgeschlagen</string>
   <string name="pref_use_soundengine_title">Individuelle Soundengine</string>
   <string name="pref_use_soundengine_description">Fortgeschrittene Funktionen wie variable Abspielgeschwindigkeit aktivieren</string>
-  <string name="dialog_playback_speed_episode">Nur diese Episode</string>
-  <string name="dialog_playback_speed_subscription">Alle Episoden dieses Podcasts</string>
-  <string name="dialog_playback_speed_global">Alle Episoden</string>
+  <string name="dialog_playback_speed_episode">Nur diese Folge</string>
+  <string name="dialog_playback_speed_subscription">Alle Folgen dieses Podcasts</string>
+  <string name="dialog_playback_speed_global">Alle Folgen</string>
   <string name="dialog_playback_engine_title">Soundengine Einstellungen</string>
   <string name="dialog_playback_speed_title">Abspielgeschwindigkeit</string>
   <string name="dialog_playback_speed_scope">Änderungen übernehmen für</string>
-  <string name="feed_settings_show_description">Beschreibung der Episode anzeigen</string>
-  <string name="feed_settings_in_playlist">Neue Episoden zur Wiedergabeliste hinzufügen</string>
-  <string name="feed_settings_download_new">Neue Episoden herunterladen</string>
+  <string name="feed_settings_show_description">Beschreibung der Folge anzeigen</string>
+  <string name="feed_settings_in_playlist">Neue Folgen zur Wiedergabeliste hinzufügen</string>
+  <string name="feed_settings_download_new">Neue Folgen herunterladen</string>
   <string name="feed_settings_delete_when_listened">Nach dem Ende löschen</string>
   <string name="feed_settings_intro">Diese Einstellungen überschreiben die globalen Standardeinstellungen für den Podcast</string>
-  <string name="feed_settings_oldest_first">Alte Episoden oben anzeigen</string>
+  <string name="feed_settings_oldest_first">Alte Folgen oben anzeigen</string>
+  <string name="feed_settings_notify_on_new">Bei neuen Folgen benachrichtigen</string>
+  <string name="feed_settings_skip_intro">Intro überspringen</string>
   <string name="open_video_externally_title">Videos in einem anderen Player öffnen?</string>
-  <string name="open_video_externally_body">Diese Episode ist ein Video, was von der App nicht unterstützt wird. Sie können es in einem externen Videoplayer öffnen oder nur den Ton abspielen.</string>
+  <string name="open_video_externally_body">Diese Folge ist ein Video, was von der App nicht unterstützt wird. Sie können es in einem externen Videoplayer öffnen oder nur den Ton abspielen.</string>
   <string name="open_video_externally_confirm">Videoplayer öffnen</string>
   <string name="open_video_externally_reject">Ton abspielen</string>
   <string name="pref_open_video_externally">Videos in externem Player öffnen</string>
@@ -165,14 +168,14 @@
   <string name="opml_import_toolbar_title">OPML Inhalt</string>
   <string name="opml_import_toolbar_description">Podcasts auswählen, die abonniert werden sollen</string>
   <string name="download_manager_toolbar_title">Download-Warteschlange</string>
-  <string name="download_manager_toolbar_description">Herunterzuladende Episoden</string>
+  <string name="download_manager_toolbar_description">Herunterzuladende Folgen</string>
   <string name="menu_clear_download">Leeren</string>
   <string name="download_manager_empty_title">Kein aktiver Download</string>
   <string name="action_enter_fullscreen">Vollbild</string>
   <string name="action_exit_fullscreen">Vollbild verlassen</string>
   <string name="unknown_filesize">Unbekannte Dateigröße</string>
   <!--log_submit_activity-->
-  <string name="log_submit_activity__log_fetch_failed">Konnte das Log deines Geräts nicht lesen. Du kannst aber ADB nutzen um ein Log zur Fehlersuche zu bekommen.</string>
+  <string name="log_submit_activity__log_fetch_failed">Konnte das Log Ihres Gerätes nicht lesen. Sie können aber ADB nutzen um ein Log zur Fehlersuche zu bekommen.</string>
   <string name="log_submit_activity__thanks">Danke für die Unterstützung!</string>
   <string name="log_submit_activity__submitting">Sende</string>
   <string name="log_submit_activity__posting_logs">Sende Logs zu gist...</string>
@@ -194,9 +197,41 @@
   <!--Used for 1.1X speed-->
   <string name="speed_multiplier">%1$.1f X</string>
   <string name="discovery_directory_icon">Podcastverzeichnis (Suchmaschine)</string>
-  <string name="subscription_instruction_title">Du hast keine Podcasts abonniert</string>
+  <string name="subscription_instruction_title">Sie haben keine Podcasts abonniert</string>
   <string name="dialog_playback_boost_volume">Lautstärke verstärken</string>
   <!--The audio engine has an option to remove periods of silence in an audio file.-->
+  <string name="dialog_playback_removile_silence">Stille entfernen</string>
+  <string name="menu_web_player">Webplayer (beta)</string>
+  <string name="menu_subscriptions_order">sortieren nach</string>
+  <string name="menu_subscriptions_order_alphabetically">Name (A-Z)</string>
+  <string name="menu_subscriptions_order_alphabetically_reverse">Name absteigend (Z-A)</string>
+  <string name="menu_subscriptions_order_updated">zuletzt aktualisiert</string>
+  <string name="menu_subscriptions_order_new_count">neue Folgen</string>
+  <string name="title_activity_web_scanner">WebScannerActivity</string>
+  <string name="web_scanner_instrcution_title">Auf dem PC anhören</string>
+  <string name="web_scanner_instructions"><![CDATA[1) Gehen Sie zu web.soundwavesapp.com<br />2) Scannen Sie den QR-Code]]></string>
+  <string name="web_scanner_qr_scanned">Gescannt. Logge ein.</string>
+  <string name="player_chapters_title">Kapitel</string>
+  <string name="player_chapters_missing">Diese Folge enthält keine Kapitel</string>
+  <string name="player_sleep_cancel">Einschlaffunktion ausgeschalten</string>
+  <string name="player_sleep_dialog_cancel_button">Einschlaffunktion ausschalten</string>
+  <string name="player_sleep_dialog_ok_button">Einschlaffunktion einschalten</string>
+  <string name="menu_feed_sort_order">Umgekehrte Reihenfolge</string>
+  <string name="shortcut_short_download">Neue herunterladen</string>
+  <string name="shortcut_long_download">Neue Folgen herunterladen</string>
+  <string name="app_intro_activity">SoundWaves Einführung</string>
+  <string name="appintro_playlist_title">Es gibt eine Wiedergabeliste unter dem Hauptplayer</string>
+  <string name="appintro_playlist_description">Standardmäßig füllt sich die Wiedergabeliste mit den neusten Folgen deiner Abonnements.</string>
+  <string name="appintro_filters_title">Wiedergabeliste anpassen</string>
+  <string name="appintro_filters_description">Beispiel: Die Wiedergabeliste sollte nur mit Folgen gefüllt werden die heruntergeladen sind und selten gehörte Podcasts ignoriert werden.</string>
+  <string name="appintro_settings_title">Einstellungen</string>
+  <string name="intro_settings_auto_download">Neue Folgen automatisch herunterladen</string>
+  <string name="intro_settings_wifi_download">Nur bei WLAN automatisch herunterladen</string>
+  <string name="intro_settings_title">Netzwerkeinstellungen</string>
+  <string name="intro_settings_done">Das war\'s. Happy Podcasting</string>
+  <string name="app_intro_welcome_title">Willkommen bei SoundWaves</string>
+  <string name="app_intro_welcome_description">Bitte schauen Sie sich diese Einführungsseiten kurz an.</string>
+  <string name="appintro_settings_description">SoundWaves Podcast ist absolut frei und es entstehen keine Kosten für erweiterte Funktionen wie \"Neue Folgen herunterladen wenn verfügbar\". Trotzdem sollten Sie Ihre Einstellungen überprüfen, bevor Sie beginnen es zu nutzen, um ungewünschten Datenverbrauch zu verhindern.</string>
   <plurals name="player_sleep">
     <item quantity="one">Player wird in %d Minute schlafen</item>
     <item quantity="other">Player wird in %d Minuten schlafen</item>
@@ -208,5 +243,9 @@
   <plurals name="subscriptions_imported">
     <item quantity="one">%d Abonnement wurde importiert.</item>
     <item quantity="other">%d Abonnements wurden importiert.</item>
+  </plurals>
+  <plurals name="subscriptions_selected">
+    <item quantity="one">%d ausgewählt</item>
+    <item quantity="other">%d ausgewählt</item>
   </plurals>
 </resources>
