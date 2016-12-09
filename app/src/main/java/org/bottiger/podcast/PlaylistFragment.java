@@ -461,6 +461,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
          if (mTopPlayer != null && mTopPlayer.isFullscreen()) {
              MenuItem menuItem = menu.findItem(R.id.action_fullscreen_player);
              menuItem.setIcon(R.drawable.ic_fullscreen_exit_white_24px);
+             menuItem.setTitle(R.string.action_exit_fullscreen);
          }
 
          super.onCreateOptionsMenu(menu, inflater);

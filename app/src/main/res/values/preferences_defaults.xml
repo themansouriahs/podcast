@@ -5,7 +5,7 @@
     <bool name="pref_open_video_externally_default">false</bool>
     <bool name="pref_delete_when_finished_default">false</bool>
     <bool name="pref_continuously_playing_default">false</bool>
-    <bool name="pref_show_listened_default">true</bool>
+    <bool name="pref_show_listened_default">false</bool>
     <string name="pref_theme_default">1</string>
     <integer name="gpodder_last_sync_default">0</integer>
 

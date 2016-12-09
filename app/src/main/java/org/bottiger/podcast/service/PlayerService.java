@@ -68,7 +68,7 @@ import io.reactivex.schedulers.Schedulers;
 public class PlayerService extends MediaBrowserServiceCompat implements
 		AudioManager.OnAudioFocusChangeListener {
 
-    private static final String TAG = "PlayerService";
+    private static final String TAG = PlayerService.class.getSimpleName();
 
 	/** Which action to perform when a track ends */
 	@Retention(RetentionPolicy.SOURCE)
