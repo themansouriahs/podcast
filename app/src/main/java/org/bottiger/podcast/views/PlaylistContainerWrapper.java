@@ -534,7 +534,7 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
         if (argNotifyAboutScrolling)
             dispatchNestedScroll(0, consumedY, 0, unconsumedY, offsetInWindow);
 
-        if (mTopPlayer == null || mRecyclerView == null) {
+        if (mTopPlayer == null || mRecyclerView == null || mTopPlayer.isFullscreen()) {
             return;
         }
 
@@ -553,7 +553,6 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
                 Log.v(TAG, "scroll.run, mRecyclerView2");
                 mRecyclerView.scrollBy(0, (int) distanceY);
             } else {
-
                 int canscrollup = canScrollUp(mRecyclerView);
                 if (canscrollup > 0) {
                     Log.v(TAG, "scroll.run, mTopPlayer1 diffY: " + distanceY + " canscroll: " + canscrollup);
