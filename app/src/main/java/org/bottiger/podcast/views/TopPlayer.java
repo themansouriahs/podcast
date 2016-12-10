@@ -142,12 +142,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     @Nullable private ImageView mChapterButton;
     @Nullable private Button mSpeedButton;
 
-    @Nullable private ViewStub mStubChaptersList;
-    @Nullable private View mChapterList;
-    @Nullable private RecyclerView mChapterRecyclerView;
-    @Nullable private PlayerChapterAdapter mAdapter;
-    @Nullable private RecyclerView.LayoutManager mLayoutManager;
-
     @NonNull private GenericMediaPlayerInterface mPlayer;
 
     private PlayerButtonView mDownloadButton;
@@ -319,7 +313,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
 
         mMoreButtonsStub = (ViewStub) findViewById(R.id.stub_expanded_action_bar);
-        mStubChaptersList = (ViewStub) findViewById(R.id.stub_chapters_list);
 
         mTriangle = findViewById(R.id.visual_triangle);
 
