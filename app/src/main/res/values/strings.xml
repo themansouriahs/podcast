@@ -253,6 +253,13 @@
     <string name="app_intro_welcome_title">Welcome to SoundWaves</string>
     <string name="app_intro_welcome_description">Please spend 10 seconds reading these intro pages</string>
     <string name="appintro_settings_description">SoundWaves Podcast is completely free, and do not charge for advanced features such as \'Download new episodes when available\'. However, you should review your datasettings before start using it in order to avoid unwanted data consumption</string>
+    <string name="opml_import_export">Import / Export OPML File</string>
+    <string name="import_export_explanation">Import or export your subscription list</string>
+    <string name="opml_import_explanation">Select an OPML file from your internal storage</string>
+    <string name="opml_export_explanation">Export your subscriptions to the internal storage. \\n\\t They are stored on /STORAGE/podcasts.opml</string>
+    <string name="opml_import_button">Import OPML</string>
+    <string name="opml_export_button">Export to storage</string>
+    <string name="opml_exported_to_toast">"Exported to "</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
