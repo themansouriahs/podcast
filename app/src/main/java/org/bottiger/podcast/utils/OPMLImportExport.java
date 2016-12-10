@@ -2,17 +2,24 @@ package org.bottiger.podcast.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Path;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.util.SortedList;
 import android.util.Log;
 import android.widget.Toast;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
@@ -38,10 +45,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static android.location.Location.convert;
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
+
 public class OPMLImportExport {
 
 	private static final String filename = "podcasts.opml";
 	private static final String filenameOut = "podcasts_export.opml";
+	private static final int ACTIVITY_CHOOSE_FILE = 3;
+	private static final int FILE_SELECT_CODE = 0;
 
 	public File file;
 	public File fileOut;
@@ -125,7 +137,7 @@ public class OPMLImportExport {
 		return opmlSubscriptions;
 	}
 
-	public int importSubscriptions() {
+	public int importSubscriptions(File ftest) {
 		int numImported = 0;
 		BufferedReader reader;
 
@@ -134,7 +146,7 @@ public class OPMLImportExport {
 		}
 
 		try {
-			reader = new BufferedReader(new FileReader(file));
+			reader = new BufferedReader(new FileReader(ftest));
 
 			OpmlReader omplReader = new OpmlReader();
 			ArrayList<OpmlElement> opmlElements = omplReader
@@ -199,7 +211,7 @@ public class OPMLImportExport {
         });
 	}
 
-    public void exportSubscriptions() {
+    public void exportSubscriptions(File fileOut) {
 
         if (!initInputOutputFiles()) {
             return;
@@ -233,7 +245,7 @@ public class OPMLImportExport {
         }
 
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
-        toastMsg(opmlSuccesfullyExported);
+        //toastMsg(opmlSuccesfullyExported);
     }
 
 	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
@@ -257,22 +269,25 @@ public class OPMLImportExport {
 
 	/**
 	 *
-	 * @return true if everything is OK. Returns false if there was an IOException
+	 * @return just launches the file manager, return true if everything is ok
 	 * @throws SecurityException
 	 */
-	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+	/* POSSIBLY NOT NEEDED ANYMORE?
+
+	 */
 	private boolean initInputOutputFiles() throws SecurityException {
 
 		if (file != null && fileOut != null)
 			return true;
 
-		try {
-			file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
-			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
+//		try {
+			//file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
+
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return false;
+//		}
 
 		return true;
 	}
