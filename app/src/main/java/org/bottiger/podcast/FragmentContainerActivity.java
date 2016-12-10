@@ -129,21 +129,6 @@ public class FragmentContainerActivity extends DrawerActivity {
 			return fragment;
 		}
 
-        @Override
-        public void setPrimaryItem (ViewGroup container, int position, Object object) {
-            Activity activity = this.getItem(position).getActivity();
-            boolean HasTinted = false;
-            if (activity != null) {
-                if (HasTinted) {
-                    mViewPager.bringToFront();
-                } else {
-                    UIUtils.resetStatusBar(activity);
-                    mViewPager.bringToFront();
-                }
-            }
-            super.setPrimaryItem(container, position, object);
-        }
-
 		@Override
 		public int getCount() {
             return MAX_FRAGMENTS;
