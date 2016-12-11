@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.GestureDetectorCompat;
@@ -32,7 +33,13 @@ import org.bottiger.podcast.utils.UIUtils;
  */
 public class PlaylistContainerWrapper extends CoordinatorLayout implements NestedScrollingParent, NestedScrollingChild, GestureDetector.OnGestureListener {
 
-    private static final String TAG = "PlaylistContainerView";
+    private static final String TAG = PlaylistContainerWrapper.class.getSimpleName();
+
+    @Nullable private TopPlayer mTopPlayer;
+    @Nullable private RecyclerView mRecyclerView;
+
+    private static final int DOWN = -1;
+    private static final int UP = 1;
 
     private final NestedScrollingChildHelper mNestedScrollingChildHelper;
     private GestureDetectorCompat mDetector;
@@ -499,12 +506,6 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
         return true;
     }
 
-    private TopPlayer mTopPlayer;
-    private RecyclerView mRecyclerView;
-
-    private static final int DOWN = -1;
-    private static final int UP = 1;
-
     private void scrollInternal(float distanceY, float distanceYconsumed, int[] offsetInWindow, boolean argNotifyAboutScrolling) {
         Log.v(TAG, "scrollInternal called");
 
@@ -533,7 +534,10 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
         if (argNotifyAboutScrolling)
             dispatchNestedScroll(0, consumedY, 0, unconsumedY, offsetInWindow);
 
-        //mTopPlayer.scrollBy(distanceY);
+        if (mTopPlayer == null || mRecyclerView == null || mTopPlayer.isFullscreen()) {
+            return;
+        }
+
         if (distanceY < 0) {
             if (mRecyclerView.canScrollVertically(DOWN)) {
                 // it cannot be larger, scroll recyclerview
@@ -549,7 +553,6 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
                 Log.v(TAG, "scroll.run, mRecyclerView2");
                 mRecyclerView.scrollBy(0, (int) distanceY);
             } else {
-
                 int canscrollup = canScrollUp(mRecyclerView);
                 if (canscrollup > 0) {
                     Log.v(TAG, "scroll.run, mTopPlayer1 diffY: " + distanceY + " canscroll: " + canscrollup);
@@ -563,12 +566,14 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
     }
 
     private boolean canScrollDown() {
+        if (mTopPlayer == null)
+            return false;
+
         return !mTopPlayer.isMaximumSize();
     }
 
     private static int canScrollUp(RecyclerView argRecyclerView) {
         int lastItemPos = ((LinearLayoutManager)argRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
-
 
         View v = (argRecyclerView.getLayoutManager()).findViewByPosition(lastItemPos);
 
@@ -677,7 +682,6 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
             final ScrollerCompat scroller = mScroller;
             if (scroller.computeScrollOffset()) {
 
-
                 final int x = scroller.getCurrX();
                 final int y = scroller.getCurrY();
                 final int dx = x - mLastFlingX;
@@ -698,41 +702,6 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
                     scroller.abortAnimation();
                 }
 
-                /*
-                if (mAdapter != null) {
-                    eatRequestLayout();
-                    onEnterLayoutOrScroll();
-                    TraceCompat.beginSection(TRACE_SCROLL_TAG);
-                    if (dx != 0) {
-                        hresult = mLayout.scrollHorizontallyBy(dx, mRecycler, mState);
-                        overscrollX = dx - hresult;
-                    }
-                    if (dy != 0) {
-                        vresult = mLayout.scrollVerticallyBy(dy, mRecycler, mState);
-                        overscrollY = dy - vresult;
-                    }
-                    TraceCompat.endSection();
-                    repositionShadowingViews();
-
-                    onExitLayoutOrScroll();
-                    resumeRequestLayout(false);
-
-                    if (smoothScroller != null && !smoothScroller.isPendingInitialRun() &&
-                            smoothScroller.isRunning()) {
-                        final int adapterSize = mState.getItemCount();
-                        if (adapterSize == 0) {
-                            smoothScroller.stop();
-                        } else if (smoothScroller.getTargetPosition() >= adapterSize) {
-                            smoothScroller.setTargetPosition(adapterSize - 1);
-                            smoothScroller.onAnimation(dx - overscrollX, dy - overscrollY);
-                        } else {
-                            smoothScroller.onAnimation(dx - overscrollX, dy - overscrollY);
-                        }
-                    }
-
-                }
-                */
-
                 if (overscrollX != 0 || overscrollY != 0) {
                     final int vel = (int) scroller.getCurrVelocity();
 
@@ -746,10 +715,6 @@ public class PlaylistContainerWrapper extends CoordinatorLayout implements Neste
                         velY = overscrollY < 0 ? -vel : overscrollY > 0 ? vel : 0;
                     }
 
-                    if (ViewCompat.getOverScrollMode(PlaylistContainerWrapper.this) !=
-                            ViewCompat.OVER_SCROLL_NEVER) {
-                        //absorbGlows(velX, velY);
-                    }
                     if ((velX != 0 || overscrollX == x || scroller.getFinalX() == 0) &&
                             (velY != 0 || overscrollY == y || scroller.getFinalY() == 0)) {
                         scroller.abortAnimation();

@@ -139,7 +139,7 @@ public class LibraryPersistency {
                     long inserted_id = insertEpisode(argContext, mLibrary, statement, episode);
                     episode.setId(inserted_id);
                 } catch (SQLiteConstraintException sqce) {
-                    Log.wtf(TAG, "Failed to insert: " + episode.getURL());
+                    //Log.wtf(TAG, "Failed to insert: " + episode.getURL());
                 } catch (Exception e) {
                     // This still happens when the user is subscribed to multiple podcasts (different URL's) which hosts the
                     // same episode.

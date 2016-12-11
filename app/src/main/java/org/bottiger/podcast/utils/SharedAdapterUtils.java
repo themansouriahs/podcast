@@ -22,7 +22,7 @@ public class SharedAdapterUtils {
     public static void AddPaddingToLastElement(@NonNull View argView, int argDefaultBottomPadding, boolean argIsLast) {
 
         int[] paddings = calculatePaddings(argView, argDefaultBottomPadding, argIsLast);
-        argView.setPadding(paddings[0], paddings[1], paddings[2], paddings[3]);
+        //argView.setPadding(paddings[0], paddings[1], paddings[2], paddings[3]);
 
     }
 

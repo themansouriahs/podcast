@@ -88,8 +88,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     custom:mfb_animate_favorite="true"
-                    custom:mfb_favorite_image="@drawable/ic_favorite_black"
-                    custom:mfb_not_favorite_image="@drawable/ic_favorite_outline_black"
+                    custom:mfb_favorite_image="@drawable/ic_favorite_24dp"
+                    custom:mfb_not_favorite_image="@drawable/ic_favorite_outline_24dp"
                     custom:mfb_rotation_duration="100"
                     custom:mfb_bounce_duration="150"
                     android:layout_marginTop="-6dp"
@@ -158,7 +158,7 @@
             android:layout_alignEnd="@id/episode_title"
             android:layout_below="@id/episode_title"
             style="@style/TextAppearance.AppCompat.Small"
-            android:singleLine="true"
+            android:maxLines="1"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"/>
 

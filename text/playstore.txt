@@ -1,3 +1,5 @@
+SoundWaves Podcast Player
+
 Free Libre and Open Source Podcast player (podcatcher)
 
 <b>About</b>

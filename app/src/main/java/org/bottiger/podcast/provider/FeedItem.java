@@ -21,6 +21,7 @@ import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -981,7 +982,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			return;
 		}
 
-		this.content = Html.fromHtml(argHTMLDescription).toString().trim();
+		this.content = StrUtils.fromHtmlCompat(argHTMLDescription).toString().trim();
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}

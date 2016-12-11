@@ -22,6 +22,17 @@
     <item>30</item>
     <item>60</item>
   </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>Automático</item>
+    <item>Modo lista</item>
+    <item>2 columnas</item>
+    <item>3 columnas</item>
+  </string-array>
+  <string-array name="pref_theme_entries">
+    <item>Claro (por defecto)</item>
+    <item>Oscuro</item>
+    <item>Automático (Día/Noche)</item>
+  </string-array>
   <string-array name="playlist_sort_order">
     <item>Ordenar por más recientes</item>
     <item>Ordenar por más antiguos</item>
