@@ -200,32 +200,34 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
     private static void attachButtonListeners(Context context, RemoteViews views) {
 
-            Intent toggleIntent = new Intent(context, SoundWavesWidgetProvider.class);
-            toggleIntent.setAction(NotificationPlayer.toggleAction);
+        Class<?> pendingIntentReciever = PlayerService.class;
 
-            Intent nextIntent = new Intent(context, SoundWavesWidgetProvider.class);
-            nextIntent.setAction(NotificationPlayer.nextAction);
+        Intent toggleIntent = new Intent(context, pendingIntentReciever);
+        toggleIntent.setAction(NotificationPlayer.toggleAction);
 
-            Intent fastForwardIntent = new Intent(context, SoundWavesWidgetProvider.class);
-            fastForwardIntent.setAction(NotificationPlayer.fastForwardAction);
+        Intent nextIntent = new Intent(context, pendingIntentReciever);
+        nextIntent.setAction(NotificationPlayer.nextAction);
 
-            Intent rewindIntent = new Intent(context, SoundWavesWidgetProvider.class);
-            rewindIntent.setAction(NotificationPlayer.rewindAction);
+        Intent fastForwardIntent = new Intent(context, pendingIntentReciever);
+        fastForwardIntent.setAction(NotificationPlayer.fastForwardAction);
 
-            Intent muteIntent = new Intent(context, SoundWavesWidgetProvider.class);
-            muteIntent.setAction(NotificationPlayer.muteAction);
+        Intent rewindIntent = new Intent(context, pendingIntentReciever);
+        rewindIntent.setAction(NotificationPlayer.rewindAction);
 
-            PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, toggleIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            PendingIntent pendingNextIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, nextIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            PendingIntent pendingFastForwardIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, fastForwardIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            PendingIntent pendingRewindIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, rewindIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            PendingIntent pendingMuteIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, muteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent muteIntent = new Intent(context, pendingIntentReciever);
+        muteIntent.setAction(NotificationPlayer.muteAction);
 
-            views.setOnClickPendingIntent(R.id.widget_play, pendingToggleIntent);
-            views.setOnClickPendingIntent(R.id.widget_skip_next, pendingNextIntent);
-            views.setOnClickPendingIntent(R.id.widget_rewind, pendingRewindIntent);
-            views.setOnClickPendingIntent(R.id.widget_fast_forward, pendingFastForwardIntent);
-            views.setOnClickPendingIntent(R.id.widget_mute, pendingMuteIntent);
+        PendingIntent pendingToggleIntent = PendingIntent.getService(context, REQUEST_CODE, toggleIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingNextIntent = PendingIntent.getService(context, REQUEST_CODE, nextIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingFastForwardIntent = PendingIntent.getService(context, REQUEST_CODE, fastForwardIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingRewindIntent = PendingIntent.getService(context, REQUEST_CODE, rewindIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingMuteIntent = PendingIntent.getService(context, REQUEST_CODE, muteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        views.setOnClickPendingIntent(R.id.widget_play, pendingToggleIntent);
+        views.setOnClickPendingIntent(R.id.widget_skip_next, pendingNextIntent);
+        views.setOnClickPendingIntent(R.id.widget_rewind, pendingRewindIntent);
+        views.setOnClickPendingIntent(R.id.widget_fast_forward, pendingFastForwardIntent);
+        views.setOnClickPendingIntent(R.id.widget_mute, pendingMuteIntent);
     }
 
     @Override

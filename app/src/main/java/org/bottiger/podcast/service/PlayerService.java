@@ -59,6 +59,8 @@ import io.reactivex.processors.FlowableProcessor;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
+import static org.bottiger.podcast.player.PlayerStateManager.ACTION_TOGGLE;
+
 /**
  * The service which handles the audio extended_player. This is responsible for playing
  * including controlling the playback. Play, pause, stop etc.
@@ -184,9 +186,45 @@ public class PlayerService extends MediaBrowserServiceCompat implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "onStartCommand");
-		MediaButtonReceiver.handleIntent(mPlayerStateManager.getSession(), intent);
+
+		boolean sendToTransportControls = handleIncomingActions(intent);
+
+		if (!sendToTransportControls) {
+			MediaButtonReceiver.handleIntent(mPlayerStateManager.getSession(), intent);
+		}
+		
         return START_STICKY;
     }
+
+	private boolean handleIncomingActions(Intent playbackAction) {
+		if (playbackAction == null || playbackAction.getAction() == null) {
+			return false;
+		}
+
+		boolean wasHandeled = false;
+		String actionString = playbackAction.getAction();
+		if (actionString.equalsIgnoreCase(NotificationPlayer.toggleAction)) {
+			mPlayerStateManager.onCustomAction(ACTION_TOGGLE, null);
+			wasHandeled = true;
+		} else if (actionString.equalsIgnoreCase(NotificationPlayer.playAction)) {
+			mPlayerStateManager.onPlay();
+			wasHandeled = true;
+		} else if (actionString.equalsIgnoreCase(NotificationPlayer.pauseAction)) {
+			mPlayerStateManager.onPause();
+			wasHandeled = true;
+		} else if (actionString.equalsIgnoreCase(NotificationPlayer.nextAction)) {
+			mPlayerStateManager.onSkipToNext();
+			wasHandeled = true;
+		} else if (actionString.equalsIgnoreCase(NotificationPlayer.rewindAction)) {
+			mPlayerStateManager.onRewind();
+			wasHandeled = true;
+		} else if (actionString.equalsIgnoreCase(NotificationPlayer.fastForwardAction)) {
+			mPlayerStateManager.onFastForward();
+			wasHandeled = true;
+		}
+
+		return wasHandeled;
+	}
 
 	@Override
 	public void onDestroy() {
