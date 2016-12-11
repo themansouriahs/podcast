@@ -65,9 +65,9 @@ public class OPMLImportExport {
 	private ContentResolver contentResolver;
 	private DatabaseHelper mUpdater = new DatabaseHelper();
 
-    @RequiresPermission(allOf = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE})
+	@RequiresPermission(allOf = {
+			Manifest.permission.READ_EXTERNAL_STORAGE,
+			Manifest.permission.WRITE_EXTERNAL_STORAGE})
 	public OPMLImportExport(Activity argActivity) {
 		this.mActivity = argActivity;
 		this.contentResolver = argActivity.getContentResolver();
@@ -165,9 +165,9 @@ public class OPMLImportExport {
 
 		if (numImported > 0) {
 			Resources res = mActivity.getResources();
-            String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
-            toastMsg(formattedString);
-            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
+			String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
+			toastMsg(formattedString);
+			SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
 		}
 
 		return numImported;
@@ -175,7 +175,7 @@ public class OPMLImportExport {
 
 	private int importElements(ArrayList<OpmlElement> elements) {
 		int numImported = 0;
-        List<Subscription> importedSubscriptions = new LinkedList<>();
+		List<Subscription> importedSubscriptions = new LinkedList<>();
 
 		Subscription subscription;
 		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
@@ -194,59 +194,59 @@ public class OPMLImportExport {
 	}
 
 	private void toastMsg(final CharSequence msg) {
-        Activity activity = null;
+		Activity activity = null;
 
-        if (mActivity instanceof Activity) {
-            activity = (Activity) mActivity;
-        }
+		if (mActivity instanceof Activity) {
+			activity = (Activity) mActivity;
+		}
 
-        if (activity == null) return;
+		if (activity == null) return;
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int duration = Toast.LENGTH_LONG;
-                Toast.makeText(mActivity, msg, duration).show();
-            }
-        });
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				int duration = Toast.LENGTH_LONG;
+				Toast.makeText(mActivity, msg, duration).show();
+			}
+		});
 	}
 
-    public void exportSubscriptions(File fileOut) {
+	public void exportSubscriptions(File fileOut) {
 
-        if (!initInputOutputFiles()) {
-            return;
-        }
+		if (!initInputOutputFiles()) {
+			return;
+		}
 
-        FileWriter fileWriter = null;
+		FileWriter fileWriter = null;
 
-        try {
-            if (!fileOut.exists()) {
-                fileOut.createNewFile();
-            }
+		try {
+			if (!fileOut.exists()) {
+				fileOut.createNewFile();
+			}
 
-            fileWriter = new FileWriter(fileOut);
-        } catch (IOException e) {
-            VendorCrashReporter.handleException(e);
-        }
+			fileWriter = new FileWriter(fileOut);
+		} catch (IOException e) {
+			VendorCrashReporter.handleException(e);
+		}
 
-        if (fileWriter == null) {
-            toastMsg(opmlFailedToExport);
-            return;
-        }
+		if (fileWriter == null) {
+			toastMsg(opmlFailedToExport);
+			return;
+		}
 
-        OpmlWriter opmlWriter = new OpmlWriter();
-        SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
+		OpmlWriter opmlWriter = new OpmlWriter();
+		SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
 
-        try {
-            opmlWriter.writeDocument(subscriptionList, fileWriter);
-        } catch (IOException e) {
-            toastMsg(opmlFailedToExport);
-            return;
-        }
+		try {
+			opmlWriter.writeDocument(subscriptionList, fileWriter);
+		} catch (IOException e) {
+			toastMsg(opmlFailedToExport);
+			return;
+		}
 
-        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
-        //toastMsg(opmlSuccesfullyExported);
-    }
+		SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
+		//toastMsg(opmlSuccesfullyExported);
+	}
 
 	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
 		OpmlWriter opmlWriter = new OpmlWriter();
@@ -262,10 +262,10 @@ public class OPMLImportExport {
 		return sw.toString();
 	}
 
-    @NonNull
-    public static String getFilename() {
-        return filename;
-    }
+	@NonNull
+	public static String getFilename() {
+		return filename;
+	}
 
 	/**
 	 *
@@ -277,17 +277,6 @@ public class OPMLImportExport {
 
 	 */
 	private boolean initInputOutputFiles() throws SecurityException {
-
-		if (file != null && fileOut != null)
-			return true;
-
-//		try {
-			//file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
-
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return false;
-//		}
 
 		return true;
 	}

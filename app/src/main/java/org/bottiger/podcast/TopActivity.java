@@ -165,7 +165,8 @@ public class TopActivity extends AppCompatActivity {
                 return;
             }
             case PERMISSION_TO_IMPORT_EXPORT: {
-                SubscriptionsFragment.openImportExportDialog(this);
+                //Cannot call the activity from a static context
+                //SubscriptionsFragment.openImportExportActivity(this);
                 return;
             }
         }
@@ -182,10 +183,6 @@ public class TopActivity extends AppCompatActivity {
     @NonNull
     public PlayerHelper getPlayerHelper() {
         return ((SoundWaves)getApplicationContext()).mPlayerHelper;
-    }
-
-    protected void importOPMLButtonCallback() {
-        SubscriptionsFragment.openImportExportDialog(this);
     }
 
     /**
