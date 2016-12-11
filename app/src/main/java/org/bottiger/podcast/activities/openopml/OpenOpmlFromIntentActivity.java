@@ -29,6 +29,7 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
     private static final String TAG = "OpenOpmlFromIntentActivity";
 
     private List<SlimSubscription> mSubscriptions = new LinkedList<>();
+    private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -58,9 +59,8 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
         }
         OPMLImportExport opmlImportExport = new OPMLImportExport(this);
         try {
-            Uri uri = getIntent().getData();
 
-            File opmlFile = new File(uri.getPath());
+            File opmlFile = new File(getIntent().getStringExtra(OPML_SUBS_LIST_EXTRA_CODE));
 
             mSubscriptions = opmlImportExport.readSubscriptionsFromOPML(opmlFile);
         } catch (Exception e) {

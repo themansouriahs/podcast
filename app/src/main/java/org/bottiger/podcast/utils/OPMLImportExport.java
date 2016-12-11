@@ -137,41 +137,41 @@ public class OPMLImportExport {
 		return opmlSubscriptions;
 	}
 
-	public int importSubscriptions(File ftest) {
-		int numImported = 0;
-		BufferedReader reader;
-
-		if (!initInputOutputFiles()) {
-			return 0;
-		}
-
-		try {
-			reader = new BufferedReader(new FileReader(ftest));
-
-			OpmlReader omplReader = new OpmlReader();
-			ArrayList<OpmlElement> opmlElements = omplReader
-					.readDocument(reader);
-			numImported = importElements(opmlElements);
-
-		} catch (FileNotFoundException e) {
-			toastMsg(opmlNotFound);
-		} catch (XmlPullParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (numImported > 0) {
-			Resources res = mActivity.getResources();
-			String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
-			toastMsg(formattedString);
-			SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
-		}
-
-		return numImported;
-	}
+//	public int importSubscriptions(File ftest) {
+//		int numImported = 0;
+//		BufferedReader reader;
+//
+//		if (!initInputOutputFiles()) {
+//			return 0;
+//		}
+//
+//		try {
+//			reader = new BufferedReader(new FileReader(ftest));
+//
+//			OpmlReader omplReader = new OpmlReader();
+//			ArrayList<OpmlElement> opmlElements = omplReader
+//					.readDocument(reader);
+//			numImported = importElements(opmlElements);
+//
+//		} catch (FileNotFoundException e) {
+//			toastMsg(opmlNotFound);
+//		} catch (XmlPullParserException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		if (numImported > 0) {
+//			Resources res = mActivity.getResources();
+//			String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
+//			toastMsg(formattedString);
+//			SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
+//		}
+//
+//		return numImported;
+//	}
 
 	private int importElements(ArrayList<OpmlElement> elements) {
 		int numImported = 0;
@@ -248,19 +248,19 @@ public class OPMLImportExport {
 		//toastMsg(opmlSuccesfullyExported);
 	}
 
-	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
-		OpmlWriter opmlWriter = new OpmlWriter();
-		StringWriter sw = new StringWriter();
-
-		try {
-			opmlWriter.writeDocument(argSubscriptions, sw);
-		} catch (IOException e) {
-			Log.d("toOPML", "Failed converting subscriptions to OPML");
-			return "";
-		}
-
-		return sw.toString();
-	}
+//	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
+//		OpmlWriter opmlWriter = new OpmlWriter();
+//		StringWriter sw = new StringWriter();
+//
+//		try {
+//			opmlWriter.writeDocument(argSubscriptions, sw);
+//		} catch (IOException e) {
+//			Log.d("toOPML", "Failed converting subscriptions to OPML");
+//			return "";
+//		}
+//
+//		return sw.toString();
+//	}
 
 	@NonNull
 	public static String getFilename() {
