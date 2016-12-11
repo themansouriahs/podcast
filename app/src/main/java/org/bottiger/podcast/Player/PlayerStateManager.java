@@ -38,7 +38,7 @@ import org.bottiger.podcast.service.PlayerService;
  */
 public class PlayerStateManager extends MediaSessionCompat.Callback {
 
-    private static final String TAG = "PlayerStateManager";
+    private static final String TAG = PlayerStateManager.class.getSimpleName();
     private static final String SESSION_TAG = "SWMediaSession";
 
     public static int AUDIO_STREAM = AudioManager.STREAM_MUSIC;
@@ -55,10 +55,11 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
      * Started when the PlayerService is started
      */
     public PlayerStateManager() {
-        Log.d(TAG, "Constructor");
+        Log.d(TAG, "started");
     }
 
     public void setService(@NonNull PlayerService argService) {
+        Log.d(TAG, "setting service");
         mPlayerService = argService;
 
         ComponentName mediaButtonReceiver = new ComponentName(mPlayerService, HeadsetReceiver.class);
@@ -111,7 +112,8 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     }
 
     public void onSkipToNext() {
-        mPlayerService.pause();
+        Log.d(TAG, "skipToNext");
+        mPlayerService.playNext();
     }
 
     @Override

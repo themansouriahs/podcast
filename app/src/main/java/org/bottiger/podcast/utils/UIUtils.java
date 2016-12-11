@@ -372,16 +372,7 @@ public class UIUtils {
         }
     }
 
-    public static void resetStatusBar(@NonNull Activity argActivity) {
-        int color = attrColor(R.attr.colorPrimaryDark, argActivity); //ContextCompat.getColor(argActivity, R.attr.colorPrimaryDark);
-        int r = Color.red(color);
-        int g = Color.green(color);
-        int b = Color.blue(color);
-        int opaqueColor = Color.argb(255, r, g, b);
-        tintStatusBar(opaqueColor, argActivity);
-    }
-
-    public static @ColorInt  int attrColor(@AttrRes int argRes, @NonNull Context argContext) {
+    public static @ColorInt int attrColor(@AttrRes int argRes, @NonNull Context argContext) {
         TypedValue typedValue = new TypedValue();
 
         // R.attr.colorAccent

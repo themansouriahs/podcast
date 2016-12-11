@@ -30,6 +30,7 @@
     <!-- SoundWaves Player - Start -->
     <integer name="soundwaves_player_speed_default">10</integer>
     <dimen name="player_elevation">5dp</dimen>
+    <dimen name="player_fullscreen_image_padding">25dp</dimen>
     <!-- SoundWaves Player - End -->
 
     <!-- Play Pause Button Drawable - Start -->

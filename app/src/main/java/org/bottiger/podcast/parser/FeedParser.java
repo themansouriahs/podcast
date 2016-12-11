@@ -43,15 +43,9 @@ import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
  */
 public class FeedParser {
 
-    private static final String TAG = "FeedParser";
+    private static final String TAG = FeedParser.class.getSimpleName();
 
-    private String[] DURATION_FORMATS = {"HH:mm:ss", "mm:ss"};
-
-    @Nullable
-    private DateUtils.Hint mDateFormatHint = null;
-
-    @Nullable
-    private Boolean mContainsHTML = null;
+    private static final SimpleDateFormat[] DURATION_FORMATS = {new SimpleDateFormat("HH:mm:ss"), new SimpleDateFormat("mm:ss")};
 
     // We don't use namespaces
     private static final String ns = null;
@@ -102,7 +96,7 @@ public class FeedParser {
             EPISODE_AUTHOR_TAG, EPISODE_CATEGORY_TAG, EPISODE_COMMENTS_TAG, EPISODE_ENCLOSURE_TAG, EPISODE_GUID_TAG,
             EPISODE_PUB_DATE_TAG, EPISODE_SOURCE_TAG
     })
-    public @interface RssItemTag {}
+    @interface RssItemTag {}
 
     private static final String EPISODE_TITLE_TAG = "title";
     private static final String EPISODE_LINK_TAG = "link";
@@ -115,10 +109,10 @@ public class FeedParser {
     private static final String EPISODE_PUB_DATE_TAG = "pubDate";
     private static final String EPISODE_SOURCE_TAG = "source";
 
-    final String EPISODE_ENCLOSURE_URL = "url"; // in bytes
-    final String EPISODE_ENCLOSURE_FILESISZE = "length"; // in bytes
-    final String EPISODE_ENCLOSURE_MIMETYPE = "type";
-    final String ITUNES_IMAGE_HREF = "href";
+    private static final String EPISODE_ENCLOSURE_URL = "url"; // in bytes
+    private static final String EPISODE_ENCLOSURE_FILESISZE = "length"; // in bytes
+    private static final String EPISODE_ENCLOSURE_MIMETYPE = "type";
+    private static final String ITUNES_IMAGE_HREF = "href";
 
     /**
      * Not complete
@@ -138,8 +132,6 @@ public class FeedParser {
         public long filesize;
     }
 
-    private boolean mParsingSlim = false;
-
     /**
      * Parse a ISubscription by reading the stream. The parser will update the subscriptions metadata
      * and add new episodes to the subscription.
@@ -156,26 +148,30 @@ public class FeedParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    public ISubscription parse(@NonNull ISubscription argSubscription,
+    public static ISubscription parse(@NonNull ISubscription argSubscription,
                                @NonNull InputStream in,
-                               @NonNull Context argContext) throws XmlPullParserException, IOException {
+                               @NonNull Context argContext,
+                               boolean argFullRead) throws XmlPullParserException, IOException {
+        long startTime = System.currentTimeMillis();
         argSubscription.setIsRefreshing(true);
-        mParsingSlim = argSubscription instanceof SlimSubscription;
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
-            return readFeed(parser, argSubscription, argContext);
+            return readFeed(parser, argSubscription, argContext, argFullRead);
         } finally {
             argSubscription.setIsRefreshing(false);
             in.close();
+            long duration = System.currentTimeMillis()-startTime;
+            Log.d(TAG, "duration: " + duration + "ms"  + " (" + argSubscription.getTitle() + ")");
         }
     }
 
-    private ISubscription readFeed(@NonNull XmlPullParser parser,
+    private static ISubscription readFeed(@NonNull XmlPullParser parser,
                                    @NonNull ISubscription argSubscription,
-                                   @NonNull Context argContext) throws XmlPullParserException, IOException {
+                                   @NonNull Context argContext,
+                                   boolean argFullRead) throws XmlPullParserException, IOException {
 
 
         List<IEpisode> addedEpisodes = new LinkedList<>();
@@ -189,7 +185,7 @@ public class FeedParser {
             // Starts by looking for the entry tag
             switch (name) {
                 case startTag:
-                    addedEpisodes = readChannel(parser, argSubscription, argContext);
+                    addedEpisodes = readChannel(parser, argSubscription, argFullRead);
                     break;
                 default:
                     skip(parser);
@@ -197,7 +193,7 @@ public class FeedParser {
             }
         }
 
-        if (addedEpisodes.size() > 0 && !isParsingSlimSubscription()) {
+        if (addedEpisodes.size() > 0 && !isParsingSlimSubscription(argSubscription)) {
             Subscription sub = ((Subscription) argSubscription);
             SoundWaves.getAppContext(argContext).getLibraryInstance().addEpisodes(sub);
 
@@ -208,7 +204,7 @@ public class FeedParser {
         return argSubscription;
     }
 
-    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private static void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();
         }
@@ -231,11 +227,14 @@ public class FeedParser {
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
     @NonNull
-    private List<IEpisode> readChannel(@NonNull XmlPullParser parser,
-                                @NonNull ISubscription argSubscription,
-                                @NonNull Context argContext) throws XmlPullParserException, IOException {
+    private static List<IEpisode> readChannel(@NonNull XmlPullParser parser,
+                                              @NonNull ISubscription argSubscription,
+                                              boolean argFullRead) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, startTag);
         List<IEpisode> addedEpisodes = new LinkedList<>();
+
+        Boolean containsHTML = null;
+        DateUtils.Hint dateFormatHint = null;
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -259,16 +258,18 @@ public class FeedParser {
                     break;
                 }
                 case SUBSCRIPTION_DESCRIPTION_TAG: {
-                    argSubscription.setDescription(getAndParseDescription(parser));
+                    argSubscription.setDescription(getAndParseDescription(parser, containsHTML));
                     break;
                 }
                 case EPISODE_ITEM_TAG: {
-                    IEpisode episode = readEpisode(parser, argSubscription);
+                    IEpisode episode = readEpisode(parser, argSubscription, dateFormatHint);
 
                     // Bulk insert.
                     if (episode != null) {
                         if (argSubscription.addEpisode(episode)) {
                             addedEpisodes.add(episode);
+                        } else if (!argFullRead) {
+                            return addedEpisodes;
                         }
                     }
 
@@ -304,7 +305,7 @@ public class FeedParser {
         return addedEpisodes;
     }
 
-    private void readSubscriptionItunesTag(XmlPullParser parser, String name, ISubscription argSubscription) throws XmlPullParserException, IOException {
+    private static void readSubscriptionItunesTag(XmlPullParser parser, String name, ISubscription argSubscription) throws XmlPullParserException, IOException {
         switch (name) {
             case ITUNES_IMAGE_TAG: {
                 String image = parser.getAttributeValue(null, ITUNES_IMAGE_HREF);
@@ -321,14 +322,15 @@ public class FeedParser {
     // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
     // to their respective "read" methods for processing. Otherwise, skips the tag.
     @Nullable
-    private IEpisode readEpisode(@NonNull XmlPullParser parser,
-                                 @NonNull ISubscription argSubscription) throws XmlPullParserException, IOException {
+    private static IEpisode readEpisode(@NonNull XmlPullParser parser,
+                                        @NonNull ISubscription argSubscription,
+                                        @Nullable DateUtils.Hint argDateHint) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ITEM_TAG);
 
         IEpisode episode;
         boolean parsedURL = false;
 
-        if (isParsingSlimSubscription()) {
+        if (isParsingSlimSubscription(argSubscription)) {
             episode = new SlimEpisode((SlimSubscription) argSubscription);
         } else {
             FeedItem item = new FeedItem(true);
@@ -337,11 +339,12 @@ public class FeedParser {
             episode = item;
         }
 
+        String name;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
-            String name = parser.getName();
+            name = parser.getName();
 
             if (name.startsWith(FEED_TYPE_ITUNES)) { // FIXME FEED_TYPE_ITUNES.equals(prefix)
                 readEpisodeItunesTag(parser, name, episode);
@@ -366,7 +369,7 @@ public class FeedParser {
                 }
                 case EPISODE_PUB_DATE_TAG: {
                     try {
-                        Date date = readDate(parser);
+                        Date date = readDate(parser, argDateHint);
                         if (date != null) {
                             episode.setPubDate(DateUtils.preventDateInTheFutre(date));
                         }
@@ -422,7 +425,7 @@ public class FeedParser {
         return parsedURL ? episode : null;
     }
 
-    private void readEpisodeItunesTag(@NonNull XmlPullParser parser, @NonNull String name, @NonNull IEpisode episode) throws IOException, XmlPullParserException {
+    private static void readEpisodeItunesTag(@NonNull XmlPullParser parser, @NonNull String name, @NonNull IEpisode episode) throws IOException, XmlPullParserException {
         switch (name) {
             case ITUNES_DURATION_TAG: {
                 // The duration should be of the format hh:mm:ss, or hh:mm
@@ -430,25 +433,9 @@ public class FeedParser {
                 String unparsedDuration = readSimpleTag(ITUNES_DURATION_TAG, parser);
                 long duration = -1;
 
-                if (unparsedDuration.contains(":")) {
-
-                    Date date = null;
-                    SimpleDateFormat sdf = null;
-                    for (String formatString : DURATION_FORMATS)
-                    {
-                        try
-                        {
-                            sdf = new SimpleDateFormat(formatString);
-                            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                            date = sdf.parse(unparsedDuration);
-                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                            cal.setTime(date);
-                            duration = cal.getTimeInMillis();
-                            break;
-                        }
-                        catch (ParseException e) {
-                        }
-                    }
+                //if (unparsedDuration.contains(":")) {
+                if (unparsedDuration.indexOf(':') > -1) {
+                    duration = parseDuration(unparsedDuration);
                 } else {
                     // We assume it's the number of seconds
                     // http://lists.apple.com/archives/syndication-dev/2005/Nov/msg00002.html#_Toc526931683
@@ -490,15 +477,15 @@ public class FeedParser {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private String getAndParseDescription(@NonNull XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String getAndParseDescription(@NonNull XmlPullParser parser, @Nullable Boolean argContainsHTML) throws IOException, XmlPullParserException {
         String description = readSummary(parser);
         String parsedHTML = null;
-        if (mContainsHTML == null && description != null) {
-            parsedHTML = StrUtils.fromHtmlCompat(description).toString();
-            mContainsHTML = description.equals(parsedHTML);
+        if (argContainsHTML == null && description != null) {
+            parsedHTML = StrUtils.fromHtmlCompat(description);
+            argContainsHTML = description.equals(parsedHTML);
         }
 
-        if (mContainsHTML != null && mContainsHTML) {
+        if (argContainsHTML != null && argContainsHTML) {
             description = parsedHTML != null ? parsedHTML : Html.fromHtml(description).toString();
         }
 
@@ -508,14 +495,14 @@ public class FeedParser {
     /**
      * A hack
      */
-    private String readSimpleTag(@ItunesItemTag String argTag, XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readSimpleTag(@ItunesItemTag String argTag, XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, argTag);
         String value = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, argTag);
         return value;
     }
 
-    private String readSimpleTag(XmlPullParser parser, @RssItemTag String argTag) throws IOException, XmlPullParserException {
+    private static String readSimpleTag(XmlPullParser parser, @RssItemTag String argTag) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, argTag);
         String value = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, argTag);
@@ -523,7 +510,7 @@ public class FeedParser {
     }
 
     // Processes title tags of an item in the feed.
-    private String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_TITLE_TAG);
         String title = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_TITLE_TAG);
@@ -532,31 +519,22 @@ public class FeedParser {
 
     // Processes pubdate tag of an item in the feed.
     @Nullable
-    private Date readDate(XmlPullParser parser) throws IOException, XmlPullParserException, ParseException {
+    private static Date readDate(XmlPullParser parser, @Nullable DateUtils.Hint argDateHint) throws IOException, XmlPullParserException, ParseException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_PUB_DATE_TAG);
         String pubDate = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_PUB_DATE_TAG);
 
-        return cacheDateFormat(pubDate.trim());
+        return cacheDateFormat(pubDate.trim(), argDateHint);
     }
 
-    // Processes pubdate tag of an item in the feed.
-    private Date readSubscriptionPubDate(XmlPullParser parser) throws IOException, XmlPullParserException, ParseException {
-        parser.require(XmlPullParser.START_TAG, ns, SUBSCRIPTION_PUB_DATE_TAG);
-        String pubDate = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, SUBSCRIPTION_PUB_DATE_TAG);
-
-        return cacheDateFormat(pubDate);
-    }
-
-    private Date cacheDateFormat(@NonNull String argDate) throws IOException, XmlPullParserException, ParseException {
-        Pair<Date, DateUtils.Hint> parsedDate = DateUtils.parse(argDate, mDateFormatHint);
-        mDateFormatHint = parsedDate.second;
+    private static Date cacheDateFormat(@NonNull String argDate, @Nullable DateUtils.Hint argDateHint) throws IOException, XmlPullParserException, ParseException {
+        Pair<Date, DateUtils.Hint> parsedDate = DateUtils.parse(argDate, argDateHint);
+        argDateHint = parsedDate.second;
         return parsedDate.first;
     }
 
     // Processes link tags in the feed.
-    private EpisodeEnclosure readEnclosure(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static EpisodeEnclosure readEnclosure(XmlPullParser parser) throws IOException, XmlPullParserException {
         EpisodeEnclosure enclosure = new EpisodeEnclosure();
 
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ENCLOSURE_TAG);
@@ -581,7 +559,7 @@ public class FeedParser {
         return enclosure;
     }
 
-    private String readSubscriptionImage(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readSubscriptionImage(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, SUBSCRIPTION_IMAGE_TAG);
 
         String url = "";
@@ -607,7 +585,7 @@ public class FeedParser {
         return image;
     }
 
-    private String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_LINK_TAG);
         String title = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_LINK_TAG);
@@ -615,7 +593,7 @@ public class FeedParser {
     }
 
     // Processes summary tags in the feed.
-    private String readSummary(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readSummary(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_DESCRIPTION_TAG);
         String summary = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, EPISODE_DESCRIPTION_TAG);
@@ -623,7 +601,7 @@ public class FeedParser {
     }
 
     // For the tags title and summary, extracts their text values.
-    private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
         if (parser.next() == XmlPullParser.TEXT) {
             String result = parser.getText();
             parser.nextTag();
@@ -633,8 +611,31 @@ public class FeedParser {
         return "";
     }
 
-    private boolean isParsingSlimSubscription() {
-        return mParsingSlim;
+    private static boolean isParsingSlimSubscription(@NonNull ISubscription argSubscription) {
+        return argSubscription instanceof SlimSubscription;
+    }
+
+    private static long parseDuration(@NonNull String argUnparsedDuration) {
+        Date date;
+        SimpleDateFormat sdf;
+        Calendar cal;
+
+        long duration = -1;
+
+        for (int i = 0; i < DURATION_FORMATS.length; i++) {
+            try {
+                sdf = DURATION_FORMATS[i];
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                date = sdf.parse(argUnparsedDuration);
+                cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                cal.setTime(date);
+                duration = cal.getTimeInMillis();
+                break;
+            } catch (ParseException ignored) {
+            }
+        }
+
+        return duration;
     }
 
 }

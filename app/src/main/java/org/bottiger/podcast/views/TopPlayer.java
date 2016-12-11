@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -17,15 +20,15 @@ import android.support.transition.ChangeBounds;
 import android.support.transition.Scene;
 import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -36,7 +39,6 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,25 +46,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import org.bottiger.podcast.PlaylistFragment;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlayerChapterAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.NewPlayerEvent;
+import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
@@ -70,23 +75,21 @@ import org.bottiger.podcast.views.dialogs.DialogChapters;
 import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.SingleObserver;
-import io.reactivex.disposables.Disposable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static org.bottiger.podcast.views.PlayerButtonView.StaticButtonColor;
+import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
 /**
  * Created by apl on 30-09-2014.
  */
 public class TopPlayer extends LinearLayout implements ScrollingView, NestedScrollingChild {
 
-    private static final String TAG = "TopPlayer";
+    private static final String TAG = TopPlayer.class.getSimpleName();
 
     private static final long TIMER_NOT_SET = -1;
     private static final int DEFAULT_SLEEP_TIME_MIN = 30;
@@ -120,9 +123,17 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     @Nullable IEpisode mCurrentEpisode;
 
-    private TopPlayer Layout;
+    private TopPlayer mMainLayout;
     private LinearLayout mControls;
-    private PlayPauseImageView mPlayPauseButton;
+
+    @Nullable private TextView mEpisodeTitle;
+    @Nullable private TextView mEpisodeInfo;
+    @Nullable private TextViewObserver mCurrentTime;
+    @Nullable private TextView mTotalTime;
+    @Nullable private PlayPauseImageView mPlayPauseButton;
+    @Nullable private PlayerSeekbar mPlayerSeekbar;
+    @Nullable private DownloadButtonView mPlayerDownloadButton;
+    @Nullable private MaterialFavoriteButton mFavoriteButton;
 
     @Nullable private ViewStub mMoreButtonsStub;
     @Nullable private LinearLayout mExpandedActionsBar;
@@ -131,20 +142,17 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     @Nullable private ImageView mChapterButton;
     @Nullable private Button mSpeedButton;
 
-    @Nullable private ViewStub mStubChaptersList;
-    @Nullable private View mChapterList;
-    @Nullable private RecyclerView mChapterRecyclerView;
-    @Nullable private PlayerChapterAdapter mAdapter;
-    @Nullable private RecyclerView.LayoutManager mLayoutManager;
+    @NonNull private GenericMediaPlayerInterface mPlayer;
 
     private PlayerButtonView mDownloadButton;
-    private MaterialFavoriteButton mFavoriteButton;
     private ImageView mFastForwardButton;
     private ImageView mRewindButton;
     private ImageButton mMoreButton;
-    private PlayerSeekbar mPlayerSeekbar;
 
     @Nullable private Overlay mOverlay;
+
+    private Subscription mRxPlayerChanged;
+    private Subscription mRxTopEpisodeChanged;
 
     @Nullable private CountDownTimer mCountDownTimer;
     private long mCountDownTimeLeft = TIMER_NOT_SET;
@@ -202,8 +210,11 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mTopPLayerScrollGestureListener = new TopPLayerScrollGestureListener();
         scrollingChildHelper.setNestedScrollingEnabled(true);
 
+        mRxPlayerChanged = getPlayerSubscription();
+
         mGestureDetector = new GestureDetectorCompat(argContext,mTopPLayerScrollGestureListener);
 
+        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
         mViewConfiguration = ViewConfiguration.get(argContext);
 
         if (isInEditMode()) {
@@ -239,13 +250,12 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        // FIXME  && !mFullscreen
-        if (sizeLarge > 0){
+        if (sizeLarge > 0 && !mFullscreen){
             int hSize = MeasureSpec.getSize(heightMeasureSpec);
             int hMode = MeasureSpec.getMode(heightMeasureSpec);
 
             int height = -1;
-            int mode = MeasureSpec.AT_MOST;
+            int mode = MeasureSpec.EXACTLY;
 
             switch (hMode){
                 case MeasureSpec.AT_MOST:
@@ -277,10 +287,21 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         super.onFinishInflate();
 
 
-        Layout = (TopPlayer) findViewById(R.id.top_player);
+        mMainLayout = this;
         mControls = (LinearLayout) findViewById(R.id.top_player_controls);
 
         getPlayerControlHeight(mControls);
+
+        mEpisodeTitle           =    (TextView) findViewById(R.id.player_title);
+        mEpisodeInfo            =    (TextView) findViewById(R.id.player_podcast);
+        mFavoriteButton         = (MaterialFavoriteButton) findViewById(R.id.favorite);
+
+        mCurrentTime            =    (TextViewObserver) findViewById(R.id.current_time);
+        mTotalTime              =    (TextView) findViewById(R.id.total_time);
+
+        mPlayPauseButton        =    (PlayPauseImageView) findViewById(R.id.playpause);
+        mPlayerSeekbar          =    (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
+        mPlayerDownloadButton   =    (DownloadButtonView) findViewById(R.id.download);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
         mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
@@ -292,7 +313,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
 
         mMoreButtonsStub = (ViewStub) findViewById(R.id.stub_expanded_action_bar);
-        mStubChaptersList = (ViewStub) findViewById(R.id.stub_chapters_list);
 
         mTriangle = findViewById(R.id.visual_triangle);
 
@@ -310,6 +330,8 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         }
 
         setPlaylistEmpty(isRecyclerViewEmpty);
+
+        setFullscreenImagePadding(getContext());
 
         if (mDoDisplayText) {
             //showText();
@@ -441,6 +463,101 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         if (argEpisode == null)
             return;
 
+        if (mRxTopEpisodeChanged != null && !mRxTopEpisodeChanged.isUnsubscribed()) {
+            mRxTopEpisodeChanged.unsubscribe();
+        }
+
+        mRxTopEpisodeChanged = getEpisodeChangedSubscription();
+
+
+        final String title = StrUtils.formatTitle(argEpisode.getTitle());
+        final String description = argEpisode.getDescription();
+
+        mEpisodeTitle.setText(title);
+        mEpisodeInfo.setText(description.trim());
+
+        View.OnClickListener onClickListener = getToast(title, description);
+        mEpisodeTitle.setOnClickListener(onClickListener);
+        mEpisodeInfo.setOnClickListener(onClickListener);
+
+        if (argEpisode instanceof FeedItem) {
+            mFavoriteButton.setFavorite(((FeedItem) argEpisode).isFavorite());
+        }
+
+        final int colorText = UIUtils.attrColor(R.attr.themeTextColorPrimary, mContext);
+        mEpisodeTitle.setTextColor(colorText);
+        mEpisodeInfo.setTextColor(colorText);
+
+        long duration = argEpisode.getDuration();
+        if (duration > 0) {
+            mTotalTime.setText(StrUtils.formatTime(duration));
+        } else {
+            PlayerHelper.setDuration(argEpisode, mTotalTime);
+        }
+
+        setPlayerProgress(argEpisode);
+
+        mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
+        mPlayerDownloadButton.setEpisode(argEpisode);
+
+        mPlayPauseButton.setStatus(STATE_READY);
+
+        ISubscription iSubscription = argEpisode.getSubscription(getContext());
+        if (mPlayer.isPlaying()) {
+            setPlaybackSpeedView(mPlayer.getCurrentSpeedMultiplier());
+        } else if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
+            org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
+            setPlaybackSpeedView(subscription.getPlaybackSpeed());
+        }
+
+        mPlayerSeekbar.setEpisode(argEpisode);
+        mPlayerSeekbar.setOverlay(mOverlay);
+        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+
+        mPlayerDownloadButton.setEpisode(argEpisode);
+
+        String artworkURL = argEpisode.getArtwork(getContext());
+
+        if (iSubscription != null && !TextUtils.isEmpty(iSubscription.getImageURL())) {
+            artworkURL = iSubscription.getImageURL();
+        }
+
+        if (iSubscription != null) {
+
+            //PaletteHelper.generate(iSubscription, activity, mTopPlayer);
+
+            iSubscription.getColors(mContext)
+                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+
+                        @Override
+                        public void onSuccess(ColorExtractor value) {
+                            mPlayPauseButton.setColor(value);
+
+                            int transparentgradientColor;
+                            int gradientColor = value.getPrimary();
+
+                            int alpha = 0;
+                            int red = Color.red(gradientColor);
+                            int green = Color.green(gradientColor);
+                            int blue = Color.blue(gradientColor);
+                            transparentgradientColor = Color.argb(alpha, red, green, blue);
+
+                            GradientDrawable gd = new GradientDrawable(
+                                    GradientDrawable.Orientation.TOP_BOTTOM,
+                                    new int[]{transparentgradientColor, gradientColor});
+                            Drawable wrapDrawable = DrawableCompat.wrap(gd);
+                            DrawableCompat.setTint(wrapDrawable, value.getPrimary());
+                        }
+                    });
+
+
+            Log.v("MissingImage", "Setting image");
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false);
+
+        }
+
         SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
 
         mRewindButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
@@ -468,6 +585,8 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                     public void onSuccess(ColorExtractor value) {
                         mPlayPauseButton.setColor(value);
                         mBackgroundColor = value.getPrimaryTint();
+
+                        mBackgroundColor = ColorUtils.adjustToTheme(getResources(), mBackgroundColor);
 
                         if (mBackgroundColor != -1) {
                             setBackgroundColor(mBackgroundColor);
@@ -660,7 +779,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     private boolean validateState() {
         if (sizeSmall < 0 || sizeMedium < 0 || sizeLarge < 0) {
-            Log.d("TopPlayer", "Layout sizes needs to be defined");
+            Log.d("TopPlayer", "mMainLayout sizes needs to be defined");
             return false;
         }
         return true;
@@ -713,7 +832,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     public synchronized void setFullscreen(boolean argNewState, boolean doAnimate) {
         mFullscreen = argNewState;
         try {
-            if (doAnimate && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (doAnimate) {
                 Transition trans = new ChangeBounds();
                 trans.setDuration(getResources().getInteger(R.integer.animation_quick));
                 TransitionManager.go(new Scene(this), trans);
@@ -724,30 +843,42 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
             } else {
                 exitFullscreen();
             }
+
+            setFullscreenImagePadding(getContext());
         } finally {
             prefs.edit().putBoolean(mDoFullscreentKey, argNewState).apply();
         }
     }
 
     private void goFullscreen() {
-        exitFullscreen();
+        Log.d(TAG, "Enter fullscreen mode");
+
+        if (mMainLayout != null) {
+
+            setPlayerHeight(sizeLarge);
+
+            CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT);
+
+            mMainLayout.setLayoutParams(layoutParams);
+        }
     }
 
     private void exitFullscreen() {
 
         Log.d(TAG, "Exit fullscreen mode");
-        mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
+        //mFullscreenButton.setImageResource(R.drawable.ic_fullscreen_white);
 
-        if (Layout != null) {
+        if (mMainLayout != null) {
             CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(
                     LayoutParams.MATCH_PARENT,
                     sizeLarge);
 
-            Layout.setLayoutParams(layoutParams);
+            mMainLayout.setLayoutParams(layoutParams);
 
             setPlayerHeight(sizeLarge);
         }
-
     }
 
     public boolean isFullscreen() {
@@ -771,7 +902,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         try {
             mDoDisplayText = !mDoDisplayText;
-            TransitionManager.beginDelayedTransition(Layout, UIUtils.getDefaultTransition(getResources()));
+            TransitionManager.beginDelayedTransition(mMainLayout, UIUtils.getDefaultTransition(getResources()));
 
             if (mDoDisplayText) {
                 Log.d(TAG, "ShowText");
@@ -878,6 +1009,126 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                 }
             }.start();
         }
+    }
+
+    private void setFullscreenImagePadding(@NonNull Context argContext) {
+        int padding = (int)argContext.getResources().getDimension(R.dimen.player_fullscreen_image_padding);
+        mPhoto.setPadding(padding, 0 ,padding, padding);
+    }
+
+    private View.OnClickListener getToast(@NonNull final String argTitle, @NonNull final String argDescription) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View argView) {
+                String msg = argTitle + "\n\n" + argDescription;
+                // HACK: ugly, but it does actually work :)
+                // double the lifetime of a toast
+                for (int i = 0; i < 2; i++) {
+                    Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+        };
+    }
+
+    public void onDestroyView() {
+
+        if (mRxPlayerChanged != null && !mRxPlayerChanged.isUnsubscribed()) {
+            mRxPlayerChanged.unsubscribe();
+        }
+
+        if (mRxTopEpisodeChanged != null && !mRxTopEpisodeChanged.isUnsubscribed()) {
+            mRxTopEpisodeChanged.unsubscribe();
+        }
+
+        unsetPlayer();
+
+    }
+
+    private void setPlayerProgress(@NonNull IEpisode argEpisode) {
+        long offset = argEpisode.getOffset();
+        if (offset > 0) {
+            mCurrentTime.setText(StrUtils.formatTime(offset));
+        } else {
+            mCurrentTime.setText("00:00");
+        }
+        mCurrentTime.setEpisode(argEpisode);
+    }
+
+    private void setPlayer() {
+        unsetPlayer();
+
+        mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+
+        mPlayer.addListener(mPlayerSeekbar);
+        mPlayer.addListener(mCurrentTime);
+        mPlayer.addListener(mPlayPauseButton);
+    }
+
+    private void unsetPlayer() {
+        if (mPlayer != null) {
+            mPlayer.removeListener(mPlayerSeekbar);
+            mPlayer.removeListener(mCurrentTime);
+            mPlayer.removeListener(mPlayPauseButton);
+        }
+    }
+
+    private Subscription getPlayerSubscription() {
+        return SoundWaves
+                .getRxBus()
+                .toObserverable()
+                .onBackpressureLatest()
+                .observeOn(AndroidSchedulers.mainThread())
+                .ofType(NewPlayerEvent.class)
+                .subscribe(new Action1<NewPlayerEvent>() {
+                    @Override
+                    public void call(NewPlayerEvent playlistChanged) {
+                        Log.wtf(TAG, "NewPlayerEvent: NewPlayerEvent event recieved");
+                        setPlayer();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.wtf(TAG, "ERROR: NewPlayerEvent: mRxPlaylistSubscription event recieved");
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.wtf(TAG, "error: " + throwable.toString());
+                    }
+                });
+    }
+
+    private Subscription getEpisodeChangedSubscription() {
+        return SoundWaves.getRxBus()
+                .toObserverable()
+                .onBackpressureDrop()
+                .ofType(EpisodeChanged.class)
+                .filter(new Func1<EpisodeChanged, Boolean>() {
+                    @Override
+                    public Boolean call(EpisodeChanged episodeChanged) {
+                        return episodeChanged.getAction() != EpisodeChanged.PLAYING_PROGRESS &&
+                                episodeChanged.getAction() != EpisodeChanged.DOWNLOAD_PROGRESS;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<EpisodeChanged>() {
+                    @Override
+                    public void call(EpisodeChanged itemChangedEvent) {
+                        long episodeId = itemChangedEvent.getId();
+                        IEpisode episode = SoundWaves.getAppContext(getContext()).getLibraryInstance().getEpisode(episodeId);
+
+                        if (episode == null)
+                            return;
+
+                        if (episode.equals(mCurrentEpisode)) {
+                            TopPlayer.this.bind(episode);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                    }
+                });
     }
 
     @Override
@@ -1031,32 +1282,32 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     // Compute the horizontal extent of the horizontal scrollbar's thumb within the horizontal range.
     public int computeHorizontalScrollOffset() {
-        return 0;// this.Layout.canScrollHorizontally()?this.Layout.computeHorizontalScrollOffset(this.mState):0;
+        return 0;// this.mMainLayout.canScrollHorizontally()?this.mMainLayout.computeHorizontalScrollOffset(this.mState):0;
     }
 
     // Compute the horizontal offset of the horizontal scrollbar's thumb within the horizontal range.
     public int computeHorizontalScrollExtent() {
-        return 0;// this.Layout.canScrollHorizontally()?this.Layout.computeHorizontalScrollExtent(this.mState):0;
+        return 0;// this.mMainLayout.canScrollHorizontally()?this.mMainLayout.computeHorizontalScrollExtent(this.mState):0;
     }
 
     // Compute the horizontal range that the horizontal scrollbar represents.
     public int computeHorizontalScrollRange() {
-        return 0;// this.Layout.canScrollHorizontally()?this.Layout.computeHorizontalScrollRange(this.mState):0;
+        return 0;// this.mMainLayout.canScrollHorizontally()?this.mMainLayout.computeHorizontalScrollRange(this.mState):0;
     }
 
     // Compute the vertical extent of the vertical scrollbar's thumb within the vertical range.
     public int computeVerticalScrollOffset() {
-        return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollOffset(this.mState):0;
+        return 0;// this.mMainLayout.canScrollVertically()?this.mMainLayout.computeVerticalScrollOffset(this.mState):0;
     }
 
     // Compute the vertical offset of the vertical scrollbar's thumb within the horizontal range.
     public int computeVerticalScrollExtent() {
-        return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollExtent(this.mState):0;
+        return 0;// this.mMainLayout.canScrollVertically()?this.mMainLayout.computeVerticalScrollExtent(this.mState):0;
     }
 
     // Compute the vertical range that the vertical scrollbar represents.
     public int computeVerticalScrollRange() {
-        return 0;// this.Layout.canScrollVertically()?this.Layout.computeVerticalScrollRange(this.mState):0;
+        return 0;// this.mMainLayout.canScrollVertically()?this.mMainLayout.computeVerticalScrollRange(this.mState):0;
     }
 
 

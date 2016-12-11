@@ -470,7 +470,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 	 */
 	public String getWhere() {
 
-        String where = "";
+        StringBuilder where = new StringBuilder();
 
         // Ignore (or include) podcasts which have been toggled manually
         String filterSubscriptions = "";
@@ -480,38 +480,37 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         filterSubscriptions += SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.SETTINGS + " & " + Subscription.ADD_NEW_TO_PLAYLIST;
         filterSubscriptions += ") ELSE 1 END";
 
-        where += "(";
+        where.append("(");
 
 
         String ids = "";
         if (mSubscriptionFilter.getMode() == SubscriptionFilter.SHOW_SELECTED) {
             //where += mSubscriptionFilter.toSQL();
-            where += "1";
+            where.append("1");
         } else {
-            where += ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID+ " ";
+            where.append(ItemColumns.TABLE_NAME + "." + ItemColumns.SUBS_ID+ " ");
             // only find episodes from suscriptions which are not "unsubscribed"
-            where += "IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM "  +
-                    SubscriptionColumns.TABLE_NAME + " WHERE (" + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>"
-                    + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)" +  filterSubscriptions + " )";
+            where.append("IN (SELECT " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns._ID + " FROM " + SubscriptionColumns.TABLE_NAME + " WHERE (" + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + "<>" + Subscription.STATUS_UNSUBSCRIBED + " OR " + SubscriptionColumns.TABLE_NAME + "." + SubscriptionColumns.STATUS + " IS NULL)")
+                    .append(filterSubscriptions).append(" )");
         }
 
-        where += " )";
+        where.append(" )");
 
-        where += " AND " + mSubscriptionFilter.toSQL();
+        where.append(" AND ").append(mSubscriptionFilter.toSQL());
 
         // show only downloaded
         if (showOnlyDownloadedVal) {
-            where += " AND (" + ItemColumns.IS_DOWNLOADED + "==1)";
+            where.append(" AND (" + ItemColumns.IS_DOWNLOADED + "==1)");
         }
 
         // skip 'removed' episodes
-        where += " AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+        where.append(" AND (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)");
 
         // Manually queued episodes
-        where += " OR (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " >= 0)";
+        where.append(" OR (" + ItemColumns.TABLE_NAME + "." + ItemColumns.PRIORITY + " > 0)");
 
 
-		return where;
+		return where.toString();
 	}
 
 	/**

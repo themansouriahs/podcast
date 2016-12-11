@@ -42,16 +42,10 @@
         <item name="bookmark_inv">@drawable/ic_import_contacts_black</item>
         <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
         <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
-        <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
-        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
+        <item name="ic_remove_inv">@drawable/ic_clear_black_24dp</item>
         <item name="ic_close_inv">@drawable/ic_close_24dp</item>
-        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
+        <item name="favorite_outline_inv">@drawable/ic_favorite_outline_24dp</item>
 
-        <!--<item name="android:actionBarStyle">@style/TransparentActionBar</item>-->
-
-        <!--
-        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">false</item>
-        -->
         <item name="themeBackground">@color/white_opaque</item>
         <item name="themeTextColorPrimary">@color/pitch_black</item>
         <item name="themeTextColorFaded">@color/grayDark</item>
@@ -64,17 +58,7 @@
 
         <item name="colorButtonNormal">@color/white_opaque</item>
 
-        <!--
-        They are here because 4.1.2 will crash otherwise
-        http://stackoverflow.com/questions/21822523/java-lang-unsupportedoperationexception-cant-convert-to-dimension-type-0x12
-
-        Therefore I set it manually in TopActivity for now
-
-        <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item> <!- actionbar and  bottom navigation ->
-        <item name="android:windowTranslucentStatus" tools:targetApi="19">true</item> <!- top statusbar ->
-        -->
-
-        <item name="android:statusBarColor" tools:targetApi="21">@color/colorPrimary</item>
+        <item name="android:statusBarColor" tools:targetApi="21">@color/colorPrimaryDark</item>
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
@@ -95,7 +79,6 @@
 
     <style name="Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="background">@color/colorPrimary</item>
-        <!--<item name="titleTextStyle">@style/TextAppearance.AppCompat</item>-->
         <item name="android:textColor">@android:color/white</item>
     </style>
 

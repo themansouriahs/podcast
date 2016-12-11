@@ -15,6 +15,9 @@ import android.util.Base64;
 import android.util.Patterns;
 
 import org.bottiger.podcast.provider.IEpisode;
+import org.unbescape.html.HtmlEscape;
+import org.unbescape.html.HtmlEscapeLevel;
+import org.unbescape.html.HtmlEscapeType;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -137,18 +140,12 @@ public class StrUtils {
 		return stringBuilder.toString();
 	}
 
-	public static Spanned fromHtmlCompat(@Nullable String argString) {
-
+	public static String fromHtmlCompat(@Nullable String argString) {
 		if (TextUtils.isEmpty(argString)) {
 			new SpannedString("");
 		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			return Html.fromHtml(argString, Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			//noinspection deprecation
-			return Html.fromHtml(argString);
-		}
+		return HtmlEscape.escapeHtml(argString, HtmlEscapeType.DECIMAL_REFERENCES, HtmlEscapeLevel.LEVEL_0_ONLY_MARKUP_SIGNIFICANT_EXCEPT_APOS);
 	}
     
 	public static String formatDownloadString(int offset, long length) {

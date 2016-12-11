@@ -43,7 +43,6 @@
         <item name="fullscreen_inv">@drawable/ic_fullscreen_black</item>
         <item name="fullscreen_exit_inv">@drawable/ic_fullscreen_exit_black</item>
         <!--<item name="seekbar_handle">@drawable/seekbar_handle</item>-->
-        <item name="ic_remove_inv">@drawable/ic_highlight_remove_black</item>
         <item name="ic_close_inv">@drawable/ic_close_24dp</item>
         <item name="favorite_outline_inv">@drawable/ic_favorite_outline_black</item>
 
