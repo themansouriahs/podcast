@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.bottiger.podcast.activities.openopml.OPML_import_export_activity;
+import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
@@ -51,6 +52,7 @@ public class SubscriptionsFragment extends Fragment {
     private static final boolean SHARE_CLOUD_DEFAULT = false;
     private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
     private static final String EXTRAS_CODE = "path";
+    private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
     private static final String EXPORT_RETURN_CODE = "RETURN_EXPORT";
     private static final String EXPORT_FILENAME = "/podcast_export.opml";
 
@@ -403,8 +405,10 @@ public class SubscriptionsFragment extends Fragment {
 
             OPMLImportExport importExport = new OPMLImportExport(getActivity());
             if (!extraData.equals(EXPORT_RETURN_CODE)) {
-                Log.d(TAG, "IMPORT SUBSCRIPTIONS");// NoI18N
-                importExport.importSubscriptions(new File(data.getStringExtra(EXTRAS_CODE)));
+                Log.d(TAG, "IMPORT SUBSCRIPTIONS. File: " + data.getStringExtra(EXTRAS_CODE));// NoI18N
+                Intent selectSubs = new Intent(mActivity.getApplicationContext(), OpenOpmlFromIntentActivity.class);
+                selectSubs.putExtra(OPML_SUBS_LIST_EXTRA_CODE, data.getStringExtra(EXTRAS_CODE));
+                startActivity(selectSubs);
             }
             else {
                 Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
