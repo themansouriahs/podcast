@@ -51,7 +51,7 @@ public class ChapterUtil {
                 } catch (UnsatisfiedLinkError unsatisfiedLinkError) {
                     ErrorUtils.handleException(unsatisfiedLinkError, TAG);
                 } finally {
-                    if (chapters == null) {
+                    if (chapters == null || chapters.isEmpty()) {
                         chapters = getMp3Chapters(argEpisode);
                     }
                 }
@@ -83,6 +83,7 @@ public class ChapterUtil {
         return chapters;
     }
 
+    @NonNull
     private static List<Chapter> getM4aChapters(@NonNull final Context argContext,
                                                 @NonNull final IEpisode argEpisode) throws SecurityException {
 
