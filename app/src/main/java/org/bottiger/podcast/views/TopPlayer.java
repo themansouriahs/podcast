@@ -955,9 +955,13 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mChapterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                //toggleChapters();
-                MainActivity activity = ((MainActivity)getContext());
-                DialogChapters dialogChapters = DialogChapters.newInstance(mCurrentEpisode);
+                Context context = getContext();
+                IEpisode episode = mCurrentEpisode;
+                if (!(context instanceof MainActivity) || episode == null)
+                    return;
+
+                MainActivity activity = (MainActivity)context;
+                DialogChapters dialogChapters = DialogChapters.newInstance(episode);
                 dialogChapters.show(activity.getFragmentManager(), DialogPlaybackSpeed.class.getName());
             }
         });
