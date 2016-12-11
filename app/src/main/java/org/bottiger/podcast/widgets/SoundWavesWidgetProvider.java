@@ -30,6 +30,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.AndroidUtil;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
 
 import static org.bottiger.podcast.notification.NotificationPlayer.REQUEST_CODE;
@@ -162,9 +163,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             if (imageUrl != null) {
                 AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_logo, appWidgetId);
 
-                Glide.with(context.getApplicationContext()) // safer!
-                        .load(imageUrl)
-                        .asBitmap()
+                ImageLoaderUtils.getGlide(context, imageUrl)
                         .into(appWidgetTarget);
             }
         }

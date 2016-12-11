@@ -192,7 +192,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		if (!sendToTransportControls) {
 			MediaButtonReceiver.handleIntent(mPlayerStateManager.getSession(), intent);
 		}
-		
+
         return START_STICKY;
     }
 

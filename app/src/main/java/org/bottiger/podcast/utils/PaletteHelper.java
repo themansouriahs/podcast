@@ -78,9 +78,7 @@ public class PaletteHelper {
             sLock.unlock();
         }
 
-        Glide.with(argActivity)
-                .load(url)
-                .asBitmap()
+        ImageLoaderUtils.getGlide(argActivity, url)
                 .into(new SimpleTarget<Bitmap>(200, 200) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {

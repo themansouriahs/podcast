@@ -42,6 +42,7 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
@@ -260,11 +261,9 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             if (!TextUtils.isEmpty(image) && StrUtils.isValidUrl(image)) {
 
                 if (getItemViewType(position) == GRID_TYPE) {
-                    Glide.with(mActivity).load(image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);
+                    ImageLoaderUtils.getGlide(mActivity, image).centerCrop().placeholder(R.drawable.generic_podcast).into(holder.image);
                 } else {
-                    Glide.with(mActivity)
-                            .load(image)
-                            .asBitmap()
+                    ImageLoaderUtils.getGlide(mActivity, image)
                             .centerCrop()
                             .placeholder(R.drawable.generic_podcast)
                             .into(new BitmapImageViewTarget(holder.image) {

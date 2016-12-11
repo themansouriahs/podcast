@@ -389,7 +389,7 @@ public class SoundWavesDownloadManager extends Observable {
     }
 
 	private static @NetworkState int updateConnectStatus(@NonNull Context argContext) {
-		Log.v(TAG, "updateConnectStatus");
+		Log.v(TAG, "getNetworkStatus");
 
         ConnectivityManager cm = (ConnectivityManager) argContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);

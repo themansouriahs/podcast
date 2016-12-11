@@ -41,6 +41,7 @@ import org.bottiger.podcast.receiver.PodcastUpdateReceiver;
 import org.bottiger.podcast.receiver.StartFeedActivityReceiver;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ErrorUtils;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.NetworkUtils;
 
 import java.net.URISyntaxException;
@@ -196,10 +197,7 @@ public class ShortcutManagerUtil {
         Icon icon = null;
 
         try {
-            bitmap = Glide.
-                    with(argContext)
-                    .load(argArtwork)
-                    .asBitmap()
+            bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, argArtwork)
                     .into(200, 200) // Width and height
                     .get();
 

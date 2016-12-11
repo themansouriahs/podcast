@@ -12,15 +12,20 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.BitmapRequestBuilder;
+import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.DrawableTypeRequest;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.Transformation;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
+import org.bottiger.podcast.utils.image.NetworkDisablingLoader;
 
 /**
  * Created by aplb on 30-09-2015.
@@ -28,6 +33,27 @@ import org.bottiger.podcast.R;
 public class ImageLoaderUtils {
 
     private static Context sContext;
+
+    public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl) {
+        RequestManager requestManager = Glide.with(argContext);
+
+        DrawableTypeRequest drawableTypeRequest;
+        BitmapRequestBuilder bitmapRequestBuilder;
+        boolean noNetwork = NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK;
+
+        if (noNetwork) {
+            drawableTypeRequest = requestManager.using(new NetworkDisablingLoader()).load(argUrl);
+        } else {
+            drawableTypeRequest = requestManager.load(argUrl);
+        }
+
+         bitmapRequestBuilder = drawableTypeRequest
+                 .asBitmap()
+                 .diskCacheStrategy( DiskCacheStrategy.ALL );
+
+
+        return bitmapRequestBuilder;
+    }
 
     @Deprecated
     public static void loadImageInto(@NonNull View argImageView,
@@ -65,18 +91,7 @@ public class ImageLoaderUtils {
             target = getViewTarget(argTargetView, argRounddedCorners);
         }
 
-        DrawableTypeRequest request = Glide.with(sContext).load(argUrl);
-
-        /*
-        if (argTransformation != null) {
-            int c = Color.argb(50, 0,0,0);
-            Transformation t = new ColorFilterTransformation(argTargetView.getContext(), c);
-            request.bitmapTransform(argTransformation, t).into((ImageView)argTargetView);
-            return;
-        }
-        */
-
-        BitmapRequestBuilder builder = request.asBitmap();
+        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(sContext, argUrl);
 
         if (argDoCrop)
             builder.centerCrop();

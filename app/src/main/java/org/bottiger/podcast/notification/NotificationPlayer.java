@@ -35,6 +35,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 
 public class NotificationPlayer extends BroadcastReceiver {
 
@@ -334,9 +335,7 @@ public class NotificationPlayer extends BroadcastReceiver {
             // NOTIFICATION_PLAYER_ID allows you to update the notification later on.
             displayNotification(isPlaying, null);
         } else {
-            Glide.with(mPlayerService)
-                    .load(url)
-                    .asBitmap()
+            ImageLoaderUtils.getGlide(mPlayerService, url)
                     .into(new SimpleTarget<Bitmap>(512, 512) {
                         @Override
                         public void onResourceReady(Bitmap argBitmap, GlideAnimation anim) {
