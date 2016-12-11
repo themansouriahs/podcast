@@ -16,67 +16,90 @@
 
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:background="?attr/colorPrimary"
             android:theme="?attr/actionBarTheme"
             android:minHeight="69dp"
-            android:id="@+id/toolbar2"
+            android:id="@+id/opml_import_export_toolbar"
             app:titleTextColor="@color/cast_expanded_controller_text_color"
             app:title="@string/menu_import"
             style="?android:attr/toolbarStyle"
             app:navigationIcon="@drawable/ic_arrow_back_white"
             android:nestedScrollingEnabled="true" />
 
-        <TextView
-            android:text="@string/import_export_explanation"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView2"
-            android:textStyle="normal|bold"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="5dp" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
 
-        <TextView
-            android:text="@string/opml_import_explanation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView5"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
 
-        <Button
-            android:text="@string/opml_import_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/bOPML_import" />
+                <TextView
+                    android:text="@string/import_export_explanation"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:id="@+id/textView2"
+                    android:textStyle="normal|bold"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical" />
 
-        <TextView
-            android:text="@string/opml_radio_export"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView4"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
-            android:textStyle="normal|bold"
-            android:layout_marginLeft="5dp" />
+                <TextView
+                    android:text="@string/opml_import_explanation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView5"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp" />
 
-        <TextView
-            android:text="@string/opml_export_explanation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView6"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp" />
+                <Button
+                    android:text="@string/opml_import_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/bOPML_import" />
+            </LinearLayout>
 
-        <Button
-            android:text="@string/opml_export_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/bOMPLexport" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:text="@string/opml_radio_export"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:id="@+id/textView4"
+                    android:layout_marginBottom="10dp"
+                    android:textStyle="normal|bold"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:text="@string/opml_export_explanation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView6"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp" />
+
+                <Button
+                    android:text="@string/opml_export_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/bOMPLexport" />
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -2,7 +2,6 @@ package org.bottiger.podcast;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,7 +13,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,13 +28,13 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.bottiger.podcast.activities.openopml.OPML_import_export_activity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
-import org.bottiger.podcast.views.dialogs.DialogOPML;
 
 import java.io.File;
 
@@ -51,8 +49,10 @@ public class SubscriptionsFragment extends Fragment {
 
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
-    private static final int OMPL_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
-    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 9;
+    private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
+    private static final String EXTRAS_CODE = "path";
+    private static final String EXPORT_RETURN_CODE = "RETURN_EXPORT";
+    private static final String EXPORT_FILENAME = "/podcast_export.opml";
 
     /**
      1 = Auto
@@ -210,7 +210,8 @@ public class SubscriptionsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (getActivity() instanceof TopActivity) {
-                    openImportExportDialog((TopActivity) getActivity());
+                    Intent i = new Intent(mActivity.getApplicationContext(), OPML_import_export_activity.class);
+                    startActivityForResult(i, 999);
                 } else {
                     Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
                 }
@@ -274,15 +275,8 @@ public class SubscriptionsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_import: {
-                Intent i = new Intent(getActivity().getApplicationContext(), OPML_import_export_activity.class);
-                startActivityForResult(i, 999);
-//                try {
-//                    TopActivity topActivity = (TopActivity) getActivity();
-//                    openImportExportDialog(topActivity);
-//                } catch (ClassCastException cce) {
-//                    Log.wtf(TAG, "Activity (" + getActivity().getClass().getName() + ") could not be cast to TopActivity." +
-//                            "This is needed in order to requets filesystem permission. Exception: " + cce.toString()); // NoI18N
-//                }
+                Intent i = new Intent(mActivity.getApplicationContext(), OPML_import_export_activity.class);
+                startActivityForResult(i, OPML_ACTIVITY_STATUS_CODE);
                 break;
             }
             case R.id.menu_refresh_all_subscriptions: {
@@ -350,16 +344,6 @@ public class SubscriptionsFragment extends Fragment {
         return numColumns;
     }
 
-    static void openImportExportDialog(@NonNull TopActivity argActivity) {
-
-        if (!checkPermission(argActivity))
-            return;
-
-        DialogOPML dialogOPML = new DialogOPML();
-        Dialog dialog = dialogOPML.onCreateDialog(argActivity);
-        dialog.show();
-    }
-
     /**
      *
      * @return True if the permissions are granted
@@ -407,26 +391,26 @@ public class SubscriptionsFragment extends Fragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OMPL_ACTIVITY_STATUS_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == OPML_ACTIVITY_STATUS_CODE && resultCode == Activity.RESULT_OK) {
 
-            Log.d("OPML", data.getStringExtra("path"));
-            String extraData = data.getStringExtra("path");
+            Log.d("OPML", data.getStringExtra(EXTRAS_CODE));// NoI18N
+            String extraData = data.getStringExtra(EXTRAS_CODE);
 
-            if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
+            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                return;
             }
 
             OPMLImportExport importExport = new OPMLImportExport(getActivity());
-            if (!extraData.equals("RETURN_EXPORT")) {
-                Log.d(TAG, "IMPORT SUBSCRIPTIONS");
-                importExport.importSubscriptions(new File(data.getStringExtra("path")));
+            if (!extraData.equals(EXPORT_RETURN_CODE)) {
+                Log.d(TAG, "IMPORT SUBSCRIPTIONS");// NoI18N
+                importExport.importSubscriptions(new File(data.getStringExtra(EXTRAS_CODE)));
             }
             else {
-                Log.d(TAG, "EXPORT SUBSCRIPTIONS");
-                Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory()+"/podcast_e.opml");
-                importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory()+"/podcast_export.opml"));
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory()+"/podcast_export.opml", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
+                Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory()+EXPORT_FILENAME);// NoI18N
+                importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory()+ EXPORT_FILENAME));
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory()+EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
             }
         }
     }

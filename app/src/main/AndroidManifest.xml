@@ -40,20 +40,21 @@
 
     <application
         android:name=".SoundWaves"
-        android:allowBackup="true"
         android:icon="@drawable/ic_launcher_sw"
-        android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_sw_round"
-        android:theme="@style/SoundWavesTheme.Light">
+        android:label="@string/app_name"
+        android:theme="@style/SoundWavesTheme.Light"
+        android:allowBackup="true">
+
         <uses-library android:name="android.test.runner" />
 
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_swipe"
             android:launchMode="singleTop">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
@@ -61,32 +62,32 @@
                 android:name="com.google.android.apps.drive.APP_ID"
                 android:value="FILL_ME_IN" />
         </activity>
+
         <activity
-            android:name=".activities.intro.Intro"
-            android:label="@string/app_intro_activity"
-            android:theme="@style/Theme.Intro" />
+            android:name="org.bottiger.podcast.activities.intro.Intro"
+            android:theme="@style/Theme.Intro"
+            android:label="@string/app_intro_activity" />
 
         <!-- android:theme="@style/Theme.Transparent" -->
         <activity
             android:name=".activities.feedview.FeedActivity"
-            android:exported="true"
             android:label="@string/app_name"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.Transparent">
+            android:theme="@style/Theme.Transparent"
+            android:exported="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
 
             <intent-filter>
                 <action android:name="org.bottiger.podcast.OPEN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".receiver.StartFeedActivityReceiver"
-            android:exported="true"></receiver>
+        <receiver android:name=".receiver.StartFeedActivityReceiver"
+            android:exported="true">
+        </receiver>
 
         <activity
             android:name=".activities.discovery.DiscoveryFeedActivity"
@@ -155,6 +156,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.downloadmanager.DownloadManagerActivity"
             android:label="@string/activity_download_name"
@@ -167,7 +169,7 @@
         <provider
             android:name=".provider.PodcastProvider"
             android:authorities="org.bottiger.podcast.provider.PodcastProvider"
-            android:syncable="true" />
+            android:syncable="true"></provider>
 
         <service
             android:name=".service.jobservice.PodcastUpdateJobService"
@@ -194,14 +196,26 @@
                     android:scheme="content" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SettingsActivity"
-            android:label="Settings"></activity>
+            android:label="Settings">
+        </activity>
+
         <activity
             android:name=".activities.pastelog.LogSubmitActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:label="Submit log"
             android:windowSoftInputMode="stateHidden" />
+
+        <activity android:name=".activities.openopml.OPML_import_export_activity"
+            android:label="@string/opml_import_export_toolbar_title"
+            android:parentActivityName=".activities.feedview.FeedActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.feedview.FeedActivity" />
+        </activity>
+
 
         <service
             android:name=".service.PlayerService"
@@ -211,12 +225,18 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+
         <service
             android:name=".service.DownloadService"
-            android:enabled="true"></service>
+            android:enabled="true">
+
+        </service>
+
         <service
             android:name=".player.sonic.SoundService"
-            android:enabled="true"></service>
+            android:enabled="true">
+        </service>
+
         <service android:name=".service.syncadapter.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -243,10 +263,10 @@
 
         <receiver
             android:name=".PodcastUpdateManager"
-            android:process=":remote" />
+            android:process=":remote"></receiver>
         <receiver android:name=".receiver.AutoStart">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.DownloadManagerReceiver">
@@ -281,7 +301,7 @@
         -->
 
 
-        <!-- Don't be a dick :) -->
+        <!--         Don't be a dick :) -->
         <meta-data
             android:name="com.bugsnag.android.API_KEY"
             android:value="cb1654e5ce7afda81ad5c189540d5ecc" />
@@ -297,13 +317,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.bottiger.podcast.MainActivity" />
-        </activity>
-        <activity android:name=".OPML_import_export_activity"
-            android:label="@string/opml_import_export"
-            android:parentActivityName=".activities.feedview.FeedActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.feedview.FeedActivity" />
         </activity>
     </application>
 
