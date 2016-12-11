@@ -85,9 +85,9 @@ public class MainActivity extends FragmentContainerActivity {
 		receiver = new HeadsetReceiver();
 		registerReceiver(receiver, receiverFilter);
 
-		if (Build.VERSION.SDK_INT >= 23) {
-			CloudSyncUtils.startCloudSync(this);
-		}
+		//if (Build.VERSION.SDK_INT >= 23) {
+		//	CloudSyncUtils.startCloudSync(this);
+		//}
 
 	}
 
