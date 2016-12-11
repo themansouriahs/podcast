@@ -67,10 +67,6 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-        PendingIntent pendingMediaButtonIntent = PendingIntent.getBroadcast(mPlayerService, 0, mediaButtonIntent, 0);
-        mSession.setMediaButtonReceiver(pendingMediaButtonIntent);
-
         Intent toggleIntent = new Intent(NotificationPlayer.toggleAction);
         PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
         mSession.setMediaButtonReceiver(pendingToggleIntent);
