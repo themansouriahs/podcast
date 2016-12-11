@@ -20,6 +20,7 @@ import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -205,12 +206,9 @@ public abstract class BaseSubscription implements ISubscription {
         Palette palette = null;
 
         try {
-            bitmap = Glide.
-                    with(argContext).
-                    load(getImageURL()).
-                    asBitmap().
-                    into(200, 200). // Width and height
-                    get();
+            bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, getImageURL())
+                    .into(200, 200) // Width and height
+                    .get();
             Palette.from(bitmap).generate();
         } catch (InterruptedException e) {
             e.printStackTrace();

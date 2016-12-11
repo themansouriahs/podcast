@@ -29,6 +29,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 
 /**
  * Created by apl on 12-02-2015.
@@ -163,9 +164,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
             return;
         }
 
-        Glide.with(mPlayerService)
-                .load(url)
-                .asBitmap()
+        ImageLoaderUtils.getGlide(mPlayerService, url)
                 .into(new SimpleTarget<Bitmap>(bitmapSize, bitmapSize) {
                     @Override
                     public void onResourceReady(Bitmap argBitmap, GlideAnimation anim) {

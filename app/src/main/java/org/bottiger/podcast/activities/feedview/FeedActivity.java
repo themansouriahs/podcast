@@ -38,6 +38,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
@@ -57,6 +58,7 @@ import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
@@ -304,9 +306,7 @@ public class FeedActivity extends TopActivity {
 
         if (mPhotoView.getDrawable() == null) {
             ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
-            Glide.with(this)
-                    .load(mUrl)
-                    .asBitmap()
+            ImageLoaderUtils.getGlide(this, mUrl)
                     .placeholder(cd)
                     .fitCenter()
                     .into(new BitmapImageViewTarget(mPhotoView) {

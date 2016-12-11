@@ -181,7 +181,7 @@ public class StorageUtils {
                                      @NonNull ISubscription argSubscription) {
         Log.v(TAG, "canPerform: " + argAction);
 
-        @SoundWavesDownloadManager.NetworkState int networkState = NetworkUtils.updateConnectStatus(argContext);
+        @SoundWavesDownloadManager.NetworkState int networkState = NetworkUtils.getNetworkStatus(argContext);
 
         if (networkState == SoundWavesDownloadManager.NETWORK_DISCONNECTED)
             return false;

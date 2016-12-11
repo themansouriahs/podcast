@@ -25,8 +25,8 @@ public class NetworkUtils {
     private static final String TAG = StorageUtils.class.getSimpleName();
 
     public static @SoundWavesDownloadManager.NetworkState
-    int updateConnectStatus(@NonNull Context argContext) {
-		Log.v(TAG, "updateConnectStatus");
+    int getNetworkStatus(@NonNull Context argContext) {
+		Log.v(TAG, "getNetworkStatus");
 
         ConnectivityManager cm = (ConnectivityManager) argContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -77,7 +77,7 @@ public class NetworkUtils {
             return false;
         }
 
-        @SoundWavesDownloadManager.NetworkState int networkState = updateConnectStatus(argContext);
+        @SoundWavesDownloadManager.NetworkState int networkState = getNetworkStatus(argContext);
 
         FeedItem downloadingItem;
         try {

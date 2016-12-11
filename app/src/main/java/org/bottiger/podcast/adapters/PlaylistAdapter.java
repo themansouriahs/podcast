@@ -32,6 +32,7 @@ import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
@@ -104,7 +105,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         String image = item.getArtwork(mActivity);
         if (StrUtils.isValidUrl(image)) {
-            Glide.with(mActivity).load(image).asBitmap().centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
+            ImageLoaderUtils.getGlide(mActivity, image).centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
                 @Override
                 protected void setResource(Bitmap resource) {
                     RoundedBitmapDrawable circularBitmapDrawable =
