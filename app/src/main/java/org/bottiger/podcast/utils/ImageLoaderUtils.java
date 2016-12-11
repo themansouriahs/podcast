@@ -32,8 +32,6 @@ import org.bottiger.podcast.utils.image.NetworkDisablingLoader;
  */
 public class ImageLoaderUtils {
 
-    private static Context sContext;
-
     public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl) {
         RequestManager requestManager = Glide.with(argContext);
 
@@ -81,7 +79,7 @@ public class ImageLoaderUtils {
                                             boolean argDoCrop,
                                             boolean argUsePlaceholder,
                                             final boolean argRounddedCorners) {
-        sContext = argTargetView.getContext();
+        Context context = argTargetView.getContext();
 
         Target target;
 
@@ -91,7 +89,7 @@ public class ImageLoaderUtils {
             target = getViewTarget(argTargetView, argRounddedCorners);
         }
 
-        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(sContext, argUrl);
+        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(context, argUrl);
 
         if (argDoCrop)
             builder.centerCrop();
