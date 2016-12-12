@@ -34,10 +34,10 @@ import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
+import org.bottiger.podcast.webservices.directories.audiosearch.AudioSearch;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchParameters;
 import org.bottiger.podcast.webservices.directories.gpodder.GPodder;
 import org.bottiger.podcast.webservices.directories.itunes.ITunes;
-import org.bottiger.podcast.webservices.directories.podcastaddict.PodcastAddict;
 
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
@@ -64,6 +64,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     // Match with entries_webservices_discovery_engine
     private static final int GPODDER_INDEX = 0;
     private static final int ITUNES_INDEX  = 1;
+    private static final int AUDIOSEARCH_INDEX  = 2;
 
     private static final int HANDLER_WHAT_SEARCH   = 27407; // whatever
     private static final int HANDLER_WHAT_CANCEL   = 27408; // whatever
@@ -376,6 +377,11 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                     mSearchEngineButton.setImageResource(R.drawable.discovery_itunes);
                     break;
                 }
+                case AUDIOSEARCH_INDEX: {
+                    mDirectoryProvider = new AudioSearch();
+                    mSearchEngineButton.setImageResource(R.drawable.audiosearch_logo);
+                    break;
+                }
             }
 
             // FIXME: I do not fully understand why this is needed
@@ -412,7 +418,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     }
 
     private String[] supportModes() {
-        if (mDirectoryProvider instanceof GPodder) {
+        if (mDirectoryProvider instanceof GPodder || mDirectoryProvider instanceof AudioSearch) {
             return new String[] {mSpinnerByAuthor, mSpinnerPopular};
         }
 

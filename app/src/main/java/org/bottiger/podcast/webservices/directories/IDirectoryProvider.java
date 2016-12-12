@@ -1,14 +1,16 @@
 package org.bottiger.podcast.webservices.directories;
 
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 /**
  * Created by apl on 13-04-2015.
  */
 public interface IDirectoryProvider {
 
-    int TOPLIST_AMOUNT = 20;
+    int TOPLIST_AMOUNT = 10;
 
     // Result callback
     interface Callback {
@@ -23,7 +25,7 @@ public interface IDirectoryProvider {
                 @NonNull Callback argCallback);
     void abortSearch();
 
-    void toplist(@NonNull Callback argCallback);
-    void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback);
+    @MainThread void toplist(@NonNull Callback argCallback);
+    @MainThread void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback);
 
 }
