@@ -145,7 +145,16 @@ public class StrUtils {
 			new SpannedString("");
 		}
 
-		return HtmlEscape.escapeHtml(argString, HtmlEscapeType.DECIMAL_REFERENCES, HtmlEscapeLevel.LEVEL_0_ONLY_MARKUP_SIGNIFICANT_EXCEPT_APOS);
+		//return HtmlEscape.escapeHtml(argString, HtmlEscapeType.DECIMAL_REFERENCES, HtmlEscapeLevel.LEVEL_0_ONLY_MARKUP_SIGNIFICANT_EXCEPT_APOS);
+
+		Spanned spanned;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			spanned = Html.fromHtml(argString, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			spanned = Html.fromHtml(argString);
+		}
+
+		return spanned.toString();
 	}
     
 	public static String formatDownloadString(int offset, long length) {
