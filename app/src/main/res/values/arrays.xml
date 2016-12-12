@@ -89,6 +89,7 @@
     <string-array name="entries_webservices_discovery_engine">
         <item>gPodder</item>
         <item>iTunes</item>
+        <item>AudioSearch.ch</item>
     </string-array>
 
 </resources>

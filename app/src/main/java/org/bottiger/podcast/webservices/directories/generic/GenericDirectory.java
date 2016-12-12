@@ -30,6 +30,11 @@ public abstract class GenericDirectory implements IDirectoryProvider{
         task.cancel(true);
     }
 
+    @Override
+    public void toplist(@NonNull Callback argCallback) {
+        toplist(TOPLIST_AMOUNT, null, argCallback);
+    }
+
     protected abstract AsyncTask<String, Void, ISearchResult> getAsyncTask();
 
 }
