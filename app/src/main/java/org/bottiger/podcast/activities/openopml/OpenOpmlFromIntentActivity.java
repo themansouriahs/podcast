@@ -2,6 +2,7 @@ package org.bottiger.podcast.activities.openopml;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -59,8 +61,8 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
         }
         OPMLImportExport opmlImportExport = new OPMLImportExport(this);
         try {
-
-            File opmlFile = new File(getIntent().getStringExtra(OPML_SUBS_LIST_EXTRA_CODE));
+            Uri uri = getIntent().getData();
+            File opmlFile = new File(uri.getPath());
 
             mSubscriptions = opmlImportExport.readSubscriptionsFromOPML(opmlFile);
         } catch (Exception e) {

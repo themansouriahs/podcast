@@ -173,25 +173,25 @@ public class OPMLImportExport {
 //		return numImported;
 //	}
 
-	private int importElements(ArrayList<OpmlElement> elements) {
-		int numImported = 0;
-		List<Subscription> importedSubscriptions = new LinkedList<>();
-
-		Subscription subscription;
-		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
-
-		for (OpmlElement element : elements) {
-			String url = element.getXmlUrl();
-
-			if (!library.IsSubscribed(url)) {
-				SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(url);
-				numImported++;
-				importedSubscriptions.add(SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url));
-			}
-		}
-
-		return numImported;
-	}
+//	private int importElements(ArrayList<OpmlElement> elements) {
+//		int numImported = 0;
+//		List<Subscription> importedSubscriptions = new LinkedList<>();
+//
+//		Subscription subscription;
+//		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
+//
+//		for (OpmlElement element : elements) {
+//			String url = element.getXmlUrl();
+//
+//			if (!library.IsSubscribed(url)) {
+//				SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(url);
+//				numImported++;
+//				importedSubscriptions.add(SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url));
+//			}
+//		}
+//
+//		return numImported;
+//	}
 
 	private void toastMsg(final CharSequence msg) {
 		Activity activity = null;
