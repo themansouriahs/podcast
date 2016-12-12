@@ -2,17 +2,24 @@ package org.bottiger.podcast.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Path;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.util.LongSparseArray;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.util.SortedList;
 import android.util.Log;
 import android.widget.Toast;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
@@ -38,10 +45,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static android.location.Location.convert;
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
+
 public class OPMLImportExport {
 
 	private static final String filename = "podcasts.opml";
 	private static final String filenameOut = "podcasts_export.opml";
+	private static final int ACTIVITY_CHOOSE_FILE = 3;
+	private static final int FILE_SELECT_CODE = 0;
 
 	public File file;
 	public File fileOut;
@@ -53,9 +65,9 @@ public class OPMLImportExport {
 	private ContentResolver contentResolver;
 	private DatabaseHelper mUpdater = new DatabaseHelper();
 
-    @RequiresPermission(allOf = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE})
+	@RequiresPermission(allOf = {
+			Manifest.permission.READ_EXTERNAL_STORAGE,
+			Manifest.permission.WRITE_EXTERNAL_STORAGE})
 	public OPMLImportExport(Activity argActivity) {
 		this.mActivity = argActivity;
 		this.contentResolver = argActivity.getContentResolver();
@@ -125,154 +137,146 @@ public class OPMLImportExport {
 		return opmlSubscriptions;
 	}
 
-	public int importSubscriptions() {
-		int numImported = 0;
-		BufferedReader reader;
+//	public int importSubscriptions(File ftest) {
+//		int numImported = 0;
+//		BufferedReader reader;
+//
+//		if (!initInputOutputFiles()) {
+//			return 0;
+//		}
+//
+//		try {
+//			reader = new BufferedReader(new FileReader(ftest));
+//
+//			OpmlReader omplReader = new OpmlReader();
+//			ArrayList<OpmlElement> opmlElements = omplReader
+//					.readDocument(reader);
+//			numImported = importElements(opmlElements);
+//
+//		} catch (FileNotFoundException e) {
+//			toastMsg(opmlNotFound);
+//		} catch (XmlPullParserException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		if (numImported > 0) {
+//			Resources res = mActivity.getResources();
+//			String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
+//			toastMsg(formattedString);
+//			SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
+//		}
+//
+//		return numImported;
+//	}
 
-		if (!initInputOutputFiles()) {
-			return 0;
-		}
-
-		try {
-			reader = new BufferedReader(new FileReader(file));
-
-			OpmlReader omplReader = new OpmlReader();
-			ArrayList<OpmlElement> opmlElements = omplReader
-					.readDocument(reader);
-			numImported = importElements(opmlElements);
-
-		} catch (FileNotFoundException e) {
-			toastMsg(opmlNotFound);
-		} catch (XmlPullParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (numImported > 0) {
-			Resources res = mActivity.getResources();
-            String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
-            toastMsg(formattedString);
-            SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
-		}
-
-		return numImported;
-	}
-
-	private int importElements(ArrayList<OpmlElement> elements) {
-		int numImported = 0;
-        List<Subscription> importedSubscriptions = new LinkedList<>();
-
-		Subscription subscription;
-		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
-
-		for (OpmlElement element : elements) {
-			String url = element.getXmlUrl();
-
-			if (!library.IsSubscribed(url)) {
-				SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(url);
-				numImported++;
-				importedSubscriptions.add(SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url));
-			}
-		}
-
-		return numImported;
-	}
+//	private int importElements(ArrayList<OpmlElement> elements) {
+//		int numImported = 0;
+//		List<Subscription> importedSubscriptions = new LinkedList<>();
+//
+//		Subscription subscription;
+//		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
+//
+//		for (OpmlElement element : elements) {
+//			String url = element.getXmlUrl();
+//
+//			if (!library.IsSubscribed(url)) {
+//				SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(url);
+//				numImported++;
+//				importedSubscriptions.add(SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url));
+//			}
+//		}
+//
+//		return numImported;
+//	}
 
 	private void toastMsg(final CharSequence msg) {
-        Activity activity = null;
+		Activity activity = null;
 
-        if (mActivity instanceof Activity) {
-            activity = (Activity) mActivity;
-        }
-
-        if (activity == null) return;
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int duration = Toast.LENGTH_LONG;
-                Toast.makeText(mActivity, msg, duration).show();
-            }
-        });
-	}
-
-    public void exportSubscriptions() {
-
-        if (!initInputOutputFiles()) {
-            return;
-        }
-
-        FileWriter fileWriter = null;
-
-        try {
-            if (!fileOut.exists()) {
-                fileOut.createNewFile();
-            }
-
-            fileWriter = new FileWriter(fileOut);
-        } catch (IOException e) {
-            VendorCrashReporter.handleException(e);
-        }
-
-        if (fileWriter == null) {
-            toastMsg(opmlFailedToExport);
-            return;
-        }
-
-        OpmlWriter opmlWriter = new OpmlWriter();
-        SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
-
-        try {
-            opmlWriter.writeDocument(subscriptionList, fileWriter);
-        } catch (IOException e) {
-            toastMsg(opmlFailedToExport);
-            return;
-        }
-
-        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
-        toastMsg(opmlSuccesfullyExported);
-    }
-
-	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
-		OpmlWriter opmlWriter = new OpmlWriter();
-		StringWriter sw = new StringWriter();
-
-		try {
-			opmlWriter.writeDocument(argSubscriptions, sw);
-		} catch (IOException e) {
-			Log.d("toOPML", "Failed converting subscriptions to OPML");
-			return "";
+		if (mActivity instanceof Activity) {
+			activity = (Activity) mActivity;
 		}
 
-		return sw.toString();
+		if (activity == null) return;
+
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				int duration = Toast.LENGTH_LONG;
+				Toast.makeText(mActivity, msg, duration).show();
+			}
+		});
 	}
 
-    @NonNull
-    public static String getFilename() {
-        return filename;
-    }
+	public void exportSubscriptions(File fileOut) {
+
+		if (!initInputOutputFiles()) {
+			return;
+		}
+
+		FileWriter fileWriter = null;
+
+		try {
+			if (!fileOut.exists()) {
+				fileOut.createNewFile();
+			}
+
+			fileWriter = new FileWriter(fileOut);
+		} catch (IOException e) {
+			VendorCrashReporter.handleException(e);
+		}
+
+		if (fileWriter == null) {
+			toastMsg(opmlFailedToExport);
+			return;
+		}
+
+		OpmlWriter opmlWriter = new OpmlWriter();
+		SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
+
+		try {
+			opmlWriter.writeDocument(subscriptionList, fileWriter);
+		} catch (IOException e) {
+			toastMsg(opmlFailedToExport);
+			return;
+		}
+
+		SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
+		//toastMsg(opmlSuccesfullyExported);
+	}
+
+//	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
+//		OpmlWriter opmlWriter = new OpmlWriter();
+//		StringWriter sw = new StringWriter();
+//
+//		try {
+//			opmlWriter.writeDocument(argSubscriptions, sw);
+//		} catch (IOException e) {
+//			Log.d("toOPML", "Failed converting subscriptions to OPML");
+//			return "";
+//		}
+//
+//		return sw.toString();
+//	}
+
+	@NonNull
+	public static String getFilename() {
+		return filename;
+	}
 
 	/**
 	 *
-	 * @return true if everything is OK. Returns false if there was an IOException
+	 * @return just launches the file manager, return true if everything is ok
 	 * @throws SecurityException
 	 */
-	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+	/* POSSIBLY NOT NEEDED ANYMORE?
+
+	 */
 	private boolean initInputOutputFiles() throws SecurityException {
-
-		if (file != null && fileOut != null)
-			return true;
-
-		try {
-			file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
-			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
 
 		return true;
 	}
