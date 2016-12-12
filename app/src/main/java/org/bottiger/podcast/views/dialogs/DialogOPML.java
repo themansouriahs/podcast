@@ -78,11 +78,11 @@ public class DialogOPML {
                 OPMLImportExport importExport = new OPMLImportExport(argActivity);
                 if (mAction == IMPORT) {
                     //importExport.importSubscriptions();
-                    new ImportOPMLTask().execute(importExport);
+                    //new ImportOPMLTask().execute(importExport);
                 }
 
                 if (mAction == EXPORT) {
-                    importExport.exportSubscriptions();
+                    //importExport.exportSubscriptions();
                 }
             }
         });
@@ -102,7 +102,7 @@ public class DialogOPML {
 
     private static class ImportOPMLTask extends AsyncTask<OPMLImportExport, Void, Void> {
         protected Void doInBackground(OPMLImportExport... opmlImportExports) {
-            opmlImportExports[0].importSubscriptions();
+            //opmlImportExports[0].importSubscriptions();
             return null;
         }
     }

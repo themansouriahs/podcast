@@ -2,21 +2,22 @@ package org.bottiger.podcast;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,15 +27,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import org.bottiger.podcast.activities.openopml.OPML_import_export_activity;
+import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.utils.PreferenceHelper;
-import org.bottiger.podcast.views.ContextMenuRecyclerView;
-import org.bottiger.podcast.views.dialogs.DialogOPML;
+import org.bottiger.podcast.utils.OPMLImportExport;
+
+import java.io.File;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -47,8 +51,14 @@ public class SubscriptionsFragment extends Fragment {
 
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
+    private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
+    private static final String EXTRAS_CODE = "path";
+    private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
+    private static final int RESULT_IMPORT = 201;
+    private static final int RESULT_EXPORT = 202;
+    private static final String EXPORT_FILENAME = "/podcast_export.opml";
 
-     /**
+    /**
      1 = Auto
      2 = list
      3 = 2 columns
@@ -61,7 +71,7 @@ public class SubscriptionsFragment extends Fragment {
 
     private Boolean mShowEmptyView = null;
 
-	private RecyclerView mGridView;
+    private RecyclerView mGridView;
 
     private Library mLibrary;
 
@@ -79,24 +89,25 @@ public class SubscriptionsFragment extends Fragment {
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
+    public File file;
 
     @Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mActivity = getActivity();
         mLibrary = SoundWaves.getAppContext(getContext()).getLibraryInstance();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
         shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
-	}
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		super.onCreateView(inflater, container, savedInstanceState);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         setHasOptionsMenu(true);
 
-        mContainerView = (FrameLayout)inflater.inflate(R.layout.subscription_fragment, container, false);
+        mContainerView = (FrameLayout) inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
         mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
@@ -108,7 +119,7 @@ public class SubscriptionsFragment extends Fragment {
         mAdapter = createAdapter();
         setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
-		mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
+        mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
 
 
         mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
@@ -138,7 +149,7 @@ public class SubscriptionsFragment extends Fragment {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        VendorCrashReporter.report("subscribeError", throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
@@ -151,7 +162,7 @@ public class SubscriptionsFragment extends Fragment {
                 .filter(new Func1<SubscriptionChanged, Boolean>() {
                     @Override
                     public Boolean call(SubscriptionChanged subscriptionChanged) {
-                        return subscriptionChanged.getAction()==SubscriptionChanged.CHANGED;
+                        return subscriptionChanged.getAction() == SubscriptionChanged.CHANGED;
                     }
                 })
                 .subscribe(new Action1<SubscriptionChanged>() {
@@ -175,12 +186,12 @@ public class SubscriptionsFragment extends Fragment {
                     }
                 });
 
-		return mContainerView;
+        return mContainerView;
 
-	}
+    }
 
     @Override
-    public void onDestroyView () {
+    public void onDestroyView() {
         super.onDestroyView();
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
@@ -203,7 +214,8 @@ public class SubscriptionsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (getActivity() instanceof TopActivity) {
-                    openImportExportDialog((TopActivity)getActivity());
+                    Intent i = new Intent(mActivity.getApplicationContext(), OPML_import_export_activity.class);
+                    startActivityForResult(i, 999);
                 } else {
                     Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
                 }
@@ -223,15 +235,15 @@ public class SubscriptionsFragment extends Fragment {
         if (mGridLayoutmanager.getSpanCount() != numberOfColumns()) {
             mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
             mGridView.setLayoutManager(mGridLayoutmanager);
-            ((SubscriptionAdapter)mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
+            ((SubscriptionAdapter) mGridView.getAdapter()).setNumberOfColumns(numberOfColumns());
         }
         super.onResume();
     }
 
-	@Override
-	public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.subscription_actionbar, menu);
-		super.onCreateOptionsMenu(menu, inflater);
+    @Override
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.subscription_actionbar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
 
         @IdRes int idres = 0;
 
@@ -261,20 +273,14 @@ public class SubscriptionsFragment extends Fragment {
         item.setChecked(true);
 
         return;
-	}
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_import: {
-
-                try {
-                    TopActivity topActivity = (TopActivity) getActivity();
-                    openImportExportDialog(topActivity);
-                } catch (ClassCastException cce) {
-                    Log.wtf(TAG, "Activity (" + getActivity().getClass().getName() + ") could not be cast to TopActivity." +
-                            "This is needed in order to requets filesystem permission. Exception: " + cce.toString()); // NoI18N
-                }
+                Intent i = new Intent(mActivity.getApplicationContext(), OPML_import_export_activity.class);
+                startActivityForResult(i, OPML_ACTIVITY_STATUS_CODE);
                 break;
             }
             case R.id.menu_refresh_all_subscriptions: {
@@ -342,16 +348,6 @@ public class SubscriptionsFragment extends Fragment {
         return numColumns;
     }
 
-    static void openImportExportDialog(@NonNull TopActivity argActivity) {
-
-        if (!checkPermission(argActivity))
-            return;
-
-        DialogOPML dialogOPML = new DialogOPML();
-        Dialog dialog = dialogOPML.onCreateDialog(argActivity);
-        dialog.show();
-    }
-
     /**
      *
      * @return True if the permissions are granted
@@ -359,7 +355,7 @@ public class SubscriptionsFragment extends Fragment {
     private static boolean checkPermission(@NonNull TopActivity argActivity) {
         if (Build.VERSION.SDK_INT >= 23 &&
                 (argActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                        argActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED)) {
+                        argActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
             // TODO: Consider calling
             //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
             // here to request the missing permissions, and then overriding
@@ -387,6 +383,41 @@ public class SubscriptionsFragment extends Fragment {
                 mEmptySubscrptionList.setVisibility(View.GONE);
             }
             mShowEmptyView = showEmpty;
+        }
+    }
+
+
+    /*
+       This method captures the execution of the opml_import_export activity, to return the value and parse
+            the result of the opml file
+           If the activity OPML_import_export_activity returns a "RETURN_EXPORT" it means the user pressed the export button,
+                in the other way, it returns a path
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        OPMLImportExport importExport = new OPMLImportExport(getActivity());
+
+        if (requestCode == OPML_ACTIVITY_STATUS_CODE) {
+            if (resultCode == RESULT_IMPORT){
+                //Log.d("OPML", data.getData().getPath());// NoI18N
+                Uri extraData = data.getData();
+
+                if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+
+                Log.d(TAG, "IMPORT SUBSCRIPTIONS. File: " + extraData);// NoI18N
+                Intent selectSubs = new Intent(mActivity.getApplicationContext(), OpenOpmlFromIntentActivity.class);
+                selectSubs.setData(extraData);
+                startActivity(selectSubs);
+
+            }
+            else if (resultCode == RESULT_EXPORT) {
+                Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
+                Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory() + EXPORT_FILENAME);// NoI18N
+                importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory() + EXPORT_FILENAME));
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory() + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

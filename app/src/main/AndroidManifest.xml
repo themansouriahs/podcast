@@ -208,6 +208,15 @@
             android:label="Submit log"
             android:windowSoftInputMode="stateHidden" />
 
+        <activity android:name=".activities.openopml.OPML_import_export_activity"
+            android:label="@string/opml_import_export_toolbar_title"
+            android:parentActivityName=".activities.feedview.FeedActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.feedview.FeedActivity" />
+        </activity>
+
+
         <service
             android:name=".service.PlayerService"
             android:exported="true"
