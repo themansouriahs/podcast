@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,7 +54,8 @@ public class SubscriptionsFragment extends Fragment {
     private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
     private static final String EXTRAS_CODE = "path";
     private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
-    private static final String EXPORT_RETURN_CODE = "RETURN_EXPORT";
+    private static final int RESULT_IMPORT = 201;
+    private static final int RESULT_EXPORT = 202;
     private static final String EXPORT_FILENAME = "/podcast_export.opml";
 
     /**
@@ -393,28 +395,28 @@ public class SubscriptionsFragment extends Fragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OPML_ACTIVITY_STATUS_CODE && resultCode == Activity.RESULT_OK) {
+        OPMLImportExport importExport = new OPMLImportExport(getActivity());
 
-            Log.d("OPML", data.getStringExtra(EXTRAS_CODE));// NoI18N
-            String extraData = data.getStringExtra(EXTRAS_CODE);
+        if (requestCode == OPML_ACTIVITY_STATUS_CODE) {
+            if (resultCode == RESULT_IMPORT){
+                //Log.d("OPML", data.getData().getPath());// NoI18N
+                Uri extraData = data.getData();
 
+                if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
 
-            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-
-            OPMLImportExport importExport = new OPMLImportExport(getActivity());
-            if (!extraData.equals(EXPORT_RETURN_CODE)) {
-                Log.d(TAG, "IMPORT SUBSCRIPTIONS. File: " + data.getStringExtra(EXTRAS_CODE));// NoI18N
+                Log.d(TAG, "IMPORT SUBSCRIPTIONS. File: " + extraData);// NoI18N
                 Intent selectSubs = new Intent(mActivity.getApplicationContext(), OpenOpmlFromIntentActivity.class);
-                selectSubs.putExtra(OPML_SUBS_LIST_EXTRA_CODE, data.getStringExtra(EXTRAS_CODE));
+                selectSubs.setData(extraData);
                 startActivity(selectSubs);
+
             }
-            else {
+            else if (resultCode == RESULT_EXPORT) {
                 Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
-                Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory()+EXPORT_FILENAME);// NoI18N
-                importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory()+ EXPORT_FILENAME));
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory()+EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory() + EXPORT_FILENAME);// NoI18N
+                importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory() + EXPORT_FILENAME));
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory() + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
             }
         }
     }

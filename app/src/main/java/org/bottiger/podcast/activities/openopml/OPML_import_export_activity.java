@@ -1,13 +1,10 @@
 package org.bottiger.podcast.activities.openopml;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,7 +16,6 @@ import android.widget.Button;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
-import org.jetbrains.annotations.NotNull;
 
 public class OPML_import_export_activity extends ToolbarActivity {
 
@@ -33,6 +29,8 @@ public class OPML_import_export_activity extends ToolbarActivity {
     private static final String EXPORT_RETURN_CODE = "RETURN_EXPORT";
     private static final String MimeType = "file/xml";
     private static final String TAG = "OPML_io_act";
+    private static final int RESULT_IMPORT = 201;
+    private static final int RESULT_EXPORT = 202;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +79,14 @@ public class OPML_import_export_activity extends ToolbarActivity {
 
         Button exportOPML = (Button) findViewById(R.id.bOMPLexport);
         exportOPML.setOnClickListener(new View.OnClickListener() {
+            @Nullable
             @Override
             public void onClick(View view) {
-                Intent returnData = new Intent();
+                //The return data is not checked in this particular case
                 if (getParent() == null) {
-                    returnData.putExtra(EXTRAS_CODE,EXPORT_RETURN_CODE);
-                    setResult(Activity.RESULT_OK, returnData);
+                    setResult(RESULT_EXPORT, null);
                 } else {
-                    getParent().setResult(Activity.RESULT_OK, returnData);
+                    getParent().setResult(RESULT_EXPORT, null);
                 }
                 finish();
             }
@@ -108,22 +106,13 @@ public class OPML_import_export_activity extends ToolbarActivity {
             //RETURN THE VALUE TO THE APP AND CLOSE
             Intent returnData = new Intent();
             if (getParent() == null) {
-                returnData.putExtra(EXTRAS_CODE,getRealPathFromURI(uri));
-                Log.d(TAG,getRealPathFromURI(uri));// NoI18N
-                setResult(Activity.RESULT_OK, returnData);
+                returnData.setData(uri);
+                setResult(RESULT_IMPORT, returnData);
             } else {
-                getParent().setResult(Activity.RESULT_OK, data);
+                getParent().setResult(RESULT_IMPORT, data);
             }
             finish();
         }
     }
 
-    @Nullable public String getRealPathFromURI(@NotNull Uri contentUri) {
-        String [] proj      = {MediaStore.Images.Media.DATA};
-        Cursor cursor       = getContentResolver().query( contentUri, proj, null, null,null);
-        if (cursor == null) return null;
-        int column_index    = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
 }
