@@ -81,15 +81,4 @@
         <item>Sort by: Oldest</item>
     </string-array>
 
-    <string-array name="entryvalues_webservices_discovery_engine" translatable="false">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
-
-    <string-array name="entries_webservices_discovery_engine">
-        <item>gPodder</item>
-        <item>iTunes</item>
-        <item>AudioSearch.ch</item>
-    </string-array>
-
 </resources>

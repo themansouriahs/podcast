@@ -4,9 +4,11 @@ import android.os.AsyncTask;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.StrUtils;
@@ -114,6 +116,15 @@ public class AudioSearch extends GenericDirectory {
                 .build();
 
         mService = mRetrofit.create(AudioSearchEndpoint.class);
+    }
+
+    public static @StringRes int getNameRes() {
+        return R.string.webservices_discovery_engine_audiosearch;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return !(TextUtils.isEmpty(AUDIOSEARCH_APP_ID) || TextUtils.isEmpty(AUDIOSEARCH_SECRET));
     }
 
     @Override
