@@ -58,6 +58,7 @@ import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -322,12 +323,9 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mLargeLayout.SeekBarLeftMargin = 0;
         mLargeLayout.PlayPauseSize = mPlayPauseLargeSize;
 
-        final PlayerService ps = PlayerService.getInstance();
+        final Playlist playlist = SoundWaves.getAppContext(mContext).getPlaylist();
 
-        boolean isRecyclerViewEmpty = true;
-        if (ps != null && ps.getPlaylist() != null) {
-            isRecyclerViewEmpty = ps.getPlaylist().size()<2;
-        }
+        boolean isRecyclerViewEmpty = playlist.size()<2;
 
         setPlaylistEmpty(isRecyclerViewEmpty);
 
@@ -349,12 +347,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                if (ps != null) {
-                    IEpisode episode = SoundWaves.getAppContext(getContext()).getPlaylist().first();
-                    if (episode instanceof FeedItem) {
-                        FeedItem feedItem = (FeedItem)episode;
-                        feedItem.setIsFavorite(favorite);
-                    }
+                IEpisode episode = playlist.first();
+                if (episode instanceof FeedItem) {
+                    FeedItem feedItem = (FeedItem)episode;
+                    feedItem.setIsFavorite(favorite);
                 }
             }
         });
@@ -432,23 +428,13 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     }
 
     private boolean setSleepTimer(int minutes) {
-        PlayerService ps = PlayerService.getInstance();
-        if (ps == null) {
-            String noPlayer = "Could not connect to the Player";
-            Toast.makeText(mContext, noPlayer, Toast.LENGTH_LONG).show();
-            Log.wtf(TAG, noPlayer);
-            return false;
-        }
-
-        GenericMediaPlayerInterface player = ps.getPlayer();
-
         if (minutes < 0) {
-            player.cancelFadeOut();
+            mPlayer.cancelFadeOut();
             return true;
         }
 
         int onemin = 1000 * 60;
-        player.FadeOutAndStop(onemin*minutes);
+        mPlayer.FadeOutAndStop(onemin*minutes);
         return true;
     }
 
@@ -584,7 +570,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                     @Override
                     public void onSuccess(ColorExtractor value) {
                         mPlayPauseButton.setColor(value);
-                        mBackgroundColor = value.getPrimaryTint();
+                        mBackgroundColor = value.getPrimaryTint() != -1 ? value.getPrimaryTint() : ColorUtils.lighten(value.getPrimary());
 
                         mBackgroundColor = ColorUtils.adjustToTheme(getResources(), mBackgroundColor);
 

@@ -105,6 +105,26 @@ public class ColorUtils {
     }
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:Hsl-hsv_models.svg
+    public static @ColorInt int lighten(@ColorInt int argColor) {
+        float threshold = 0.5f;
+
+        float[] hsl = new float[3];
+        android.support.v4.graphics.ColorUtils.colorToHSL(argColor, hsl);
+
+        float light = hsl[2];
+        if (light > threshold) {
+            light = light - 0.1f;
+        } else {
+            light = 0.8f; //light + 0.45f;
+        }
+
+        hsl[2] = light;
+        int color = android.support.v4.graphics.ColorUtils.HSLToColor(hsl);
+
+        return color;
+    }
+
+    // https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:Hsl-hsv_models.svg
     public static boolean isLight(@ColorInt int argColor) {
         float threshold = 0.8f;
 
