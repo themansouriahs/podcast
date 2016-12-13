@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
@@ -29,6 +31,7 @@ import org.bottiger.podcast.activities.discovery.DiscoverySearchAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.utils.IntUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
@@ -39,11 +42,15 @@ import org.bottiger.podcast.webservices.directories.generic.GenericSearchParamet
 import org.bottiger.podcast.webservices.directories.gpodder.GPodder;
 import org.bottiger.podcast.webservices.directories.itunes.ITunes;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -61,10 +68,17 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     // Animations
     private static final int ANIMATION_DURATION = 400;
 
+
     // Match with entries_webservices_discovery_engine
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({ GPODDER_INDEX, ITUNES_INDEX, AUDIOSEARCH_INDEX})
+    public @interface SearchEngine {}
     private static final int GPODDER_INDEX = 0;
     private static final int ITUNES_INDEX  = 1;
     private static final int AUDIOSEARCH_INDEX  = 2;
+
+    public static final int[] ENGINE_IDS = {GPODDER_INDEX, ITUNES_INDEX, AUDIOSEARCH_INDEX};
+    public static final @StringRes int[] ENGINE_RES = {GPodder.getNameRes(), ITunes.getNameRes(), AudioSearch.getNameRes()};
 
     private static final int HANDLER_WHAT_SEARCH   = 27407; // whatever
     private static final int HANDLER_WHAT_CANCEL   = 27408; // whatever
@@ -167,7 +181,21 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mSearchEngineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogSearchDirectory dialogSearchDirectory = new DialogSearchDirectory();
+                List<Integer> ids = new LinkedList<>();
+                List<Integer> res = new LinkedList<>();
+
+                for (int i = 0; i < ENGINE_IDS.length; i++) {
+                    @SearchEngine int id = ENGINE_IDS[i];
+                    if (isEnabled(id, getContext())) {
+                        ids.add(id);
+                        res.add(ENGINE_RES[i]);
+                    }
+                }
+
+                int[] enabled_ids = IntUtils.toIntArray(ids);
+                int[] enabled_res = IntUtils.toIntArray(res);
+
+                DialogSearchDirectory dialogSearchDirectory = DialogSearchDirectory.newInstance(enabled_ids, enabled_res);
                 dialogSearchDirectory.show(getFragmentManager(), "SearchEnginePicker"); // NoI18N
             }
         });
@@ -198,7 +226,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         });
 
         // requires both mSearchEngineButton and mSearchView to be NonNull
-        onSharedPreferenceChanged(PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()), mDiscoveryEngineKey);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        onSharedPreferenceChanged(sharedPreferences, mDiscoveryEngineKey);
 
         mResultsAdapter = new DiscoverySearchAdapter(getActivity());
         mResultsAdapter.setHasStableIds(true);
@@ -364,25 +393,9 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (mDiscoveryEngineKey.equals(key)) {
-            int searchEngine = Integer.valueOf(sharedPreferences.getString(mDiscoveryEngineKey, Integer.toString(getDefaultSearchEngine())));
+            @SearchEngine int searchEngine = Integer.valueOf(sharedPreferences.getString(mDiscoveryEngineKey, Integer.toString(getDefaultSearchEngine())));
 
-            switch (searchEngine) {
-                case GPODDER_INDEX: {
-                    mDirectoryProvider = new GPodder(getContext());
-                    mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
-                    break;
-                }
-                case ITUNES_INDEX: {
-                    mDirectoryProvider = new ITunes();
-                    mSearchEngineButton.setImageResource(R.drawable.discovery_itunes);
-                    break;
-                }
-                case AUDIOSEARCH_INDEX: {
-                    mDirectoryProvider = new AudioSearch();
-                    mSearchEngineButton.setImageResource(R.drawable.audiosearch_logo);
-                    break;
-                }
-            }
+            setSearchEngine(searchEngine);
 
             // FIXME: I do not fully understand why this is needed
             // bug: 5600e81488f8ad5351d0bdd7
@@ -390,6 +403,50 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 updateSpinnerValues(mSpinnerByAuthor);
                 setQueryHint();
             }
+        }
+    }
+
+    public static boolean isEnabled(@DiscoveryFragment.SearchEngine int argEngine, @NonNull Context argContext) {
+        IDirectoryProvider directoryProvider = null;
+        switch (argEngine) {
+            case DiscoveryFragment.GPODDER_INDEX:
+                directoryProvider = new GPodder(argContext);
+                break;
+            case DiscoveryFragment.ITUNES_INDEX:
+                directoryProvider = new ITunes();
+                break;
+            case DiscoveryFragment.AUDIOSEARCH_INDEX:
+                directoryProvider = new AudioSearch();
+                break;
+        }
+
+        return directoryProvider != null && directoryProvider.isEnabled();
+    }
+
+    private void setSearchEngine(@SearchEngine int argSearchEngine) {
+        switch (argSearchEngine) {
+            case GPODDER_INDEX: {
+                mDirectoryProvider = new GPodder(getContext());
+                mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
+                break;
+            }
+            case ITUNES_INDEX: {
+                mDirectoryProvider = new ITunes();
+                mSearchEngineButton.setImageResource(R.drawable.discovery_itunes);
+                break;
+            }
+            case AUDIOSEARCH_INDEX: {
+                mDirectoryProvider = new AudioSearch();
+                mSearchEngineButton.setImageResource(R.drawable.audiosearch_logo);
+                break;
+            }
+        }
+
+        boolean engineSupported = mDirectoryProvider != null && mDirectoryProvider.isEnabled();
+
+        if (!engineSupported) {
+            mDirectoryProvider = new GPodder(getContext());
+            mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
         }
     }
 

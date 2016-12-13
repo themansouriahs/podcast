@@ -262,6 +262,11 @@
     <string name="app_intro_welcome_description">Please spend 10 seconds reading these intro pages</string>
     <string name="appintro_settings_description">SoundWaves Podcast is completely free, and do not charge for advanced features such as \'Download new episodes when available\'. However, you should review your datasettings before start using it in order to avoid unwanted data consumption</string>
 
+    <string name="webservices_discovery_engine_gpodder">gPodder</string>
+    <string name="webservices_discovery_engine_itunes">iTunes</string>
+    <string name="webservices_discovery_engine_audiosearch">AudioSear.ch</string>
+    <string name="webservices_discovery_engine_unknown">Unknown search engine</string>
+
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
         <item quantity="other">Player will sleep in %d minutes</item>

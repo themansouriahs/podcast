@@ -4,10 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -43,6 +45,10 @@ public class GPodder extends GenericDirectory {
     public GPodder(@NonNull Context argContext) {
         super(NAME);
         mGPodderAPI = new GPodderAPI(argContext, GPodderUtils.getServer(null));
+    }
+
+    public static @StringRes int getNameRes() {
+        return R.string.webservices_discovery_engine_gpodder;
     }
 
     protected AsyncTask getAsyncTask() {

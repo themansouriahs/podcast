@@ -3,6 +3,7 @@ package org.bottiger.podcast.webservices.directories;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.annotation.WorkerThread;
 
 /**
@@ -24,6 +25,8 @@ public interface IDirectoryProvider {
     void search(@NonNull ISearchParameters argParameters,
                 @NonNull Callback argCallback);
     void abortSearch();
+
+    boolean isEnabled();
 
     @MainThread void toplist(@NonNull Callback argCallback);
     @MainThread void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback);
