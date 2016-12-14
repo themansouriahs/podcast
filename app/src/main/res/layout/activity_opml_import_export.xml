@@ -21,11 +21,13 @@
             android:theme="?attr/actionBarTheme"
             android:minHeight="69dp"
             android:id="@+id/opml_import_export_toolbar"
-            app:titleTextColor="@color/cast_expanded_controller_text_color"
             app:title="@string/menu_import"
-            style="?android:attr/toolbarStyle"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:navigationIcon="@drawable/ic_arrow_back_white"
             android:nestedScrollingEnabled="true" />
+        <!--
+            style="?android:attr/toolbarStyle"-->
 
         <LinearLayout
             android:orientation="vertical"
