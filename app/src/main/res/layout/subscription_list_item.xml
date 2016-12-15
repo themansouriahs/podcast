@@ -13,7 +13,6 @@
         android:scaleType="centerCrop"
         android:layout_gravity="center_vertical"/>
 
-
     <LinearLayout
         android:id="@+id/new_episodes_wrapper"
         android:layout_width="wrap_content"

@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="250px"
-    android:layout_height="250px"
-    android:padding="10px">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true">
 
-    <TextView
-        android:id="@+id/authentication_headline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Authentication Required"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textSize="18sp"
-        android:gravity="center_horizontal"/>
+    <RelativeLayout
+        android:id="@+id/subscription_container"
+        android:layout_width="250px"
+        android:layout_height="250px"
+        android:padding="10px">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Press to authenticate"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="12sp"
-        android:layout_below="@id/authentication_headline"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="5dp"/>
+        <TextView
+            android:id="@+id/authentication_headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/subscription_authentication_required"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textSize="18sp"
+            android:gravity="center_horizontal"/>
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/subscription_press_to_authenticate"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textSize="12sp"
+            android:layout_below="@id/authentication_headline"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp"/>
+
+    </RelativeLayout>
+
+    <include layout="@layout/subscription_item_selected_mark" />
+
+</FrameLayout>
