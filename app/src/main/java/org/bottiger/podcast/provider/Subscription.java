@@ -56,6 +56,8 @@ public class Subscription extends BasePodcastSubscription {
 	private static final int SKIP_INTRO = (1 << 19);
 	private static final int NOTIFY_ON_NEW_SET = (1 << 20);
 	private static final int NOTIFY_ON_NEW = (1 << 21);
+	private static final int PIN_AT_TOP_SET = (1 << 22);
+	private static final int PIN_AT_TOP = (1 << 23);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -541,7 +543,7 @@ public class Subscription extends BasePodcastSubscription {
 		if (!IsSettingEnabled(SKIP_INTRO_SET))
 			return false;
 
-		return IsSettingEnabled(SKIP_INTRO_SET);
+		return IsSettingEnabled(SKIP_INTRO);
 	}
 
 	public void setDoSkipIntro(boolean argSkipIntro) {
@@ -556,11 +558,30 @@ public class Subscription extends BasePodcastSubscription {
 		notifyPropertyChanged(null);
 	}
 
+	public boolean isPinned() {
+		if (!IsSettingEnabled(PIN_AT_TOP_SET))
+			return false;
+
+		return IsSettingEnabled(PIN_AT_TOP);
+	}
+
+	public void setIsPinned(boolean argIsPinned) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= PIN_AT_TOP_SET;
+
+		if (argIsPinned)
+			mSettings |= PIN_AT_TOP;
+		else
+			mSettings &= ~PIN_AT_TOP;
+
+		notifyPropertyChanged(null);
+	}
+
 	public boolean doNotifyOnNew() {
 		if (!IsSettingEnabled(NOTIFY_ON_NEW_SET))
 			return false;
 
-		return IsSettingEnabled(NOTIFY_ON_NEW_SET);
+		return IsSettingEnabled(NOTIFY_ON_NEW);
 	}
 
 	public void setDoNotifyOnNew(boolean argDoNotifyOnNew) {

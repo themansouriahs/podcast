@@ -45,6 +45,8 @@ public interface ISubscription extends PaletteListener, IDbItem {
     @Nullable
     String getDescription();
 
+    boolean isPinned();
+
     void fetchImage(@NonNull Context argContext);
 
     @NonNull
