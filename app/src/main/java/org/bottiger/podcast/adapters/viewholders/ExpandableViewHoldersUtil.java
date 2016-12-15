@@ -133,11 +133,11 @@ public class ExpandableViewHoldersUtil {
     private static void initTransition(PlaylistViewHolder argPlaylistViewHolder) {
         Log.v("TEst2", "initiTransition");
 
-        ViewGroup viewGroup = (ViewGroup) argPlaylistViewHolder.mLayout.getParent();
+        ViewGroup viewGroup = (ViewGroup) argPlaylistViewHolder.getRootView().getParent();
         if (viewGroup == null)
             return;
 
-        TransitionManager.beginDelayedTransition(viewGroup, UIUtils.getDefaultTransition(argPlaylistViewHolder.mLayout.getResources()));
+        TransitionManager.beginDelayedTransition(viewGroup, UIUtils.getDefaultTransition(argPlaylistViewHolder.getRootView().getResources()));
     }
 
 }

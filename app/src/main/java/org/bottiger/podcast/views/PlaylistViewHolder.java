@@ -1,6 +1,7 @@
 package org.bottiger.podcast.views;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -25,15 +26,13 @@ import org.bottiger.podcast.provider.ISubscription;
 // (custom viewholder)
 public class PlaylistViewHolder extends RecyclerView.ViewHolder implements ExpandableViewHoldersUtil.Expandable { //
 
-    public IEpisode episode = null;
+    private IEpisode episode = null;
     public PlaylistAdapter mAdapter = null;
 
-    public FrameLayout mLayout;
     public RelativeLayout mMainContainer;
 
     public PlayPauseImageView mPlayPauseButton;
     public PlayerButtonView mForward;
-    public PlayerButtonView mBackward;
 
     public ScrollView mExpandedLayoutBottom;
 
@@ -41,19 +40,14 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView mMainTitle;
     public TextView mSecondaryTitle;
     public TextView mTimeDuration;
-    //public ImageView mTimeDurationIcon;
     public TextView mCurrentPosition;
-    public TextView mSlash;
-    public TextView mFileSize;
     public TextView mPlaylistPosition;
 
-    // expnded extended_player
+    // expanded extended_player
     public RelativeLayout mExpandedLayoutControls;
     public LinearLayout buttonLayout;
-    public TextView timeSlash;
     public PlayerSeekbar seekbar;
     public TextView currentTime;
-    public TextView filesize;
     public TextView description;
 
     public MaterialFavoriteButton favoriteButton;
@@ -66,20 +60,17 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     private boolean mHasColor;
     private int mEpisodePrimaryColor;
 
-    // ImageView iv, TextView tv1, TextView tv2, TextView tv3, TextView tv4, TextView tv5, TextView tv6, ViewStub vs, View pv
     public PlaylistViewHolder(View view, Activity argActivity) {
         super(view);
 
         mActivity = argActivity;
 
-        mLayout = (FrameLayout) view.findViewById(R.id.item);
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
         mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
         mPodcastImage = (ImageViewTinted) view.findViewById(R.id.podcast_image);
         mMainTitle = (TextView) view.findViewById(R.id.episode_title);
         mSecondaryTitle = (TextView) view.findViewById(R.id.podcast_title);
         mTimeDuration = (TextView) view.findViewById(R.id.podcast_duration);
-        //mTimeDurationIcon = (ImageView) view.findViewById(R.id.podcast_duration_ic);
         mCurrentPosition = (TextView) view.getTag(R.id.current_position);
         mPlaylistPosition = (TextView) view.findViewById(R.id.playlist_position);
 
@@ -96,6 +87,15 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         buttonLayout = (LinearLayout) view.findViewById(R.id.expanded_buttons_layout);
         mExpandedLayoutBottom = (ScrollView) view.findViewById(R.id.expanded_layout_bottom);
         description = (TextView) view.findViewById(R.id.podcast_description);
+    }
+
+    public void setEpisode(@NonNull IEpisode argEpisode) {
+        episode = argEpisode;
+    }
+
+    @Nullable
+    public IEpisode getEpisode() {
+        return episode;
     }
 
     @Override
@@ -126,5 +126,9 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     public boolean hasColor() {
         return mHasColor;
+    }
+
+    public View getRootView() {
+        return mMainContainer;
     }
 }

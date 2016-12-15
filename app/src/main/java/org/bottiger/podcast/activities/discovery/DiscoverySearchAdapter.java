@@ -71,8 +71,6 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
 
-        SharedAdapterUtils.AddPaddingToLastElement(holder.container, 0, position == mDataset.size()-1);
-
         final URL url = subscription.getURL();
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
