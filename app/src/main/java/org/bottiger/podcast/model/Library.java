@@ -933,6 +933,11 @@ public class Library {
     }
 
     private int compareSubscriptions(ISubscription s1, ISubscription s2) {
+
+        if (s1.isPinned() != s2.isPinned()) {
+            return Boolean.valueOf(s2.isPinned()).compareTo(s1.isPinned());
+        }
+
         switch (mSubscriptionSortOrder) {
 
             case ALPHABETICALLY_REVERSE: {
@@ -1001,6 +1006,14 @@ public class Library {
         PreferenceHelper.setIntegerPreferenceValue(mContext, R.string.pref_subscription_sort_order_key, argSortOrder);
         mSubscriptionSortOrder = argSortOrder;
 
+        resetOrder();
+    }
+
+    public @SortOrder int getSubscriptionOrder() {
+        return mSubscriptionSortOrder;
+    }
+
+    public void resetOrder() {
         mActiveSubscriptions.beginBatchedUpdates();
         Subscription[] subscriptionsTmp = new Subscription[mActiveSubscriptions.size()];
         Subscription subTmp;
@@ -1017,12 +1030,6 @@ public class Library {
         }
 
         mActiveSubscriptions.endBatchedUpdates();
-
-
-    }
-
-    public @SortOrder int getSubscriptionOrder() {
-        return mSubscriptionSortOrder;
     }
 
     /**

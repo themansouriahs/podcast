@@ -9,4 +9,13 @@
         app:srcCompat="@drawable/ic_check_circle_black_24dp"
         android:tint="@color/yellow"
         android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/subscription_is_pinned"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="8dp"
+        app:srcCompat="@drawable/ic_star_black_24dp"
+        android:tint="@color/yellow"
+        android:visibility="gone"/>
 </merge>

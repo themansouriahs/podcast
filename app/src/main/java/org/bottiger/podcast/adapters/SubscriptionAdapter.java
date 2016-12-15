@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
@@ -28,19 +32,24 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.subscription.AuthenticationViewHolder;
+import org.bottiger.podcast.adapters.viewholders.subscription.ISubscriptionViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
 
 import java.util.List;
+
+import okhttp3.Interceptor;
 
 /**
  * Created by aplb on 11-10-2015.
@@ -65,13 +74,15 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     @Nullable private ActionMode mActionMode = null;
     private MultiSelector mMultiSelector = new MultiSelector();
-    private ModalMultiSelectorCallback mActionModeCallback = getModalMultiSelectorCallback();
+    private SubscriptionSelectorCallback mActionModeCallback;
 
     public SubscriptionAdapter(Activity argActivity, int argColumnsCount) {
         mActivity = argActivity;
         mInflater = (LayoutInflater) argActivity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         numberOfColumns = argColumnsCount;
+
+        mActionModeCallback = new SubscriptionSelectorCallback(mActivity, this, mMultiSelector);
     }
 
     @Override
@@ -122,11 +133,17 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
     }
 
+    private void onBindBaseHolder(ISubscriptionViewHolder argHolder, @NonNull final Subscription argSubscription) {
+        argHolder.setIsPinned(argSubscription.isPinned());
+    }
+
     private void onBindAuthenticationHolder(AuthenticationViewHolder argHolder, @NonNull final Subscription argSubscription) {
+        onBindBaseHolder(argHolder, argSubscription);
         argHolder.url = argSubscription.getURLString();
     }
 
     private void onBindDefaultHolder(@NonNull final SubscriptionViewHolder argHolder, @NonNull final Subscription argSubscription) {
+        onBindBaseHolder(argHolder, argSubscription);
 
         final String logo = argSubscription.getImageURL();
         final Resources resources = mActivity.getResources();
@@ -256,7 +273,40 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     }
 
     private void onSubscriptionSelected() {
+        boolean allIsPinned = true;
+        boolean noneIsPinned = true;
+        boolean someIsPinned = true;
+
         int numSelected = mMultiSelector.getSelectedPositions().size();
+        List<Integer> selectedPositions = mMultiSelector.getSelectedPositions();
+        for (int i = 0; i < numSelected; i++) {
+            Integer position = selectedPositions.get(i);
+
+            if (mSubscriptions == null) {
+                break;
+            }
+
+            Subscription subscription = mSubscriptions.get(position);
+            if (subscription != null) {
+                allIsPinned = allIsPinned & subscription.isPinned();
+                noneIsPinned = noneIsPinned & !subscription.isPinned();
+            }
+        }
+
+        // in case both allIsPinned && noneIsPinned no positions are selected
+        allIsPinned = allIsPinned && noneIsPinned ? noneIsPinned : allIsPinned;
+        someIsPinned = !allIsPinned && !noneIsPinned;
+
+        @SubscriptionSelectorCallback.PinState int pinState =
+                someIsPinned ? SubscriptionSelectorCallback.SOME :
+                        noneIsPinned ? SubscriptionSelectorCallback.NONE : SubscriptionSelectorCallback.ALL;
+
+        mActionModeCallback.setPinState(pinState);
+
+        if (mActionMode != null) {
+            mActionMode.invalidate();
+        }
+
         setActionModeTitle(numSelected);
         if (numSelected < 1 && mActionMode != null) {
             mActionMode.finish();
@@ -265,6 +315,11 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     public void setDataset(@NonNull SortedList<Subscription> argSubscriptions) {
         mSubscriptions = argSubscriptions;
+    }
+
+    @Nullable
+    SortedList<Subscription> getDataset() {
+        return mSubscriptions;
     }
 
     @Override
@@ -336,61 +391,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
         return false;
-    }
-
-    private ModalMultiSelectorCallback getModalMultiSelectorCallback() {
-        return new ModalMultiSelectorCallback(mMultiSelector) {
-            @Override
-            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-
-                List<Integer> positions = mMultiSelector.getSelectedPositions();
-
-                if (mSubscriptions == null)
-                    return false;
-
-                switch (menuItem.getItemId()) {
-                    case R.id.unsubscribe:
-                        actionMode.finish();
-
-                        for (int i = 0; i < positions.size(); i++) {
-                            int position = positions.get(i);
-                            Subscription subscription = mSubscriptions.get(position);
-
-                            if (subscription == null)
-                                return false;
-
-                            subscription.unsubscribe("Unsubscribe:context");
-                            notifyItemRemoved(position);
-                        }
-
-                        mMultiSelector.clearSelections();
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                super.onCreateActionMode(actionMode, menu);
-                mActivity.getMenuInflater().inflate(R.menu.subscription_context, menu);
-
-                return true;
-            }
-
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                boolean onPrepared = super.onPrepareActionMode(mode, menu);
-
-                String title = String.valueOf(mMultiSelector.getSelectedPositions().size() + 1 );
-                mode.setTitle(title);
-
-                return onPrepared;
-            }
-
-            public void onDestroyActionMode(ActionMode mode) {
-                super.onDestroyActionMode(mode);
-            }
-        };
     }
 
     private CharSequence getNewEpisodesString(int newEpisodeCount) {
