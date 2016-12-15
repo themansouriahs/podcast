@@ -21,6 +21,7 @@ import org.unbescape.html.HtmlEscapeType;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,6 +50,13 @@ public class StrUtils {
 			return "";
 
 		return argUrl.replace("http://", "").replace("https://", "");
+	}
+
+	public static boolean isValidUrl(@Nullable URL argURL) {
+		if (argURL == null)
+			return false;
+
+		return isValidUrl(argURL.toString());
 	}
 
 	public static boolean isValidUrl(@Nullable String argUrl) {
