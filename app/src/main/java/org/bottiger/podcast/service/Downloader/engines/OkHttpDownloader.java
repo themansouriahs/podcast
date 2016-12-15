@@ -1,8 +1,11 @@
 package org.bottiger.podcast.service.Downloader.engines;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.webkit.MimeTypeMap;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.File;
@@ -24,25 +28,32 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import okhttp3.OkHttpClient;
 import okhttp3.OkUrlFactory;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
 
 /**
  * Created by apl on 17-09-2014.
  */
 public class OkHttpDownloader extends DownloadEngineBase {
 
-    private static final String TAG = "OkHttpDownloaderLog";
+    private static final String TAG = OkHttpDownloader.class.getSimpleName();
 
-    private static final int BUFFER_SIZE = 4096;
+    private static final int BUFFER_SIZE = 2048;
 
-    private final okhttp3.OkHttpClient mOkHttpClient = new okhttp3.OkHttpClient();
-    private HttpURLConnection mConnection;
+    private final OkHttpClient mOkHttpClient = new OkHttpClient();;
     private final SparseArray<Callback> mExternalCallback = new SparseArray<>();
 
     private volatile boolean mAborted = false;
 
-    private Context mContext;
-    private final URL mURL;
+    @NonNull private Context mContext;
+    @Nullable private final URL mURL;
 
     private double mProgress = 0;
 
@@ -56,79 +67,100 @@ public class OkHttpDownloader extends DownloadEngineBase {
     @WorkerThread
     @Override
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    public void startDownload() throws SecurityException{
+    public void startDownload() throws SecurityException {
         mProgress = 0;
-        try {
 
+        if (!StrUtils.isValidUrl(mURL)) {
+            Log.d(TAG, "no URL, return");
+            onFailure(new MalformedURLException());
+            return;
+        }
+
+        if (!(mEpisode instanceof FeedItem)) {
+            Log.d(TAG, "Trying to download slim episode - abort");
+            onFailure(new IllegalArgumentException("Argument must be of type FeedItem"));
+            return;
+        }
+
+        FeedItem episode = (FeedItem) mEpisode;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(mURL.toString());
+        Log.d(TAG, "File extension: " + extension);
+
+        String filename = Integer.toString(episode.getEpisodeNumber()) + episode.getTitle().replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
+        episode.setFilename(filename + "." + extension);
+
+        File tmpFile;
+        File finalFile;
+        try {
+            tmpFile = new File(episode.getAbsoluteTmpPath(mContext));
+            finalFile = new File(episode.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        BufferedSource source = null;
+        BufferedSink sink = null;
+
+        try {
             Log.d(TAG, "startDownload");
 
-            if (mURL == null || !StrUtils.isValidUrl(mURL.toString())) {
-                Log.d(TAG, "no URL, return");
-                onFailure(new MalformedURLException());
-                return;
-            }
+            Request request = new Request.Builder()
+                    .url(mURL.toString())
+                    .header("User-Agent", HttpUtils.getUserAgent(mContext))
+                    .build();
 
-            mConnection = new OkUrlFactory(mOkHttpClient).open(mURL);
+            Response response = mOkHttpClient.newCall(request).execute();
+            ResponseBody body = response.body();
+            long contentLength = body.contentLength();
+            source = body.source();
 
-            if (mEpisode instanceof FeedItem) {
-                FeedItem episode = (FeedItem) mEpisode;
+            mEpisode.setFilesize(contentLength);
 
-                String extension = MimeTypeMap.getFileExtensionFromUrl(mURL.toString());
+            sink = Okio.buffer(Okio.sink(tmpFile));
+            Buffer sinkBuffer = sink.buffer();
 
-                Log.d(TAG, "fileextension: " + extension);
+            long totalBytesRead = 0;
+            int bufferSize = BUFFER_SIZE;
 
-                String filename = Integer.toString(episode.getEpisodeNumber()) + episode.getTitle().replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
-                episode.setFilename(filename + "." + extension); // .replaceAll("[^a-zA-Z0-9_-]", "") +
+            Log.d(TAG, "starting file transfer");
 
-                double contentLength = mConnection.getContentLength();
-                InputStream inputStream = mConnection.getInputStream();
-                FileOutputStream outputStream = new FileOutputStream(episode.getAbsoluteTmpPath(mContext));
+            for (long bytesRead; (bytesRead = source.read(sinkBuffer, bufferSize)) != -1; ) {
 
-                mEpisode.setFilesize((long)contentLength);
-
-                Log.d(TAG, "starting file transfer");
-
-                int bytesRead = -1;
-                byte[] buffer = new byte[BUFFER_SIZE];
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    if (mAborted) {
-                        Log.d(TAG, "Transfer abort");
-                        onFailure(new InterruptedIOException());
-                        return;
-                    }
-
-                    outputStream.write(buffer, 0, bytesRead);
-                    mProgress += bytesRead / contentLength;
-                    getEpisode().setProgress(mProgress*100);
+                if (mAborted) {
+                    Log.d(TAG, "Transfer abort");
+                    closeConnection(source, sink);
+                    onFailure(new InterruptedIOException());
+                    return;
                 }
 
-                Log.d(TAG, "filetransfer done");
+                sink.emit();
+                totalBytesRead += bytesRead;
+                mProgress = ((totalBytesRead * 100) / contentLength);
+                getEpisode().setProgress(mProgress);
+            }
 
-                outputStream.close();
-                inputStream.close();
+            Log.d(TAG, "filetransfer done");
 
-                File tmpFIle = new File(episode.getAbsoluteTmpPath(mContext));
-                File finalFIle = new File(episode.getAbsolutePath());
+            // If download was succesfull
+            boolean movedFileSuccesfully = false;
+            if (tmpFile.exists() && tmpFile.length() == contentLength) {
+                Log.d(TAG, "Renaming file");
+                movedFileSuccesfully = tmpFile.renameTo(finalFile);
+                Log.d(TAG, "File renamed");
 
-                Log.d(TAG, "pre move file");
-
-                // If download was succesfull
-                if (tmpFIle.exists() && tmpFIle.length() == contentLength) {
-                    Log.d(TAG, "Renaming file");
-                    tmpFIle.renameTo(finalFIle);
-                    Log.d(TAG, "File renamed");
-                    onSucces(finalFIle);
+                if (movedFileSuccesfully) {
+                    onSucces(finalFile);
                     Log.d(TAG, "post onSucces");
-                } else {
-                    Log.d(TAG, "File already exists");
-                    String msg = "Wrong file size. Expected: " + tmpFIle.length() + ", got: " + contentLength; // NoI18N
-                    onFailure(new FileNotFoundException(msg));
-                    Log.d(TAG, "post onfailure");
                 }
-            } else {
-                Log.d(TAG, "Trying to download slim episode - abort");
             }
 
+            if (!movedFileSuccesfully) {
+                Log.d(TAG, "File already exists");
+                String msg = "Wrong file size. Expected: " + tmpFile.length() + ", got: " + contentLength; // NoI18N
+                onFailure(new FileNotFoundException(msg));
+                Log.d(TAG, "post onfailure");
+            }
         } catch (IOException e){
             Log.d(TAG, "IOException: " + e.toString());
             onFailure(e);
@@ -136,10 +168,22 @@ public class OkHttpDownloader extends DownloadEngineBase {
             String[] values = {mURL.toString()};
             VendorCrashReporter.handleException(e, keys, values);
         } finally{
-            Log.d(TAG, "disconnecting");
-            HttpURLConnection connection = mConnection;
-            if (connection != null)
-                connection.disconnect();
+            closeConnection(source, sink);
+        }
+    }
+
+    private void closeConnection(@Nullable BufferedSource source, @Nullable BufferedSink sink) {
+        Log.d(TAG, "disconnecting");
+        try {
+            if (sink != null) {
+                sink.flush();
+                sink.close();
+            }
+            if (source != null) {
+                source.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -169,7 +213,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
         }
     }
 
-    public void onFailure(IOException e) {
+    public void onFailure(Exception e) {
         Log.w("Download", "Download Failed: " + e.getMessage());
 
         for(int i = 0; i < mExternalCallback.size(); i++) {
