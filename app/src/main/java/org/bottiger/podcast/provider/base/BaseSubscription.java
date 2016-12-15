@@ -283,4 +283,8 @@ public abstract class BaseSubscription implements ISubscription {
     public int getDbItemType() {
         return SUBSCRIPTION;
     }
+
+    public boolean isPinned() {
+        return false;
+    }
 }

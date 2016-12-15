@@ -72,6 +72,11 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
     }
 
     @Override
+    public boolean isPinned() {
+        return false;
+    }
+
+    @Override
     public void setImageURL(@Nullable String argUrl) {
         mImageURL = argUrl;
     }
