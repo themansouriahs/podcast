@@ -235,6 +235,7 @@ public class FeedParser {
 
         Boolean containsHTML = null;
         DateUtils.Hint dateFormatHint = null;
+        Boolean hasReportedUnparsableDate = false;
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -262,7 +263,7 @@ public class FeedParser {
                     break;
                 }
                 case EPISODE_ITEM_TAG: {
-                    IEpisode episode = readEpisode(parser, argSubscription, dateFormatHint);
+                    IEpisode episode = readEpisode(parser, argSubscription, dateFormatHint, hasReportedUnparsableDate);
 
                     // Bulk insert.
                     if (episode != null) {
@@ -324,7 +325,8 @@ public class FeedParser {
     @Nullable
     private static IEpisode readEpisode(@NonNull XmlPullParser parser,
                                         @NonNull ISubscription argSubscription,
-                                        @Nullable DateUtils.Hint argDateHint) throws XmlPullParserException, IOException {
+                                        @Nullable DateUtils.Hint argDateHint,
+                                        Boolean hasReportedUnparsableDate) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, EPISODE_ITEM_TAG);
 
         IEpisode episode;
@@ -374,14 +376,17 @@ public class FeedParser {
                             episode.setPubDate(DateUtils.preventDateInTheFutre(date));
                         }
                     } catch (Exception e) {
-                        Log.w(TAG, "Could not parse date from subscription: " + argSubscription + " e: " + e.toString());
-                        String[] keys = new String[1];
-                        String[] values = new String[1];
+                        if (!hasReportedUnparsableDate) {
+                            hasReportedUnparsableDate = true;
+                            Log.w(TAG, "Could not parse date from subscription: " + argSubscription + " e: " + e.toString());
+                            String[] keys = new String[1];
+                            String[] values = new String[1];
 
-                        keys[0] = "Date parse error";
-                        values[0]  = argSubscription.getURLString();
+                            keys[0] = "Date parse error";
+                            values[0] = argSubscription.getURLString();
 
-                        VendorCrashReporter.handleException(e, keys, values);
+                            VendorCrashReporter.handleException(e, keys, values);
+                        }
                     }
                     break;
                 }
