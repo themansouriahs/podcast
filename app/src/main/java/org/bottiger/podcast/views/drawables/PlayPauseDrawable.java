@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Property;
 
@@ -77,12 +78,10 @@ public class PlayPauseDrawable extends Drawable {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(@NonNull Canvas canvas) {
 
-        if (mWidth <= 0) {
-            mWidth = canvas.getWidth();
-            mHeight = canvas.getHeight();
-        }
+        mWidth = canvas.getWidth();
+        mHeight = canvas.getHeight();
 
         if (mPauseBarHeight < 0) {
             mPauseBarHeight = (int)mHeight/3;

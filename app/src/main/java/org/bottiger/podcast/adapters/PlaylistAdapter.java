@@ -98,7 +98,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         Context context = SoundWaves.getAppContext(mActivity);
-        int textColor = item.isMarkedAsListened() ? ColorUtils.getTextColor(context) : ColorUtils.getFadedTextColor(context);
+        int textColor = item.isMarkedAsListened() ? ColorUtils.getFadedTextColor(context) : ColorUtils.getTextColor(context);
 
         viewHolder.setArtwork(null);
         ISubscription subscription = item.getSubscription(context);
@@ -196,7 +196,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
 
         holder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
         holder.downloadButton.setEpisode(argEpisode);
-        holder.removeButton.setEpisode(argEpisode);
 
         ISubscription subscription = argEpisode.getSubscription(context);
         subscription.getColors(context)
@@ -207,12 +206,11 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                     @Override
                     public void onSuccess(ColorExtractor value) {
                         holder.downloadButton.onPaletteFound(value);
-                        holder.removeButton.onPaletteFound(value);
                     }
                 });
 
 
-        holder.removeButton.setOnClickListener(new View.OnClickListener() {
+        holder.getRemoveButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PlaylistAdapter.this.toggle(holder);
@@ -255,7 +253,6 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         viewHolder.mPlayPauseButton.unsetEpisodeId();
-        viewHolder.removeButton.unsetEpisodeId();
         viewHolder.downloadButton.unsetEpisodeId();
     }
 

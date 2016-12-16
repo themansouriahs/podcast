@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -29,7 +30,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     private IEpisode episode = null;
     public PlaylistAdapter mAdapter = null;
 
-    public RelativeLayout mMainContainer;
+    private RelativeLayout mMainContainer;
 
     public PlayPauseImageView mPlayPauseButton;
     public PlayerButtonView mForward;
@@ -40,18 +41,16 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
     public TextView mMainTitle;
     public TextView mSecondaryTitle;
     public TextView mTimeDuration;
-    public TextView mCurrentPosition;
+    private TextView mCurrentPosition;
     public TextView mPlaylistPosition;
 
     // expanded extended_player
     public RelativeLayout mExpandedLayoutControls;
-    public LinearLayout buttonLayout;
     public PlayerSeekbar seekbar;
     public TextView currentTime;
     public TextView description;
 
-    public MaterialFavoriteButton favoriteButton;
-    public PlayerButtonView removeButton;
+    private ImageButton removeButton;
     public DownloadButtonView downloadButton;
 
     private Activity mActivity;
@@ -80,11 +79,10 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
                 .findViewById(R.id.current_position);
         seekbar = (PlayerSeekbar) view.findViewById(R.id.top_player_seekbar);
 
-        favoriteButton = (MaterialFavoriteButton) view.findViewById(R.id.favorite);
-        removeButton = (PlayerButtonView) view.findViewById(R.id.remove_episode);
+        removeButton = (ImageButton) view.findViewById(R.id.remove_episode);
         downloadButton = (DownloadButtonView) view
                 .findViewById(R.id.expanded_download);
-        buttonLayout = (LinearLayout) view.findViewById(R.id.expanded_buttons_layout);
+
         mExpandedLayoutBottom = (ScrollView) view.findViewById(R.id.expanded_layout_bottom);
         description = (TextView) view.findViewById(R.id.podcast_description);
     }
@@ -130,5 +128,15 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     public View getRootView() {
         return mMainContainer;
+    }
+
+    @NonNull
+    public View getDownloadButton() {
+        return downloadButton;
+    }
+
+    @NonNull
+    public ImageButton getRemoveButton() {
+        return removeButton;
     }
 }

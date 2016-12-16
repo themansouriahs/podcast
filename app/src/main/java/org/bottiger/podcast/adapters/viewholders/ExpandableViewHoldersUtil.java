@@ -29,7 +29,7 @@ public class ExpandableViewHoldersUtil {
     private static ViewGroup.LayoutParams sImageParams;
 
 
-    public static void openH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
+    private static void openH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
         if (animate) {
             initTransition(holder);
         }
@@ -50,28 +50,28 @@ public class ExpandableViewHoldersUtil {
 
             holder.mMainTitle.setLayoutParams(sTitleParams);
             holder.mMainTitle.setSingleLine(false);
-            holder.mMainTitle.setTextColor(Color.BLACK);
 
-            sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 100, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
-            sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+            //sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 100, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
+            //sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL, 0);
 
             holder.mExpandedLayoutBottom.setVisibility(View.VISIBLE);
             expandView.setVisibility(View.VISIBLE);
 
-            holder.buttonLayout.setVisibility(View.VISIBLE);
+            holder.getDownloadButton().setVisibility(View.VISIBLE);
+            holder.getRemoveButton().setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("NewApi")
-    public static void closeH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
+    private static void closeH(final PlaylistViewHolder holder, final View expandView, final boolean animate) {
 
         if (animate) {
             initTransition(holder);
         }
 
         if (sPlayPauseParams != null) {
-            sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 0, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
-            sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL);
-            holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
+            //sPlayPauseParams.setMargins(sPlayPauseParams.leftMargin, 0, sPlayPauseParams.rightMargin, sPlayPauseParams.bottomMargin);
+            //sPlayPauseParams.addRule(RelativeLayout.CENTER_VERTICAL);
+            //holder.mPlayPauseButton.setLayoutParams(sPlayPauseParams);
         }
 
 
@@ -84,14 +84,12 @@ public class ExpandableViewHoldersUtil {
         holder.downloadButton.enabledProgressListener(false);
 
         holder.mExpandedLayoutBottom.setVisibility(View.GONE);
-        holder.buttonLayout.setVisibility(View.GONE);
+        holder.getDownloadButton().setVisibility(View.GONE);
+        holder.getRemoveButton().setVisibility(View.GONE);
         expandView.setVisibility(View.GONE);
 
-
-        int white = ColorUtils.getBackgroundColor(holder.getActivity());
         int black = ColorUtils.getTextColor(holder.getActivity());
 
-        holder.mMainTitle.setTextColor(black);
         holder.description.setTextColor(black);
         holder.currentTime.setTextColor(black);
         holder.mTimeDuration.setTextColor(black);

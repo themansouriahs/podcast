@@ -51,8 +51,6 @@ public class PlayPauseView extends View {
 
     private AnimatorSet mAnimatorSet;
     private int mBackgroundColor;
-    private int mWidth;
-    private int mHeight;
 
     private @ColorRes int color1 = R.color.colorPrimaryDark;
     private @ColorRes int color2 = R.color.colorPrimaryDark;
@@ -60,15 +58,14 @@ public class PlayPauseView extends View {
     public PlayPauseView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(false);
-        mBackgroundColor = ContextCompat.getColor(context, color1);//getResources().getColor(R.color.purple);
+        mBackgroundColor = ContextCompat.getColor(context, color1);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
 
         mPaintBackground.setAntiAlias(true);
         mPaintBackground.setStyle(Paint.Style.FILL);
 
-        mDrawable = new PlayPauseDrawable(context); // context.getDrawable(R.drawable.action_search);
-        //mDrawable.setTint(Color.WHITE);
+        mDrawable = new PlayPauseDrawable(context);
         mDrawable.setCallback(this);
 
         mPauseBackgroundColor = ContextCompat.getColor(context, color1);
@@ -97,7 +94,12 @@ public class PlayPauseView extends View {
         super.onDraw(canvas);
         mPaint.setColor(mBackgroundColor);
         final float radius = Math.min(getWidth(), getHeight()) / 2f;
-        canvas.drawCircle(getWidth()/2f, radius, radius, mPaint);
+        final float cx = getWidth()/2f;
+        final float cy = getHeight()/2f;
+        canvas.drawCircle(cx, cy, radius, mPaint);
+
+        //float transY = (getHeight()-getWidth())/2f;
+        //canvas.translate(0, transY);
         mDrawable.draw(canvas);
     }
 

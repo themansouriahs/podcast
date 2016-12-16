@@ -312,9 +312,9 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
         boolean updateOutline = bounds == null;
 
         bounds.left = contentWidth > minSize ? (contentWidth-minSize)/2f + drawOffset : drawOffset;
-        bounds.top = drawOffset;
+        bounds.top = (contentHeight-minSize)/2f + drawOffset;
         bounds.right = minSize - drawOffset; //contentWidth - drawOffset;
-        bounds.bottom = minSize - drawOffset; //contentWidth - drawOffset;
+        bounds.bottom = (contentHeight-minSize)/2f + minSize - drawOffset; //contentWidth - drawOffset;
 
         if (DEBUG)
             Log.d(TAG, "onDraw. Preparing => " + (mStatus == STATE_BUFFERING) + " status: " + mStatus);
@@ -591,28 +591,6 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
 
     public void setColor(ColorExtractor value) {
         setColor(value.getPrimary(), value.getPrimaryTint());
-    }
-
-
-    private static int smallSize = -1;
-    private static int largeSize = -1;
-
-    public static int getSmallSize(@NonNull Context argContext) {
-        if (smallSize > 0)
-            return smallSize;
-
-        smallSize = argContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size_normal);
-
-        return smallSize;
-    }
-
-    public static int getLargeSize(@NonNull Context argContext) {
-        if (largeSize > 0)
-            return largeSize;
-
-        largeSize = argContext.getResources().getDimensionPixelSize(R.dimen.playpause_button_size);
-
-        return largeSize;
     }
 
     private float getProgressAngle(int argProgress) {
