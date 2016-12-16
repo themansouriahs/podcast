@@ -20,6 +20,7 @@ import android.support.transition.ChangeBounds;
 import android.support.transition.Scene;
 import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -564,12 +565,12 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         argEpisode.getSubscription(mContext).getColors(mContext)
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.schedulers.Schedulers.computation())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
                 .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
                     @Override
                     public void onSuccess(ColorExtractor value) {
                         mPlayPauseButton.setColor(value);
-                        mBackgroundColor = value.getPrimaryTint() != -1 ? value.getPrimaryTint() : ColorUtils.lighten(value.getPrimary());
+                        mBackgroundColor = value.getPrimaryTint() != -1 ? value.getPrimaryTint() : ContextCompat.getColor(mContext, R.color.colorBgSecondary);
 
                         mBackgroundColor = ColorUtils.adjustToTheme(getResources(), mBackgroundColor);
 

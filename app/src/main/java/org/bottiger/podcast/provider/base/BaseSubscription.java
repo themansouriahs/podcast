@@ -198,9 +198,11 @@ public abstract class BaseSubscription implements ISubscription {
     @WorkerThread
     private ColorExtractor getColorExtractor(@NonNull Context argContext) {
 
+        /*
         if (mPrimaryColor != -1 && mPrimaryTintColor != -1 && mSecondaryColor != -1) {
             return new ColorExtractor(mPrimaryColor, mPrimaryTintColor, mSecondaryColor);
         }
+        */
 
         Bitmap bitmap;
         Palette palette = null;

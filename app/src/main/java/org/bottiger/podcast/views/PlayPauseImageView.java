@@ -276,16 +276,14 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
 
     public void setColor(@ColorInt int argColor, @ColorInt int argOuterColor) {
         float scale = 1.3f;
-        //scale = 1.8f;
-        float red = Color.red(argColor)*scale;
-        float green = Color.green(argColor)*scale;
-        float blue = Color.blue(argColor)*scale;
+        int maxColor = 255;
 
-        int newColor = Color.argb(255, (int)red, (int)green, (int)blue);
+        float red = Math.min(Color.red(argColor)*scale, maxColor);
+        float green = Math.min(Color.green(argColor)*scale, maxColor);
+        float blue = Math.min(Color.blue(argColor)*scale, maxColor);
 
-        float darkPrimary = newColor;
+        int newColor = Color.argb(maxColor, (int)red, (int)green, (int)blue);
 
-        //setBackgroundColor(newColor);
         setColor(newColor);
         paintBorder.setColor(argOuterColor);
     }
@@ -590,7 +588,10 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
     }
 
     public void setColor(ColorExtractor value) {
-        setColor(value.getPrimary(), value.getPrimaryTint());
+        @ColorInt int innerColor = value.getPrimary() != -1 ? value.getPrimary() : ContextCompat.getColor(mContext, R.color.colorPrimary);
+        @ColorInt int outerColor = value.getPrimaryTint() != -1 ? value.getPrimaryTint() : ContextCompat.getColor(mContext, R.color.colorBgPrimary);
+
+        setColor(innerColor, outerColor);
     }
 
     private float getProgressAngle(int argProgress) {
