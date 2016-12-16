@@ -48,10 +48,7 @@ public class SubscriptionRefreshManager {
 
     @NonNull
     private final Handler mainHandler;
-
-    @NonNull
-    private static final FeedParser sFeedParser = new FeedParser();
-
+    
     @NonNull
     private Context mContext;
 
@@ -225,7 +222,7 @@ public class SubscriptionRefreshManager {
             if (response.body() != null && response.isSuccessful()) {
                 boolean success = true;
                 try {
-                    sFeedParser.parse(argSubscription, response.body().byteStream(), argContext, true);
+                    FeedParser.parse(argSubscription, response.body().byteStream(), argContext, true);
 
                     //downloadNewEpisodes(argContext, argSubscription);
                 } catch (XmlPullParserException xppe) {
@@ -243,8 +240,8 @@ public class SubscriptionRefreshManager {
 
                 Log.d(TAG, "Parsing callback for: " + argSubscription);
 
-                //if (argCallback != null)
-                //    argCallback.complete(success, argSubscription);
+                if (argCallback != null)
+                    argCallback.complete(success, argSubscription);
 
             }
         } catch (NullPointerException npe) {
