@@ -566,7 +566,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
                 .observeOn(io.reactivex.schedulers.Schedulers.computation())
                 .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
-
                     @Override
                     public void onSuccess(ColorExtractor value) {
                         mPlayPauseButton.setColor(value);

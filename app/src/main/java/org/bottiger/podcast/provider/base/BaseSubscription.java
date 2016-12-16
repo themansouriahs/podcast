@@ -198,18 +198,18 @@ public abstract class BaseSubscription implements ISubscription {
     @WorkerThread
     private ColorExtractor getColorExtractor(@NonNull Context argContext) {
 
-        if (mPrimaryColor != 0 && mPrimaryTintColor != 0 && mSecondaryColor != 0) {
+        if (mPrimaryColor != -1 && mPrimaryTintColor != -1 && mSecondaryColor != -1) {
             return new ColorExtractor(mPrimaryColor, mPrimaryTintColor, mSecondaryColor);
         }
 
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         Palette palette = null;
 
         try {
             bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, getImageURL())
                     .into(200, 200) // Width and height
                     .get();
-            Palette.from(bitmap).generate();
+            palette = Palette.from(bitmap).generate();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
