@@ -161,6 +161,7 @@ public class FeedParser {
             parser.nextTag();
             return readFeed(parser, argSubscription, argContext, argFullRead);
         } finally {
+            argSubscription.cacheImage(argContext);
             argSubscription.setIsRefreshing(false);
             in.close();
             long duration = System.currentTimeMillis()-startTime;

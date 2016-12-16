@@ -172,7 +172,15 @@ public class SubscriptionsFragment extends Fragment {
                         // Update the subscription fragment when a image is updated in an subscription
                         SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
                         Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
-                        int index = subscriptions.indexOf(subscription);
+
+                        int index = subscriptions.indexOf(subscription); // doesn't work
+                        for (int i = 0; i < subscriptions.size(); i++) {
+                            Subscription currentSubscription = subscriptions.get(i);
+                            if (subscription != null && subscription.equals(currentSubscription)) {
+                                index = i;
+                                break;
+                            }
+                        }
 
                         if (!mGridView.isComputingLayout()) {
                             mAdapter.notifyItemChanged(index);

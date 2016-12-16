@@ -2,6 +2,7 @@ package org.bottiger.podcast.provider.base;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.support.v7.graphics.Palette;
@@ -10,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.PreloadTarget;
 
 import org.bottiger.podcast.SoundWaves;
@@ -17,10 +19,13 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 
 import java.util.Date;
 import java.util.List;
@@ -34,9 +39,14 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.SingleSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.internal.operators.single.SingleObserveOn;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by aplb on 08-06-2016.
@@ -221,6 +231,46 @@ public abstract class BaseSubscription implements ISubscription {
         return new ColorExtractor(palette);
     }
 
+    @MainThread
+    public void cacheImage(@NonNull final Context argContext) {
+        Single.just(argContext)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<Context, Boolean>() {
+                    @Override
+                    public Boolean apply(Context context) throws Exception {
+                        try {
+                            Glide.with(context).load(getImageURL()).diskCacheStrategy(DiskCacheStrategy.ALL).into(200, 200).get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            return false;
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                            return false;
+                        }
+
+                        return true;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean value) {
+                        if (value) {
+                            notifyPropertyChanged(SubscriptionChanged.CHANGED, "ImageCached");
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ErrorUtils.handleException(e);
+                    }
+                });
+    }
+
     public boolean doSkipIntro() {
         return false;
     }
@@ -288,5 +338,41 @@ public abstract class BaseSubscription implements ISubscription {
 
     public boolean isPinned() {
         return false;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        if (mUrlString == null) {
+            return 31;
+        }
+
+        return mUrlString.hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        boolean isInstanceof = obj instanceof ISubscription;
+        if (!isInstanceof) {
+            return false;
+        }
+
+        ISubscription other = (ISubscription) obj;
+
+        return mUrlString != null && mUrlString.equals(other.getURLString());
+
     }
 }

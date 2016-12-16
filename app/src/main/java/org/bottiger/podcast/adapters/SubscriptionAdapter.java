@@ -203,7 +203,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             if (!TextUtils.isEmpty(image) && StrUtils.isValidUrl(image)) {
 
                 if (getItemViewType(position) == GRID_TYPE) {
-                    ImageLoaderUtils.getGlide(mActivity, image).centerCrop().placeholder(R.drawable.generic_podcast).into(argHolder.image);
+                    ImageLoaderUtils.getGlide(mActivity, image)
+                            .centerCrop()
+                            .placeholder(R.drawable.generic_podcast)
+                            .into(argHolder.image);
                 } else {
                     ImageLoaderUtils.getGlide(mActivity, image)
                             .centerCrop()

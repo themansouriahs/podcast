@@ -91,4 +91,6 @@ public interface ISubscription extends PaletteListener, IDbItem {
     @ColorInt int getSecondaryColor();
 
     Single<ColorExtractor> getColors(@NonNull final Context argContext);
+
+    void cacheImage(@NonNull final Context argContext);
 }

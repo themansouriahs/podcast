@@ -865,7 +865,6 @@ public class Library {
                             mSubscriptionUrlLUT.put(key, subscription);
                             mSubscriptionIdLUT.put(subscription.getId(), subscription);
                             mActiveSubscriptions.add(subscription);
-
                         } finally {
                             mSubscriptionLock.unlock();
                         }

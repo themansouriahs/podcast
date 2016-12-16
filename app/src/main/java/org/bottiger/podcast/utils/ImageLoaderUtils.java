@@ -39,11 +39,14 @@ public class ImageLoaderUtils {
         BitmapRequestBuilder bitmapRequestBuilder;
         boolean noNetwork = NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK;
 
+        /*
         if (noNetwork) {
             drawableTypeRequest = requestManager.using(new NetworkDisablingLoader()).load(argUrl);
         } else {
             drawableTypeRequest = requestManager.load(argUrl);
         }
+        */
+        drawableTypeRequest = requestManager.load(argUrl);
 
          bitmapRequestBuilder = drawableTypeRequest
                  .asBitmap()
