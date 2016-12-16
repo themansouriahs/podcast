@@ -74,4 +74,6 @@
         android:layout_alignStart="@id/grid_title"
         />
 
+    <include layout="@layout/subscription_item_selected_mark" />
+
 </RelativeLayout>
