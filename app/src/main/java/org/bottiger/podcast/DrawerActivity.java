@@ -32,19 +32,10 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
 
     protected DrawerLayout mDrawerLayout;
     protected ActionBarDrawerToggle mDrawerToggle;
-    private Activity mActivity;
 
-    protected ViewGroup mDrawerMainContent;
     private NavigationView mNavigationView;
     private NavigationView mNavigationViewBottom;
     private Toolbar mToolbar;
-    private View mFragmentTop;
-    private View mHeaderContainerBackground;
-    private ViewPager mAppContent;
-    private SlidingTabLayout mSlidingTabLayout;
-
-    private int mFragmentTopPosition = -1;
-    private ViewTreeObserver mVto;
 
     public List<TopFound> listeners = new LinkedList<>();
     public interface TopFound {
@@ -61,14 +52,9 @@ public abstract class DrawerActivity extends MediaRouterPlaybackActivity impleme
         mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
         mNavigationViewBottom = (NavigationView) findViewById(R.id.navigation_drawer_bottom);
         mToolbar = (Toolbar) findViewById(R.id.soundwaves_toolbar);
-        //mFragmentTop = (View) findViewById(R.id.fragment_top);
-        //mHeaderContainerBackground = findViewById(R.id.header_container_background);
-        mAppContent = (ViewPager) findViewById(R.id.app_content);
-        //mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+
         mNavigationView.setNavigationItemSelectedListener(this);
         mNavigationViewBottom.setNavigationItemSelectedListener(this);
-
-        //observeToolbarHeight(mFragmentTop);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon

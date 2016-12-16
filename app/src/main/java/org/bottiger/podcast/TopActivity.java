@@ -210,7 +210,8 @@ public class TopActivity extends AppCompatActivity {
         Drawable drawable = item.getIcon();
         drawable = DrawableCompat.wrap(drawable);
         drawable = drawable.getConstantState().newDrawable(); // clone it.
-        @ColorInt int color = UIUtils.isInNightMode(this.getResources()) ? ContextCompat.getColor(this, R.color.pitch_black) : ContextCompat.getColor(this, R.color.white_opaque);
+        //@ColorInt int color = UIUtils.isInNightMode(this.getResources()) ? ContextCompat.getColor(this, R.color.pitch_black) : ContextCompat.getColor(this, R.color.white_opaque);
+        @ColorInt int color = ContextCompat.getColor(this, R.color.white_opaque);
         DrawableCompat.setTint(drawable, color);
         argMenu.findItem(R.id.menu_download_manager).setIcon(drawable);
 
