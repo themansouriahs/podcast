@@ -21,6 +21,8 @@ import android.widget.TextView;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import org.bottiger.podcast.BuildConfig;
 import org.bottiger.podcast.R;
@@ -474,6 +476,11 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
 
     }
 

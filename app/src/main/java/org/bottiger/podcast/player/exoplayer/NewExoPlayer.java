@@ -46,16 +46,19 @@ import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
+import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.metadata.id3.Id3Decoder;
 import com.google.android.exoplayer2.metadata.id3.Id3Frame;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
 import com.google.android.exoplayer2.trackselection.AdaptiveVideoTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
@@ -138,7 +141,7 @@ public final class NewExoPlayer implements ExoPlayer {
     private SurfaceHolder surfaceHolder;
     private TextureView textureView;
     private TextRenderer.Output textOutput;
-    private MetadataRenderer.Output<List<Id3Frame>> id3Output;
+    private MetadataRenderer.Output id3Output;
     private VideoListener videoListener;
     private AudioRendererEventListener audioDebugListener;
     private VideoRendererEventListener videoDebugListener;
@@ -204,7 +207,7 @@ public final class NewExoPlayer implements ExoPlayer {
 
         TrackSelection.Factory videoTrackSelectionFactory =
                 new AdaptiveVideoTrackSelection.Factory(BANDWIDTH_METER);
-        trackSelector = new DefaultTrackSelector(mainHandler, videoTrackSelectionFactory);
+        trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
         //trackSelector.addListener(argContext);
         //trackSelector.addListener(eventLogger);
         //trackSelectionHelper = new TrackSelectionHelper(trackSelector, videoTrackSelectionFactory);
@@ -239,6 +242,16 @@ public final class NewExoPlayer implements ExoPlayer {
      */
     public int getRendererType(int index) {
         return renderers[index].getTrackType();
+    }
+
+    @Override
+    public TrackGroupArray getCurrentTrackGroups() {
+        return null;
+    }
+
+    @Override
+    public TrackSelectionArray getCurrentTrackSelections() {
+        return null;
     }
 
     /**
@@ -440,7 +453,7 @@ public final class NewExoPlayer implements ExoPlayer {
      *
      * @param output The output.
      */
-    public void setId3Output(MetadataRenderer.Output<List<Id3Frame>> output) {
+    public void setId3Output(MetadataRenderer.Output output) {
         id3Output = output;
     }
 
@@ -571,8 +584,8 @@ public final class NewExoPlayer implements ExoPlayer {
     private void buildRenderers(Context context, DrmSessionManager drmSessionManager,
                                 ArrayList<Renderer> renderersList, long allowedVideoJoiningTimeMs) {
         MediaCodecVideoRenderer videoRenderer = new MediaCodecVideoRenderer(context,
-                MediaCodecSelector.DEFAULT, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT,
-                allowedVideoJoiningTimeMs, drmSessionManager, false, mainHandler, componentListener,
+                MediaCodecSelector.DEFAULT, allowedVideoJoiningTimeMs,
+                drmSessionManager, false, mainHandler, componentListener,
                 MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY);
         renderersList.add(videoRenderer);
 
@@ -585,7 +598,7 @@ public final class NewExoPlayer implements ExoPlayer {
         Renderer textRenderer = new TextRenderer(componentListener, mainHandler.getLooper());
         renderersList.add(textRenderer);
 
-        MetadataRenderer<List<Id3Frame>> id3Renderer = new MetadataRenderer<>(componentListener,
+        MetadataRenderer id3Renderer = new MetadataRenderer(componentListener,
                 mainHandler.getLooper(), new Id3Decoder());
         renderersList.add(id3Renderer);
     }
@@ -677,7 +690,7 @@ public final class NewExoPlayer implements ExoPlayer {
     }
 
     private final class ComponentListener implements VideoRendererEventListener,
-            AudioRendererEventListener, TextRenderer.Output, MetadataRenderer.Output<List<Id3Frame>>,
+            AudioRendererEventListener, TextRenderer.Output, MetadataRenderer.Output,
             SurfaceHolder.Callback, TextureView.SurfaceTextureListener {
 
         // VideoRendererEventListener implementation
@@ -811,15 +824,6 @@ public final class NewExoPlayer implements ExoPlayer {
             }
         }
 
-        // MetadataRenderer.Output<List<Id3Frame>> implementation
-
-        @Override
-        public void onMetadata(List<Id3Frame> id3Frames) {
-            if (id3Output != null) {
-                id3Output.onMetadata(id3Frames);
-            }
-        }
-
         // SurfaceHolder.Callback implementation
 
         @Override
@@ -860,6 +864,10 @@ public final class NewExoPlayer implements ExoPlayer {
             // Do nothing.
         }
 
+        @Override
+        public void onMetadata(Metadata metadata) {
+            id3Output.onMetadata(metadata);
+        }
     }
 
     @TargetApi(23)

@@ -10,6 +10,8 @@ import android.widget.Chronometer;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
@@ -90,6 +92,11 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
 
     }
 

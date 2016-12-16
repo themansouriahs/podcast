@@ -45,6 +45,7 @@ import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.metadata.id3.Id3Frame;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashChunkSource;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
@@ -52,6 +53,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveVideoTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.DebugTextViewHelper;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -73,6 +75,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.google.android.exoplayer2.SimpleExoPlayer.EXTENSION_RENDERER_MODE_PREFER;
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
 
 /**
@@ -555,6 +558,11 @@ public class ExoPlayerWrapper implements ExoPlayer.EventListener {
 
     }
 
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
     public void onLoadStarted(int sourceId, long length, int type, int trigger, Format format,
                               long mediaStartTimeMs, long mediaEndTimeMs) {
         if (infoListener != null) {
@@ -606,17 +614,17 @@ public class ExoPlayerWrapper implements ExoPlayer.EventListener {
     private void initializePlayer(@NonNull Context argContext) {
 
         if (player == null) {
-            boolean preferExtensionDecoders = false;
+            @SimpleExoPlayer.ExtensionRendererMode int extensionRendererModePrefer = EXTENSION_RENDERER_MODE_PREFER;
 
             //eventLogger = new EventLogger();
             TrackSelection.Factory videoTrackSelectionFactory =
                     new AdaptiveVideoTrackSelection.Factory(BANDWIDTH_METER);
-            trackSelector = new DefaultTrackSelector(mainHandler, videoTrackSelectionFactory);
+            trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
             //trackSelector.addListener(this);
             //trackSelector.addListener(eventLogger);
             //trackSelectionHelper = new TrackSelectionHelper(trackSelector, videoTrackSelectionFactory);
             player = ExoPlayerFactory.newSimpleInstance(argContext, trackSelector, new DefaultLoadControl(),
-                    null, preferExtensionDecoders);
+                    null, extensionRendererModePrefer);
             player.addListener(this);
             //player.addListener(eventLogger);
             //player.setAudioDebugListener(eventLogger);

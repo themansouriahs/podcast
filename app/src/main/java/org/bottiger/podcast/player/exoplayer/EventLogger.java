@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.StreamingDrmSessionManager;
+import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.metadata.id3.ApicFrame;
 import com.google.android.exoplayer2.metadata.id3.GeobFrame;
@@ -40,7 +41,7 @@ import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelections;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
@@ -54,8 +55,7 @@ import java.util.Locale;
  */
 /* package */ final class EventLogger implements ExoPlayer.EventListener,
         AudioRendererEventListener, VideoRendererEventListener, AdaptiveMediaSourceEventListener,
-        ExtractorMediaSource.EventListener, StreamingDrmSessionManager.EventListener,
-        TrackSelector.EventListener<MappingTrackSelector.MappedTrackInfo>, MetadataRenderer.Output<List<Id3Frame>> {
+        ExtractorMediaSource.EventListener, StreamingDrmSessionManager.EventListener, MetadataRenderer.Output {
 
     private static final String TAG = "EventLogger";
     private static final int MAX_TIMELINE_ITEM_LINES = 3;
@@ -119,19 +119,13 @@ import java.util.Locale;
     }
 
     @Override
-    public void onPlayerError(ExoPlaybackException e) {
-        Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
-    }
-
-    // MappingTrackSelector.EventListener
-
-    @Override
-    public void onTrackSelectionsChanged(TrackSelections<? extends MappingTrackSelector.MappedTrackInfo> trackSelections) {
+    public void onTracksChanged(TrackGroupArray argTrackGroups, TrackSelectionArray trackSelections) {
+        /*
         Log.d(TAG, "Tracks [");
         // Log tracks associated to renderers.
-        MappingTrackSelector.MappedTrackInfo info = trackSelections.info;
+        //MappingTrackSelector.MappedTrackInfo info = trackSelections.info;
         for (int rendererIndex = 0; rendererIndex < trackSelections.length; rendererIndex++) {
-            TrackGroupArray trackGroups = info.getTrackGroups(rendererIndex);
+            TrackGroupArray trackGroups = argTrackGroups; //info.getTrackGroups(rendererIndex);
             TrackSelection trackSelection = trackSelections.get(rendererIndex);
             if (trackGroups.length > 0) {
                 Log.d(TAG, "  Renderer:" + rendererIndex + " [");
@@ -173,10 +167,17 @@ import java.util.Locale;
             Log.d(TAG, "  ]");
         }
         Log.d(TAG, "]");
+        */
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException e) {
+        Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
     }
 
     // MetadataRenderer.Output<List<Id3Frame>>
 
+    /*
     @Override
     public void onMetadata(List<Id3Frame> id3Frames) {
         for (Id3Frame id3Frame : id3Frames) {
@@ -204,6 +205,7 @@ import java.util.Locale;
             }
         }
     }
+    */
 
     // AudioRendererEventListener
 
@@ -438,4 +440,8 @@ import java.util.Locale;
         return enabled ? "[X]" : "[ ]";
     }
 
+    @Override
+    public void onMetadata(Metadata metadata) {
+
+    }
 }
