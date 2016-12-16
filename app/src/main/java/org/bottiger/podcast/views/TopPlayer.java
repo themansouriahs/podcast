@@ -217,6 +217,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mGestureDetector = new GestureDetectorCompat(argContext,mTopPLayerScrollGestureListener);
 
         mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
+
         mViewConfiguration = ViewConfiguration.get(argContext);
 
         if (isInEditMode()) {
@@ -355,6 +356,9 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                 }
             }
         });
+
+
+        setPlayer();
     }
 
     @Override
@@ -486,6 +490,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
         mPlayerDownloadButton.setEpisode(argEpisode);
+        mPlayerDownloadButton.enabledProgressListener(true);
 
         mPlayPauseButton.setStatus(STATE_READY);
 
@@ -510,9 +515,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         }
 
         if (iSubscription != null) {
-
-            //PaletteHelper.generate(iSubscription, activity, mTopPlayer);
-
             iSubscription.getColors(mContext)
                     .subscribeOn(io.reactivex.schedulers.Schedulers.io())
                     .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
@@ -542,7 +544,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
             Log.v("MissingImage", "Setting image");
             ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false);
-
         }
 
         SoundWaves soundwaves = SoundWaves.getAppContext(getContext());

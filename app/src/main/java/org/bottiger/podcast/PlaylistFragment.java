@@ -253,17 +253,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             if (mTopPlayer != null) {
                 mTopPlayer.bind(item);
             }
-            /*
-            if (item != null) {
-                if (mPlayPauseButton != null)
-                    mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
-
-                if (mPlayerDownloadButton != null) {
-                    mPlayerDownloadButton.setEpisode(item);
-                    mPlayerDownloadButton.enabledProgressListener(true);
-                }
-            }
-            */
             playlistChanged(mPlaylist);
         }
 
@@ -423,8 +412,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             return;
 
         mTopPlayer = (TopPlayer) mTopPlayerStub.inflate();
-
-        //mTopPlayer =   (TopPlayer) view.findViewById(R.id.top_player);
         mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
 
         assert mTopPlayer != null;
@@ -445,7 +432,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             return;
 
         mRecyclerView = (RecyclerView) mRecyclerStub.inflate();
-        //mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
 
         // use a linear layout manager
         mLayoutManager = new CustomLinearLayoutManager(mContext);

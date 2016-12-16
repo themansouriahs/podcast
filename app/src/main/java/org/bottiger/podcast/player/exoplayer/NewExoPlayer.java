@@ -156,7 +156,7 @@ public final class NewExoPlayer implements ExoPlayer {
     boolean mDoRemoveSilence = false;
     boolean mAutomaticGainControl = false;
 
-    /* package */ NewExoPlayer(Context context, TrackSelector trackSelector,
+    NewExoPlayer(Context context, TrackSelector trackSelector,
                                   LoadControl loadControl, DrmSessionManager drmSessionManager,
                                   boolean preferExtensionDecoders, long allowedVideoJoiningTimeMs) {
         mainHandler = new Handler();
