@@ -128,12 +128,14 @@ public class UIUtils {
 
         argSnack.setActionTextColor(ContextCompat.getColor(argView.getContext(), R.color.white_opaque));
 
+        /*
         if (addBototmPadding) {
             View view = argSnack.getView();
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
             params.bottomMargin = DrawerActivity.getStatusBarHeight(view.getContext().getResources())*2;
             view.setLayoutParams(params);
         }
+        */
 
         argSnack.show();
     }
