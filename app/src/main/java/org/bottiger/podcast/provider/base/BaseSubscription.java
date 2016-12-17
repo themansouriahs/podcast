@@ -239,7 +239,7 @@ public abstract class BaseSubscription implements ISubscription {
                     @Override
                     public Boolean apply(Context context) throws Exception {
                         try {
-                            Glide.with(context).load(getImageURL()).diskCacheStrategy(DiskCacheStrategy.ALL).into(200, 200).get();
+                            Glide.with(context).load(getImageURL()).diskCacheStrategy(ImageLoaderUtils.SW_DiskCacheStrategy).into(200, 200).get();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             return false;

@@ -32,25 +32,28 @@ import org.bottiger.podcast.utils.image.NetworkDisablingLoader;
  */
 public class ImageLoaderUtils {
 
+    public static final DiskCacheStrategy SW_DiskCacheStrategy = DiskCacheStrategy.SOURCE;
+
     public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl) {
+        return getGlide(argContext, argUrl, false);
+    }
+
+    public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl, boolean forceNetworkConnection) {
         RequestManager requestManager = Glide.with(argContext);
 
         DrawableTypeRequest drawableTypeRequest;
         BitmapRequestBuilder bitmapRequestBuilder;
-        boolean noNetwork = NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK;
+        boolean noNetwork = !forceNetworkConnection && NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK;
 
-        /*
         if (noNetwork) {
             drawableTypeRequest = requestManager.using(new NetworkDisablingLoader()).load(argUrl);
         } else {
             drawableTypeRequest = requestManager.load(argUrl);
         }
-        */
-        drawableTypeRequest = requestManager.load(argUrl);
 
          bitmapRequestBuilder = drawableTypeRequest
                  .asBitmap()
-                 .diskCacheStrategy( DiskCacheStrategy.ALL );
+                 .diskCacheStrategy( SW_DiskCacheStrategy );
 
 
         return bitmapRequestBuilder;
@@ -60,8 +63,9 @@ public class ImageLoaderUtils {
     public static void loadImageInto(@NonNull View argImageView,
                                      @Nullable String argUrl,
                                      boolean argUsePlaceholder,
-                                     boolean argRoundedCorners) {
-        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners);
+                                     boolean argRoundedCorners,
+                                     boolean argForceNetworkConnection) {
+        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners, argForceNetworkConnection);
     }
 
     public static void loadImageInto(@NonNull View argImageView,
@@ -69,11 +73,12 @@ public class ImageLoaderUtils {
                                      @Nullable Transformation argTransformation,
                                      boolean argDoCrop,
                                      boolean argUsePlaceholder,
-                                     boolean argRoundedCorners) {
+                                     boolean argRoundedCorners,
+                                     boolean argForceNetworkConnection) {
         if (argUrl == null)
             return;
 
-        loadImageUsingGlide(argImageView, argUrl, argTransformation, argDoCrop, argUsePlaceholder, argRoundedCorners);
+        loadImageUsingGlide(argImageView, argUrl, argTransformation, argDoCrop, argUsePlaceholder, argRoundedCorners, argForceNetworkConnection);
     }
 
     private static void loadImageUsingGlide(final @NonNull View argTargetView,
@@ -81,7 +86,8 @@ public class ImageLoaderUtils {
                                             @Nullable Transformation argTransformation,
                                             boolean argDoCrop,
                                             boolean argUsePlaceholder,
-                                            final boolean argRounddedCorners) {
+                                            final boolean argRounddedCorners,
+                                            boolean argForceNetworkConnection) {
         Context context = argTargetView.getContext();
 
         Target target;
@@ -92,7 +98,7 @@ public class ImageLoaderUtils {
             target = getViewTarget(argTargetView, argRounddedCorners);
         }
 
-        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(context, argUrl);
+        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(context, argUrl, argForceNetworkConnection);
 
         if (argDoCrop)
             builder.centerCrop();
