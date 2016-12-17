@@ -1,6 +1,6 @@
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android.support.design="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -47,8 +47,10 @@ android:background="@color/colorPrimary"
                 android:layout_height="wrap_content"
                 app:tabMode="fixed"
                 app:tabGravity="fill"
+                app:tabPaddingStart="2dp"
+                app:tabPaddingEnd="2dp"
+                app:tabTextAppearance="@style/SWTabLayoutTextAppearance"
                 android:theme="@style/TabLayoutSingleLineTheme" />
-            <!-- app:layout_scrollFlags="scroll|enterAlways" -->
 
         </android.support.design.widget.AppBarLayout>
 
@@ -82,7 +84,6 @@ android:background="@color/colorPrimary"
             android:layout_height="wrap_content"
             app:menu="@menu/drawer_bottom"
             android:layout_gravity="bottom">
-
 
         </android.support.design.widget.NavigationView>
 

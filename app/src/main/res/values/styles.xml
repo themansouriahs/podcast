@@ -346,8 +346,12 @@
 
     <style name="SoundWavesTheme.Light.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="TabLayoutSingleLineTheme">
+    <style name="TabLayoutSingleLineTheme" parent="Base.Widget.Design.TabLayout">
         <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="SWTabLayoutTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>
