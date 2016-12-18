@@ -504,7 +504,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         mPlayerSeekbar.setEpisode(argEpisode);
         mPlayerSeekbar.setOverlay(mOverlay);
-        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
         mPlayerDownloadButton.setEpisode(argEpisode);
 
@@ -538,6 +538,8 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                                     new int[]{transparentgradientColor, gradientColor});
                             Drawable wrapDrawable = DrawableCompat.wrap(gd);
                             DrawableCompat.setTint(wrapDrawable, value.getPrimary());
+
+                            mPlayerSeekbar.getProgressDrawable().setColorFilter(value.getPrimary(), PorterDuff.Mode.SRC_IN);
                         }
                     });
 

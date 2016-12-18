@@ -42,14 +42,14 @@
 
                 <ImageButton
                     android:id="@+id/discovery_searchIcon"
-                    android:layout_width="30dp"
+                    android:layout_width="42dp"
                     android:layout_height="25dp"
                     android:elevation="5dp"
                     android:layout_alignTop="@id/discovery_searchView"
                     android:layout_alignBottom="@id/discovery_searchView"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginRight="10dp"
+                    android:paddingRight="12dp"
                     android:scaleType="centerInside"
                     android:background="@android:color/transparent"
                     android:contentDescription="@string/discovery_directory_icon" />

@@ -45,7 +45,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 03-09-2014.
  */
-public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer.EventListener {
+public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
 
     private static final String TAG = PlayerSeekbar.class.getSimpleName();
     private static final int RANGE_MAX = 1000;
@@ -211,7 +211,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
                     public void onNext(BaseEpisode.SeekEvent seekEvent) {
                         setProgress(getProgress(mEpisode, seekEvent.getMs()));
                         PlayerSeekbar.this.postInvalidate();
-                        //postInvalidate();
                     }
                 });
     }
@@ -363,23 +362,6 @@ public class PlayerSeekbar extends SeekBar implements PaletteListener, ExoPlayer
         }
         return true;
 
-    }
-
-    @Override
-    public void onPaletteFound(Palette argChangedPalette) {
-        Palette.Swatch swatch = argChangedPalette.getVibrantSwatch();
-        if (swatch==null)
-            return;
-
-        int color = swatch.getRgb();
-        ColorDrawable dc = new ColorDrawable(color);
-        dc.setAlpha(100);
-        invalidate();
-    }
-
-    @Override
-    public String getPaletteUrl() {
-        return mEpisode.getArtwork(getContext());
     }
 
     private boolean validateState() {

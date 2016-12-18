@@ -32,6 +32,7 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.AndroidUtil;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
 
 import static org.bottiger.podcast.notification.NotificationPlayer.REQUEST_CODE;
 
@@ -117,8 +118,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             Log.wtf(TAG, episode.getTitle());
 
             CharSequence podcast_title = "No title";
-            if (episode.getSubscription(context) != null)
-                podcast_title = episode.getSubscription(context).getTitle();
+            podcast_title = episode.getSubscription(context).getTitle();
 
             //podcast_title =   (wasEmpty ? "Loaded" : "Memory") + podcast_title;
 
@@ -163,7 +163,12 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
             if (imageUrl != null) {
                 AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_logo, appWidgetId);
 
+                // image size
+                int imageSizeDp = (int) context.getResources().getDimension(R.dimen.widget_logo_size);
+                //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
+
                 ImageLoaderUtils.getGlide(context, imageUrl)
+                        .override(imageSizeDp, imageSizeDp)
                         .into(appWidgetTarget);
             }
         }
