@@ -16,8 +16,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="16dp"
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:gravity="center_horizontal"
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="32dp"
+        android:paddingTop="16dp"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
         android:layout_marginBottom="0dp"
@@ -45,7 +45,7 @@
         android:layout_above="@id/mi_description"
         android:layout_below="@id/mi_title">
 
-    <VideoView
+    <org.bottiger.podcast.views.ExpandedVideoView
         android:id="@+id/intro_video_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
