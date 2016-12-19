@@ -8,6 +8,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.util.SortedList;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.ItemColumns;
@@ -37,6 +38,15 @@ public class TestUtils {
 
     public static final int LEFT = 1;
     public static final int RIGHT = 2;
+
+    public static void firstRun(@NonNull Context argContext, boolean argFirstRun) {
+        SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
+        String key = argContext.getString(R.string.preference_first_run_key);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(key, argFirstRun);
+        editor.commit();
+    }
 
     private static void clearSettings(@NonNull Context argContext) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(argContext);

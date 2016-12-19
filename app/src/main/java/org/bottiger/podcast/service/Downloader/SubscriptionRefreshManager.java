@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.annotation.WorkerThread;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
@@ -34,6 +35,8 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static android.support.annotation.RestrictTo.Scope.TESTS;
 
 /**
  * Created by apl on 26-03-2015.
@@ -301,6 +304,11 @@ public class SubscriptionRefreshManager {
         keys[0] = "url";
         values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
         VendorCrashReporter.handleException(argExceiption, keys, values);
+    }
+
+    @RestrictTo(TESTS)
+    public OkHttpClient getHttpClient() {
+        return mOkClient;
     }
 }
 
