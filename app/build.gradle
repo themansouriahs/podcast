@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 348        // even - release. Odd - development
         versionName "0.148.26" // even - release. Odd - development
@@ -18,7 +18,7 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         // Espresso
-        //testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
             abiFilters "armeabi-v7a", "x86"
@@ -166,6 +166,8 @@ dependencies {
     // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
+    androidTestCompile 'com.squareup.okhttp3:okhttp:3.5.0'
     androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2') {
         exclude module: 'support-annotations'
         exclude module: 'support-v4'
@@ -175,6 +177,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
+
+
     // Free version
 
     // Amazon version
