@@ -1,15 +1,24 @@
 package org.bottiger.podcast;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.app.ActivityCompat;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 
 import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
+import org.bottiger.podcast.activities.openopml.OPML_import_export_activity;
 import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.views.dialogs.DialogOPML;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
@@ -21,13 +30,15 @@ import static android.support.test.espresso.matcher.RootMatchers.isDialog;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.not;
 
 /**
  * Created by aplb on 17-09-2015.
  */
-@LargeTest
-public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActivity> {
+@RunWith(AndroidJUnit4.class)
+public class EspressoOPMLTest {
 
     private static final String TAG = "EspressoOPMLTest";
     private static final int FIRST_ITEM = 0;
@@ -38,44 +49,37 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
     private OPMLImportExport mOPMLImportExport;
     private File mOutputFile;
 
-    public EspressoOPMLTest() {
-        super(MainActivity.class);
-    }
-
-    public EspressoOPMLTest(Class<MainActivity> activityClass) {
-        super(activityClass);
-    }
+    @Rule
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-
-        // I guess we assume we have permision here
-        mOPMLImportExport = new OPMLImportExport(getActivity());
+    public void setUp() {
+        mOPMLImportExport = new OPMLImportExport(mActivityTestRule.getActivity());
         mOutputFile = mOPMLImportExport.getExportFile();
         mOutputFile.delete();
 
-
-        getActivity();
-
-        TestUtils.clearAllData(getActivity());
+        TestUtils.clearAllData(mActivityTestRule.getActivity());
         TestUtils.subscribe(NUMBER_OF_SUBSCRIPTIONS);
 
-        openDialog();
+        //openDialog();
 
+        Intent i = new Intent(mActivityTestRule.getActivity().getApplicationContext(), OPML_import_export_activity.class);
+        mActivityTestRule.getActivity().startActivityForResult(i, SubscriptionsFragment.getOPMLStatusCode());
     }
 
+    @Test
     public void testSDcardFolderExists() {
         File dir = new File(exportDir);
         assertTrue(dir.isDirectory());
     }
 
+    @Test
     public void testOpenImportExportDialog() {
         onView(withText(R.string.opml_radio_import)).check(matches(isDisplayed()));
         onView(withId(R.id.radio_export)).inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
+    @Test
     public void testImportOPMLButton() {
 
         // close the dialog
@@ -83,7 +87,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
 
         onView(withText(R.string.opml_radio_import)).check(matches(not(isDisplayed())));
 
-        TestUtils.unsubscribeAll(getActivity());
+        TestUtils.unsubscribeAll(mActivityTestRule.getActivity());
 
         onView(withId(R.id.import_opml_button)).check(matches(isDisplayed()));
         onView(withId(R.id.import_opml_button)).perform(click());
@@ -91,6 +95,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withText(R.string.opml_radio_import)).check(matches(isDisplayed()));
     }
 
+    @Test
     public void testExportFeeds() {
 
         File expectedFile = expectedExportedFile();
@@ -104,6 +109,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
         assertFalse(actualFile.exists());
     }
 
+    @Test
     public void testImportFeeds() {
         File expectedOutputFile = expectedExportedFile();
         File expectedImportFile = expectedImportedFile();
@@ -122,7 +128,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
 
         assertTrue(expectedImportFile.exists());
 
-        TestUtils.unsubscribeAll(getActivity());
+        TestUtils.unsubscribeAll(mActivityTestRule.getActivity());
 
         // Reopen the dialog
         openDialog();
@@ -169,7 +175,7 @@ public class EspressoOPMLTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     private void openDialog() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        openActionBarOverflowOrOptionsMenu(mActivityTestRule.getActivity());
         onView(withText(R.string.menu_import)).perform(click());
     }
 }

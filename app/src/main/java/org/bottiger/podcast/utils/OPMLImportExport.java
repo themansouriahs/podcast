@@ -272,11 +272,14 @@ public class OPMLImportExport {
 	 * @return just launches the file manager, return true if everything is ok
 	 * @throws SecurityException
 	 */
-
-	/* POSSIBLY NOT NEEDED ANYMORE?
-
-	 */
 	private boolean initInputOutputFiles() throws SecurityException {
+		try {
+			file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
+			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 
 		return true;
 	}

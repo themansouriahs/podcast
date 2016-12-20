@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.util.SortedList;
@@ -44,6 +45,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static android.support.annotation.RestrictTo.Scope.TESTS;
 
 public class SubscriptionsFragment extends Fragment {
 
@@ -427,5 +430,10 @@ public class SubscriptionsFragment extends Fragment {
                 Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory() + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @RestrictTo(TESTS)
+    public static int getOPMLStatusCode() {
+        return OPML_ACTIVITY_STATUS_CODE;
     }
 }

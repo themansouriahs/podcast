@@ -6,7 +6,11 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.util.SortedList;
+
+import com.jakewharton.espresso.OkHttp3IdlingResource;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
@@ -18,6 +22,8 @@ import org.bottiger.podcast.provider.SubscriptionColumns;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import okhttp3.OkHttpClient;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -38,6 +44,14 @@ public class TestUtils {
 
     public static final int LEFT = 1;
     public static final int RIGHT = 2;
+
+    public static void waitForSubscriptionRefresh(@NonNull Activity argActivity) {
+        Context context = argActivity.getApplicationContext();
+        OkHttpClient client = SoundWaves.getAppContext(context).getRefreshManager().getHttpClient();
+        IdlingResource resource = OkHttp3IdlingResource.create("OkHttp", client);
+
+        Espresso.registerIdlingResources(resource);
+    }
 
     public static void firstRun(@NonNull Context argContext, boolean argFirstRun) {
         SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
