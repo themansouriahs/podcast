@@ -424,9 +424,17 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     }
 
     private void setSearchEngine(@SearchEngine int argSearchEngine) {
+
+        Context context = getContext();
+
+        if (context == null) {
+            VendorCrashReporter.report(TAG, "Context is null");
+            return;
+        }
+
         switch (argSearchEngine) {
             case GPODDER_INDEX: {
-                mDirectoryProvider = new GPodder(getContext());
+                mDirectoryProvider = new GPodder(context);
                 mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
                 break;
             }
@@ -445,7 +453,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         boolean engineSupported = mDirectoryProvider != null && mDirectoryProvider.isEnabled();
 
         if (!engineSupported) {
-            mDirectoryProvider = new GPodder(getContext());
+            mDirectoryProvider = new GPodder(context);
             mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
         }
     }
