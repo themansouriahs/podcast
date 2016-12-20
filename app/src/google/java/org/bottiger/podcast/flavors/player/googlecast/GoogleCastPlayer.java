@@ -82,6 +82,7 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
         // Handle pending result
         getRemoteMediaClient().pause();
+        super.pause();
     }
 
     @Override
@@ -191,10 +192,14 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
     @Override
     public void setDataSourceAsync(@NonNull IEpisode argEpisode) {
+        Log.d(TAG, "loading: " + argEpisode.toString());
         super.setDataSourceAsync(argEpisode);
 
         String url = argEpisode.getURL();
-        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+
+        int mediaType = argEpisode.isVideo() ? MediaMetadata.MEDIA_TYPE_MOVIE : MediaMetadata.MEDIA_TYPE_MUSIC_TRACK;
+
+        MediaMetadata mediaMetadata = new MediaMetadata(mediaType);
 
         mediaMetadata.putString(MediaMetadata.KEY_TITLE, argEpisode.getTitle());
         mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE, argEpisode.getSubscription(mContext).getTitle());
@@ -216,7 +221,13 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
 
 
         RemoteMediaClient remoteMediaClient = getRemoteMediaClient();
-        remoteMediaClient.load(mediaInfo, true, startPos);
+
+        if (remoteMediaClient == null) {
+            return;
+        }
+
+        PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = remoteMediaClient.load(mediaInfo, true, startPos);
+        Log.d(TAG, "loading done");
     }
 
     @Override
@@ -303,8 +314,8 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
                         break;
                     }
                     case PLAYER_STATE_IDLE: {
-                        setState(PlayerStatusObservable.PAUSED);
-                        playbackState = STATE_IDLE;
+                        //setState(PlayerStatusObservable.PAUSED);
+                        //playbackState = STATE_IDLE;
                         break;
                     }
                     case PLAYER_STATE_BUFFERING: {

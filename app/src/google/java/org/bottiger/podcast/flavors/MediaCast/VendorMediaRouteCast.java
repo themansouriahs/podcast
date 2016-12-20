@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;
@@ -18,6 +19,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.player.googlecast.GoogleCastPlayer;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.player.SoundWavesPlayer;
 import org.bottiger.podcast.provider.IEpisode;
 
@@ -26,7 +28,7 @@ import org.bottiger.podcast.provider.IEpisode;
  */
 public class VendorMediaRouteCast extends GoogleCastPlayer {
 
-    private static final String TAG = "MediaRouteCast";
+    private static final String TAG = VendorMediaRouteCast.class.getSimpleName();
 
     @NonNull
     private final Activity mActivity;
@@ -52,60 +54,6 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
         stop();
     }
 
-    private class SessionManagerListenerImpl implements SessionManagerListener<CastSession> {
-        @Override
-        public void onSessionStarting(CastSession session) {
-        }
-
-        @Override
-        public void onSessionStarted(CastSession session, String sessionId) {
-            mCastSession = session;
-            mActivity.invalidateOptionsMenu();
-            setClient();
-        }
-
-        @Override
-        public void onSessionStartFailed(CastSession session, int i) {
-
-        }
-
-        @Override
-        public void onSessionEnding(CastSession session) {
-
-        }
-
-        @Override
-        public void onSessionResumeFailed(CastSession session, int i) {
-
-        }
-
-        @Override
-        public void onSessionSuspended(CastSession session, int i) {
-
-        }
-
-        @Override
-        public void onSessionEnded(CastSession session, int error) {
-            if (session == mCastSession) {
-                mCastSession = null;
-            }
-            mActivity.invalidateOptionsMenu();
-            unsetClient();
-        }
-
-        @Override
-        public void onSessionResuming(CastSession session, String s) {
-
-        }
-
-        @Override
-        public void onSessionResumed(CastSession castSession, boolean b) {
-            mCastSession = castSession;
-            mActivity.invalidateOptionsMenu();
-        }
-    }
-
-
     public VendorMediaRouteCast(@NonNull Activity argActivity) {
         super(argActivity);
         mActivity = argActivity;
@@ -126,13 +74,20 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
             return;
 
         mRemoteMediaClient = mCastSession.getRemoteMediaClient();
+
+        if (mRemoteMediaClient == null)
+            return;
+
         mRemoteMediaClient.addListener(getRemoteMediaClientListener());
-        SoundWaves.getAppContext(mActivity).setPlayer(this);
 
         IEpisode episode = SoundWaves.getAppContext(mActivity).getPlaylist().first();
         if (episode != null) {
             setDataSourceAsync(episode);
         }
+    }
+
+    private void setSoundWavesPlayer() {
+        SoundWaves.getAppContext(mActivity).setPlayer(this);
     }
 
     private void unsetClient() {
@@ -180,5 +135,76 @@ public class VendorMediaRouteCast extends GoogleCastPlayer {
         return mCastContext == null;
     }
 
+    private class SessionManagerListenerImpl implements SessionManagerListener<CastSession> {
+        @Override
+        public void onSessionStarting(CastSession session) {
+            Log.d(TAG, "session starting: " + session.getApplicationStatus());
+
+            setSoundWavesPlayer();
+
+            setState(PlayerStatusObservable.PREPARING);
+        }
+
+        @Override
+        public void onSessionStarted(CastSession session, String sessionId) {
+            Log.d(TAG, "session started: " + session.getApplicationStatus());
+
+            mCastSession = session;
+            mActivity.invalidateOptionsMenu();
+            setClient();
+
+            setState(PlayerStatusObservable.PLAYING);
+        }
+
+        @Override
+        public void onSessionStartFailed(CastSession session, int i) {
+            Log.d(TAG, "session start failed: " + session.getApplicationStatus());
+            setState(PlayerStatusObservable.STOPPED);
+        }
+
+        @Override
+        public void onSessionEnding(CastSession session) {
+            Log.d(TAG, "session ending: " + session.getApplicationStatus());
+        }
+
+        @Override
+        public void onSessionResumeFailed(CastSession session, int i) {
+            Log.d(TAG, "session resumed failed: " + session.getApplicationStatus());
+            setState(PlayerStatusObservable.STOPPED);
+        }
+
+        @Override
+        public void onSessionSuspended(CastSession session, int i) {
+            Log.d(TAG, "session suspended: " + session.getApplicationStatus());
+            setState(PlayerStatusObservable.STOPPED);
+        }
+
+        @Override
+        public void onSessionEnded(CastSession session, int error) {
+            Log.d(TAG, "session ended: " + session.getApplicationStatus());
+            if (session == mCastSession) {
+                mCastSession = null;
+            }
+            mActivity.invalidateOptionsMenu();
+            unsetClient();
+
+            setState(PlayerStatusObservable.STOPPED);
+        }
+
+        @Override
+        public void onSessionResuming(CastSession session, String s) {
+            Log.d(TAG, "session resuming: " + session.getApplicationStatus());
+            setState(PlayerStatusObservable.PREPARING);
+        }
+
+        @Override
+        public void onSessionResumed(CastSession castSession, boolean b) {
+            Log.d(TAG, "session resumed: " + castSession.getApplicationStatus());
+            mCastSession = castSession;
+            mActivity.invalidateOptionsMenu();
+
+            setState(PlayerStatusObservable.PLAYING);
+        }
+    }
 
 }

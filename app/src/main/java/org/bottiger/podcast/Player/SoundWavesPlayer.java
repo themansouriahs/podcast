@@ -256,7 +256,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mStatus = PlayerStatusObservable.PAUSED;
 
         MarkAsListenedIfNeeded();
-        SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
+        SoundWaves.getAppContext(mContext).getAnalystics().trackEvent(IAnalytics.EVENT_TYPE.PAUSE);
     }
 
     /**

@@ -58,13 +58,16 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     // Constants pulled into this class for convenience.
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({STATE_IDLE, STATE_BUFFERING, STATE_READY, STATE_ENDED})
-    public @interface PlayerState {}
+    public @interface PlayerState {
+    }
+
     public static final int STATE_IDLE = ExoPlayer.STATE_IDLE;
     public static final int STATE_BUFFERING = ExoPlayer.STATE_BUFFERING;
     public static final int STATE_READY = ExoPlayer.STATE_READY;
     public static final int STATE_ENDED = ExoPlayer.STATE_ENDED;
 
-    @PlayerStatusObservable.PlayerStatus int mStatus;
+    @PlayerStatusObservable.PlayerStatus
+    int mStatus;
 
     @Nullable
     PlayerService mPlayerService;
@@ -73,7 +76,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     @javax.annotation.Nullable
     private NotificationPlayer mNotificationPlayer;
 
-    @NonNull protected Context mContext;
+    @NonNull
+    protected Context mContext;
 
     long mSleepTimer = -1;
 
@@ -124,6 +128,12 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     protected void setState(@PlayerStatusObservable.PlayerStatus int argState) {
 
+        // FIXME This happens when the app is connected to a chromecast which starts emitting events before the playerservice is bound.
+        if (mPlayerStateManager == null) {
+            Log.d(TAG, "Fix this race."); // NoI18N.
+            return;
+        }
+
         mStatus = argState;
         switch (argState) {
             case PlayerStatusObservable.PAUSED:
@@ -140,7 +150,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 break;
         }
 
-        mPlayerService.notifyStatusChanged();
+        if (mPlayerService != null) {
+            mPlayerService.notifyStatusChanged();
+        }
     }
 
     public @PlayerStatusObservable.PlayerStatus int getStatus() {
@@ -153,6 +165,10 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         } else {
             start();
         }
+    }
+
+    public void pause() {
+        setState(PlayerStatusObservable.PAUSED);
     }
 
     public void release() {
