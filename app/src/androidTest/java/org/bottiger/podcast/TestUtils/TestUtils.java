@@ -8,6 +8,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResource;
+import android.support.test.espresso.ViewInteraction;
 import android.support.v7.util.SortedList;
 
 import com.jakewharton.espresso.OkHttp3IdlingResource;
@@ -32,6 +33,8 @@ import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
 
 /**
  * Created by aplb on 17-09-2015.
@@ -100,16 +103,25 @@ public class TestUtils {
      * @return true if everything goes well
      */
     public static boolean subscribe(int argAmount) {
-        ViewPagerMove(RIGHT);
-        ViewPagerMove(RIGHT);
+        //ViewPagerMove(RIGHT);
+        //ViewPagerMove(RIGHT);
+
+        ViewInteraction appCompatTextView1 = onView(
+                allOf(withText("DISCOVER"), isDisplayed()));
+        appCompatTextView1.perform(click());
+
 
         int subscriptionCount = argAmount;
 
         for (int i = 0; i < subscriptionCount; i++) {
+            RecyclerTestUtils.subscribeToPodcast(i);
+            /*
             onView(withId(R.id.search_result_view))
                     .perform(RecyclerTestUtils.actionOnItemViewAtPosition(i, R.id.result_subscribe_switch, click()));
+                    */
         }
 
+        /*
         ViewPagerMove(LEFT);
 
         onView(withId(R.id.gridview)).check(matches(isDisplayed()));
@@ -117,6 +129,7 @@ public class TestUtils {
         for (int i = 0; i < subscriptionCount; i++) {
             RecyclerTestUtils.withRecyclerView(R.id.gridview).atPosition(i).matches(isDisplayed());
         }
+        */
 
         return true;
     }

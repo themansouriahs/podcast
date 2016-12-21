@@ -67,12 +67,14 @@ public class EspressoOPMLTest {
         mActivityTestRule.getActivity().startActivityForResult(i, SubscriptionsFragment.getOPMLStatusCode());
     }
 
+
     @Test
     public void testSDcardFolderExists() {
         File dir = new File(exportDir);
         assertTrue(dir.isDirectory());
     }
 
+    /*
     @Test
     public void testOpenImportExportDialog() {
         onView(withText(R.string.opml_radio_import)).check(matches(isDisplayed()));
@@ -178,4 +180,5 @@ public class EspressoOPMLTest {
         openActionBarOverflowOrOptionsMenu(mActivityTestRule.getActivity());
         onView(withText(R.string.menu_import)).perform(click());
     }
+    */
 }

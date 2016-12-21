@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.jakewharton.espresso.OkHttp3IdlingResource;
 
+import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -64,26 +65,7 @@ public class SubscribeToPodcastTest {
                 allOf(withText("DISCOVER"), isDisplayed()));
         appCompatTextView4.perform(click());
 
-        ViewInteraction switchCompat = onView(withId(R.id.search_result_view))
-                .perform(RecyclerViewActions
-                        .actionOnItemAtPosition(2, new ViewAction() {
-                            @Override
-                            public Matcher<View> getConstraints() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getDescription() {
-                                return "Click the subscribe button";
-                            }
-
-                            @Override
-                            public void perform(UiController uiController, View view) {
-                                SwitchCompat button = (SwitchCompat) view.findViewById(R.id.result_subscribe_switch);
-                                // Maybe check for null
-                                button.performClick();
-                            }
-                        }));
+        ViewInteraction switchCompat = RecyclerTestUtils.subscribeToPodcast(2);
 
         switchCompat.perform(click());
 

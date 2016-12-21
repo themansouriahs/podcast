@@ -4,13 +4,20 @@ import android.support.annotation.IdRes;
 import android.support.test.espresso.PerformException;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.espresso.util.HumanReadables;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 
+import org.bottiger.podcast.R;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
  * Created by aplb on 16-09-2015.
@@ -22,6 +29,31 @@ public class RecyclerTestUtils {
                                                                                              int viewId,
                                                                                              ViewAction viewAction) {
         return new ActionOnItemViewAtPositionViewAction(position, viewId, viewAction);
+    }
+
+    public static ViewInteraction subscribeToPodcast(int argPosition) {
+        return onView(withId(R.id.search_result_view))
+                .perform(RecyclerViewActions
+                        .actionOnItemAtPosition(argPosition, new ViewAction() {
+                            @Override
+                            public Matcher<View> getConstraints() {
+                                return null;
+                            }
+
+                            @Override
+                            public String getDescription() {
+                                return "Click the subscribe button";
+                            }
+
+                            @Override
+                            public void perform(UiController uiController, View view) {
+                                SwitchCompat button = (SwitchCompat) view.findViewById(R.id.result_subscribe_switch);
+                                // Maybe check for null
+                                if (!button.isChecked()) {
+                                    button.performClick();
+                                }
+                            }
+                        }));
     }
 
     private static final class ActionOnItemViewAtPositionViewAction<VH extends RecyclerView
