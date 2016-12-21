@@ -1,20 +1,12 @@
 package org.bottiger.podcast;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.app.ActivityCompat;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.util.Log;
 
-import org.bottiger.podcast.TestUtils.RecyclerTestUtils;
 import org.bottiger.podcast.TestUtils.TestUtils;
-import org.bottiger.podcast.activities.openopml.OPML_import_export_activity;
+import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.utils.OPMLImportExport;
-import org.bottiger.podcast.views.dialogs.DialogOPML;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,12 +14,7 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.RootMatchers.isDialog;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertFalse;
@@ -63,7 +50,7 @@ public class EspressoOPMLTest {
 
         //openDialog();
 
-        Intent i = new Intent(mActivityTestRule.getActivity().getApplicationContext(), OPML_import_export_activity.class);
+        Intent i = new Intent(mActivityTestRule.getActivity().getApplicationContext(), OPMLImportExportActivity.class);
         mActivityTestRule.getActivity().startActivityForResult(i, SubscriptionsFragment.getOPMLStatusCode());
     }
 

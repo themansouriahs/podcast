@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 350        // even - release. Odd - development
-        versionName "0.148.28" // even - release. Odd - development
+        versionCode 351        // even - release. Odd - development
+        versionName "0.148.29" // even - release. Odd - development
         multiDexEnabled = true
         //renderscriptTargetApi 20
         //renderscriptSupportModeEnabled true
@@ -148,6 +148,7 @@ dependencies {
     compile 'com.bugsnag:bugsnag-android:3.7.0'
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
     compile 'com.heinrichreimersoftware:material-intro:1.6'
+    compile 'com.dmitrymalkovich.android:material-design-dimens:1.4'
 
     compile 'org.unbescape:unbescape:1.1.4.RELEASE'
 
@@ -214,4 +215,4 @@ tasks.whenTaskAdded { task ->
 }
 
 
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'

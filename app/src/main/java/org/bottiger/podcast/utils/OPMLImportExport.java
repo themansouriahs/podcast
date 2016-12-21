@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -83,7 +84,7 @@ public class OPMLImportExport {
 	@RequiresPermission(allOf = {
 			Manifest.permission.READ_EXTERNAL_STORAGE,
 			Manifest.permission.WRITE_EXTERNAL_STORAGE})
-	public List<SlimSubscription> readSubscriptionsFromOPML(@NonNull File argOPMLFile) {
+	public List<SlimSubscription> readSubscriptionsFromOPML(@NonNull Reader argOPMLReader) {
 
 		int numImported = 0;
 		BufferedReader reader;
@@ -91,7 +92,7 @@ public class OPMLImportExport {
 		LinkedList<SlimSubscription> opmlSubscriptions = new LinkedList<>();
 
 		try {
-			reader = new BufferedReader(new FileReader(argOPMLFile));
+			reader = new BufferedReader(argOPMLReader);
 
 			OpmlReader omplReader = new OpmlReader();
 			elements = omplReader.readDocument(reader);

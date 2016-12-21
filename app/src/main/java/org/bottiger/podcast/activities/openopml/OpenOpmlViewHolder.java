@@ -14,7 +14,6 @@ public class OpenOpmlViewHolder extends RecyclerView.ViewHolder {
     private ViewDataBinding binding;
 
     private SlimSubscription mSubscription;
-    private int mPosition;
 
     public OpenOpmlViewHolder(View rowView) {
         super(rowView);

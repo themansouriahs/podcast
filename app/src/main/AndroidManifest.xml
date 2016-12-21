@@ -208,7 +208,7 @@
             android:label="Submit log"
             android:windowSoftInputMode="stateHidden" />
 
-        <activity android:name=".activities.openopml.OPML_import_export_activity"
+        <activity android:name=".activities.openopml.OPMLImportExportActivity"
             android:label="@string/opml_import_export_toolbar_title"
             android:parentActivityName=".activities.feedview.FeedActivity">
             <meta-data

@@ -28,7 +28,7 @@ public class OpmlReader {
 	 */
 	public ArrayList<OpmlElement> readDocument(Reader reader)
 			throws XmlPullParserException, IOException {
-		elementList = new ArrayList<OpmlElement>();
+		elementList = new ArrayList<>();
 		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 		factory.setNamespaceAware(true);
 		XmlPullParser xpp = factory.newPullParser();

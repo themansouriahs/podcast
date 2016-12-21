@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +18,7 @@ import android.widget.Button;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
 
-public class OPML_import_export_activity extends ToolbarActivity {
+public class OPMLImportExportActivity extends ToolbarActivity {
 
     /*
     The status codes can be changed, they just need to be the same in all activities, it doesn't matter the number,
@@ -28,6 +29,7 @@ public class OPML_import_export_activity extends ToolbarActivity {
     private static final String EXTRAS_CODE = "path";
     private static final String EXPORT_RETURN_CODE = "RETURN_EXPORT";
     private static final String MimeType = "file/xml";
+    private static final String[] MIME_TYPES = {"file/xml", "application/xml", "text/xml", "text/x-opml", "text/plain"};
     private static final String TAG = "OPML_io_act";
     private static final int RESULT_IMPORT = 201;
     private static final int RESULT_EXPORT = 202;
@@ -70,7 +72,12 @@ public class OPML_import_export_activity extends ToolbarActivity {
                 Intent intent;
                 chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                 //Unless you have an external file manager, this not seems to work, the mimetype is wrong or something
-                chooseFile.setType(MimeType);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    chooseFile.setType("*/*");
+                    chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
+                } else {
+                    chooseFile.setType(MimeType);
+                }
                 intent = Intent.createChooser(chooseFile, "Choose a file"); //this string is not important since is not shown
                 startActivityForResult(intent, ACTIVITY_CHOOSE_FILE_STATUS_CODE);
             }

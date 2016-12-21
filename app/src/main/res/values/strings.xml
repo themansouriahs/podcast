@@ -182,7 +182,7 @@
     <string name="pref_help_beta_description">If you would like to help out with beta testing of new features you can do so by visiting this page: https://play.google.com/apps/testing/org.bottiger.podcast</string>
     <string name="activity_download_name">Download Manager</string>
     <string name="opml_import_toolbar_title">OPML content</string>
-    <string name="opml_import_toolbar_description">Select the podcasts you wish to subscribe to</string>
+    <string name="opml_import_toolbar_description">Podcasts you wish to subscribe to</string>
     <string name="download_manager_toolbar_title">Download Queue</string>
     <string name="download_manager_toolbar_description">Episodes scheduled for download</string>
     <string name="menu_clear_download">Clear</string>
@@ -270,6 +270,7 @@
     <string name="subscription_press_to_authenticate">Press to authenticate</string>
     <string name="star_subscription">Star subscriptions</string>
     <string name="remove_episode_from_playlist">Remove episode from playlist</string>
+    <string name="import_subscription_confirm">Import</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

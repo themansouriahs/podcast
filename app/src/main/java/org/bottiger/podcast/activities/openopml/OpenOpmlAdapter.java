@@ -1,5 +1,6 @@
 package org.bottiger.podcast.activities.openopml;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +16,12 @@ import java.util.List;
 /**
  * Created by aplb on 21-09-2015.
  */
-public class OpenOpmlAdapter extends RecyclerView.Adapter<OpenOpmlViewHolder> {
+class OpenOpmlAdapter extends RecyclerView.Adapter<OpenOpmlViewHolder> {
 
+    @NonNull
     private List<SlimSubscription> mSlimSubscriptions = new LinkedList<>();
 
-    public OpenOpmlAdapter(List<SlimSubscription> argSubscriptions) {
+    OpenOpmlAdapter(@NonNull List<SlimSubscription> argSubscriptions) {
         this.mSlimSubscriptions = argSubscriptions;
     }
 
@@ -27,8 +29,7 @@ public class OpenOpmlAdapter extends RecyclerView.Adapter<OpenOpmlViewHolder> {
     public OpenOpmlViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.activity_opml_import_item, parent, false);
-        OpenOpmlViewHolder holder = new OpenOpmlViewHolder(v);
-        return holder;
+        return new OpenOpmlViewHolder(v);
     }
 
     @Override

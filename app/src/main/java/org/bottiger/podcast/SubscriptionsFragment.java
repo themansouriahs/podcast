@@ -30,7 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import org.bottiger.podcast.activities.openopml.OPML_import_export_activity;
+import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
@@ -225,7 +225,7 @@ public class SubscriptionsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (getActivity() instanceof TopActivity) {
-                    Intent i = new Intent(mActivity.getApplicationContext(), OPML_import_export_activity.class);
+                    Intent i = new Intent(mActivity.getApplicationContext(), OPMLImportExportActivity.class);
                     startActivityForResult(i, 999);
                 } else {
                     Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
@@ -290,7 +290,7 @@ public class SubscriptionsFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_import: {
-                Intent i = new Intent(mActivity.getApplicationContext(), OPML_import_export_activity.class);
+                Intent i = new Intent(mActivity.getApplicationContext(), OPMLImportExportActivity.class);
                 startActivityForResult(i, OPML_ACTIVITY_STATUS_CODE);
                 break;
             }
@@ -401,7 +401,7 @@ public class SubscriptionsFragment extends Fragment {
     /*
        This method captures the execution of the opml_import_export activity, to return the value and parse
             the result of the opml file
-           If the activity OPML_import_export_activity returns a "RETURN_EXPORT" it means the user pressed the export button,
+           If the activity OPMLImportExportActivity returns a "RETURN_EXPORT" it means the user pressed the export button,
                 in the other way, it returns a path
      */
     @Override
