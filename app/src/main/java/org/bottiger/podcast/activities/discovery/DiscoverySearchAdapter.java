@@ -76,12 +76,14 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SoundWaves.getAppContext(mActivity).getLibraryInstance().containsSubscription(subscription)) {
-                    Subscription localsubscription = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(subscription.getURLString());
-                    FeedActivity.start(mActivity, localsubscription);
-                } else {
-                    FeedActivity.start(mActivity, subscription);
-                }
+
+                boolean isLocal = SoundWaves.getAppContext(mActivity).getLibraryInstance().containsSubscription(subscription);
+                ISubscription openSubscription = isLocal ?
+                        SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(subscription.getURLString()) :
+                        subscription;
+
+                assert openSubscription != null;
+                FeedActivity.start(mActivity, openSubscription);
             }
         });
 

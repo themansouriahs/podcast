@@ -83,13 +83,10 @@ public class FeedActivity extends TopActivity {
 
     public static final int MODE_FULLY_EXPANDED = 4;
 
-    private static final String TAG = "FeedActivity";
-    private static final String KEY_THEME_COLOR = "theme_color";
+    private static final String TAG = FeedActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
 
-    // Feed Settings
-    private SubscriptionSettingsUtils mSubscriptionSettingsUtils;
     private boolean mSettingsRevealed = false;
     private final int SETTINGS_REVEAL_DURATION = 200; // in ms
     private SupportAnimator mRevealAnimator;
@@ -111,7 +108,6 @@ public class FeedActivity extends TopActivity {
     private FeedViewAdapter mAdapter;
     private String mUrl;
 
-    private boolean mIsSlimSubscription = false;
     private rx.Subscription mRxSubscription;
 
     /**
@@ -200,7 +196,7 @@ public class FeedActivity extends TopActivity {
         setViewState(mSubscription);
 
         if (mSubscription instanceof Subscription) {
-            mSubscriptionSettingsUtils = new SubscriptionSettingsUtils(mRevealLayout, (Subscription)mSubscription);
+            SubscriptionSettingsUtils mSubscriptionSettingsUtils = new SubscriptionSettingsUtils(mRevealLayout, (Subscription) mSubscription);
             mAdapter.setExpanded(((Subscription) mSubscription).isShowDescription());
 
             mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
@@ -283,7 +279,6 @@ public class FeedActivity extends TopActivity {
                 });
 
         if (savedInstanceState != null) {
-            final int color = savedInstanceState.getInt(KEY_THEME_COLOR, 0);
             SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ false,
                     new Runnable() {
                         @Override
@@ -390,7 +385,6 @@ public class FeedActivity extends TopActivity {
 
     protected void setSubscription(@NonNull ISubscription argSubscription) {
         mSubscription = argSubscription;
-        mIsSlimSubscription = argSubscription instanceof SlimSubscription;
     }
 
     private void setBackgroundImage(@NonNull ISubscription argSubscription) {
