@@ -113,8 +113,8 @@ public class SoundWavesDownloadManager extends Observable {
 
     private IDownloadEngine mEngine = null;
 
-    private DownloadProgressPublisher mProgressPublisher;
-    private IDownloadEngine.Callback mDownloadCompleteCallback;
+    @NonNull private DownloadProgressPublisher mProgressPublisher;
+    @NonNull private IDownloadEngine.Callback mDownloadCompleteCallback;
 
     public SoundWavesDownloadManager(@NonNull Context argContext) {
         mContext = argContext;
@@ -186,6 +186,7 @@ public class SoundWavesDownloadManager extends Observable {
         return OK;
     }
 
+    @NonNull
     public IDownloadEngine.Callback getIDownloadEngineCallback() {
         return mDownloadCompleteCallback;
     }
@@ -235,7 +236,7 @@ public class SoundWavesDownloadManager extends Observable {
         Log.d(TAG, "Cleaning tmp folder: " + tmpFolder); // NoI18N
         File dir = new File(tmpFolder);
         if(dir.exists() && dir.isDirectory()) {
-            return FileUtils.cleanDirectory(dir);
+            return FileUtils.cleanDirectory(dir, false);
         }
 
         return  true;
@@ -494,11 +495,11 @@ public class SoundWavesDownloadManager extends Observable {
         return bytesToKeep;
     }
 
-    public class DownloadCompleteCallback implements IDownloadEngine.Callback {
+    private class DownloadCompleteCallback implements IDownloadEngine.Callback {
 
         @NonNull private Context mContext;
 
-        public DownloadCompleteCallback(@NonNull Context argContext) {
+        DownloadCompleteCallback(@NonNull Context argContext) {
             mContext = argContext;
         }
 

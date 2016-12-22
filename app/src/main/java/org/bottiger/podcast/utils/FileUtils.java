@@ -1,5 +1,9 @@
 package org.bottiger.podcast.utils;
 
+import android.Manifest;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,22 +58,33 @@ public class FileUtils {
 		return title+"_"+id+".mp3";
 	}
 
-    public static boolean cleanDirectory(File argDir) {
-        if(argDir == null){
-            return false;
-        }
-
+    /**
+     * Delete the content of a directory.
+     *
+     * @param argDir The directory to be cleaned
+     * @param argCleanRecursive If subdirectories should be clean out as well.
+     * @return If the operation was succesfull
+     */
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    public static boolean cleanDirectory(@NonNull File argDir, boolean argCleanRecursive) throws SecurityException {
         if (!argDir.isDirectory()) {
             return false;
         }
 
         File[] flist = argDir.listFiles();
-        if (flist != null && flist.length > 0) {
-            for (File f : flist) {
-                if (!cleanDirectory(f)) {
-                    return false;
-                }
+
+        if (flist == null)
+            return true;
+
+        File file;
+        for (int i = 0; i < flist.length; i++) {
+            file = flist[i];
+
+            if (argCleanRecursive && file.isDirectory()) {
+                cleanDirectory(file, argCleanRecursive);
             }
+
+            file.delete();
         }
 
         return true;

@@ -73,7 +73,7 @@ public class StorageUtils {
         Log.d(TAG, "Cleaning tmp folder: " + tmpFolder); // NoI18N
         File dir = new File(tmpFolder);
         if(dir.exists() && dir.isDirectory()) {
-            return FileUtils.cleanDirectory(dir);
+            return FileUtils.cleanDirectory(dir, false);
         }
 
         return  true;
