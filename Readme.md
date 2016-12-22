@@ -7,7 +7,7 @@ SoundWaves is a free, libre and open source app for fetching and listening to po
 
 # Help out
 
-If you feel like helping out we are more than happy to accept any kind of help. There are a lot of programming - and non programming - tasks which needs to be done .  
+If you feel like helping out we are more than happy to accept any kind of help. There are a lot of programming - and non programming - tasks which need to be done.  
 
 ## BETA Testing
 
@@ -18,7 +18,7 @@ You can opt in as a beta tester here: http://play.google.com/apps/testing/org.bo
 I, as many other developers, aim to produce the best possible application for my users :) 
 However, this requires that I know what you want. If something (anything) is not working or a feature is missing, please create a bug report - it's a huge help.
 
-Getting feedback from my users is the best way of knowing what I should priorities next.
+Getting feedback from my users is the best way of knowing what I should prioritize next.
 
 ## Translations
 If you want to help translate SoundWaves into your language please head over to:
@@ -28,13 +28,13 @@ Unfortunately a (free) account is required.
 
 ## UI Mockups
 
-If you have ideas for the look and feel, but not able to help programming. Just send me a mock-up or two of how you would like the 'workflow' of the application should be, and I'll may be testing it out.
+If you have ideas for the look and feel, but not able to help programming, just send me a mock-up or two of how you would like the 'workflow' of the application to be, and I'll may be testing it out.
 
 # Privacy
 
-SoundWaves takes privacy very seriously, and I try to do whatever I can do always behave in the users best interest.
+SoundWaves takes privacy very seriously, and I try to do whatever I can to always behave in the user's best interest.
 
-If you are getting SoundWaves from source or the F-droid it will never share any data with anyone without your explicit consent.
+If you are getting SoundWaves from source or F-droid it will never share any data with anyone without your explicit consent.
 However, if you are getting SoundWaves from a proprietary app store, like the Play store, it will collect some anonymous information - like crash reports - in order for me to improve the quality.
 
 # Special thanks to.
@@ -45,7 +45,7 @@ However, if you are getting SoundWaves from a proprietary app store, like the Pl
 
 SoundWaves aims at not requesting any permissions it doesn't need. I am not quite there yet - but almost.
 
-Basic internet access. SoundWaves also need to know the state of the current network connection in order know if 
+Basic internet access. SoundWaves also needs to know the state of the current network connection in order know if 
 the device is using a cellular connection.
 * INTERNET
 * ACCESS_WIFI_STATE
@@ -57,18 +57,18 @@ A wakelock is required in order to keep the device alive while downloading new e
 Write access to the external storage is required in order to store episodes.
 * WRITE_EXTERNAL_STORAGE
 
-Knowlegde of the phone state is required in order to pause an episode if there is an incomming phone call. Unfortunatly this permission also grants the app permission to various other capabilities like reading the phone number. However, this is never done and should be verified by anyone who is worried about it. The [Android API for getting the phone number](http://developer.android.com/reference/android/telephony/TelephonyManager.html#getLine1Number%28%29) is called "getLine1Number" and [does not appear anywhere in the source code](https://github.com/bottiger/SoundWaves/search?utf8=%E2%9C%93&q=getLine1Number). Expect for this readme file.
+Knowledge of the phone state is required in order to pause an episode if there is an incoming phone call. Unfortunately this permission also grants the app permission to various other capabilities like reading the phone number. However, this is never done and should be verified by anyone who is worried about it. The [Android API for getting the phone number](http://developer.android.com/reference/android/telephony/TelephonyManager.html#getLine1Number%28%29) is called "getLine1Number" and [does not appear anywhere in the source code](https://github.com/bottiger/SoundWaves/search?utf8=%E2%9C%93&q=getLine1Number). Except for this readme file.
 * READ_PHONE_STATE
 
-In order to start fetching new episodes in the background without starting the app first we need to get notified when the device has booted up.
+In order to start fetching new episodes in the background without starting the app first, we need to get notified when the device has booted up.
 * RECEIVE_BOOT_COMPLETED
 
-In order to synchronize the database to the cloud we use Android build in sync framework.
+In order to synchronize the database to the cloud we use Android's built-in sync framework.
 * READ_SYNC_STATS
 * READ_SYNC_SETTINGS
 * WRITE_SYNC_SETTINGS
 
-[Play store only] On the play store we can request access to Google Drive in order to provide free cross device synchronization.
+[Play store only] On the Play store we can request access to Google Drive in order to provide free cross device synchronization.
 * GET_ACCOUNTS
 * USE_CREDENTIALS
 
