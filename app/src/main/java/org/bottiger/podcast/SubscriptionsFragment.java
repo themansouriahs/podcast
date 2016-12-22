@@ -30,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.bottiger.podcast.activities.main.PreloadGridLayoutManager;
 import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
@@ -125,7 +126,7 @@ public class SubscriptionsFragment extends Fragment {
         mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
 
 
-        mGridLayoutmanager = new GridLayoutManager(getActivity(), numberOfColumns());
+        mGridLayoutmanager = new PreloadGridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);

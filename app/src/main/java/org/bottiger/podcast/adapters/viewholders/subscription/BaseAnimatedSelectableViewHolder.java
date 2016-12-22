@@ -1,10 +1,11 @@
 package org.bottiger.podcast.adapters.viewholders.subscription;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.bignerdranch.android.multiselector.MultiSelectorBindingHolder;
@@ -24,6 +25,9 @@ abstract class BaseAnimatedSelectableViewHolder extends MultiSelectorBindingHold
     private boolean mActivated = false;
     private boolean mIsPinned = false;
 
+    @Nullable
+    private TextView mImagePlaceholderText;
+
     @NonNull private ImageView mCheckMark;
     @NonNull private ImageView mIsPinnedMark;
 
@@ -31,6 +35,7 @@ abstract class BaseAnimatedSelectableViewHolder extends MultiSelectorBindingHold
         super(itemView, multiSelector);
         mCheckMark = (ImageView) itemView.findViewById(R.id.subscription_selected_mark);
         mIsPinnedMark = (ImageView) itemView.findViewById(R.id.subscription_is_pinned);
+        mImagePlaceholderText = (TextView) itemView.findViewById(R.id.grid_image_placeholder);
     }
 
     @NonNull
@@ -81,5 +86,19 @@ abstract class BaseAnimatedSelectableViewHolder extends MultiSelectorBindingHold
         view.animate().scaleX(scale).scaleY(scale).start();
         mCheckMark.setVisibility(checkMarkVisibility);
         mIsPinnedMark.setVisibility(pinnedVisibility);
+    }
+
+    public void setImagePlaceholderText(@NonNull String argTitle) {
+        if (mImagePlaceholderText == null)
+            return;
+
+        mImagePlaceholderText.setText(argTitle);
+    }
+
+    public void setImagePlaceholderVisibility(int argVisibility) {
+        if (mImagePlaceholderText == null)
+            return;
+
+        mImagePlaceholderText.setVisibility(argVisibility);
     }
 }

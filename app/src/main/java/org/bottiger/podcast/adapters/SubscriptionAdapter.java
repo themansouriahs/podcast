@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.ColorInt;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -28,8 +31,13 @@ import android.view.ViewGroup;
 
 import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
+import com.bumptech.glide.GenericRequestBuilder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.ListPreloader;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -47,16 +55,20 @@ import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.Interceptor;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * Created by aplb on 11-10-2015.
  */
 public class SubscriptionAdapter extends RecyclerView.Adapter {
 
-    private static final String TAG = "SubscriptionAdapter";
+    private static final String TAG = SubscriptionAdapter.class.getSimpleName();
 
     private static final int GRID_TYPE = 1;
     private static final int LIST_TYPE = 2;
@@ -71,6 +83,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     private int numberOfColumns = 2;
     private int position = -1;
+
+    private int[] stolenSize;
+    private int prefetchWidth = -1;
+    private int prefetchHeight = -1;
 
     @Nullable private ActionMode mActionMode = null;
     private MultiSelector mMultiSelector = new MultiSelector();
@@ -134,6 +150,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     }
 
     private void onBindBaseHolder(ISubscriptionViewHolder argHolder, @NonNull final Subscription argSubscription) {
+        argHolder.setImagePlaceholderText(argSubscription.getTitle());
         argHolder.setIsPinned(argSubscription.isPinned());
     }
 
@@ -152,7 +169,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         CharSequence pluralNew = getNewEpisodesString(newEpisodeCount);
         boolean hasNewEpisodes = newEpisodeCount > 0;
         boolean hasImage = !TextUtils.isEmpty(logo);
-        int visibility = hasNewEpisodes || !hasImage ? View.VISIBLE : View.GONE;
+        int visibility = hasNewEpisodes || !hasImage ? View.VISIBLE : GONE;
         Uri imageURI = hasImage ? Uri.parse(logo) : null;
         int generic_image_margin = 100;
         int position = argHolder.getAdapterPosition();
@@ -203,9 +220,24 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             if (!TextUtils.isEmpty(image) && StrUtils.isValidUrl(image)) {
 
                 if (getItemViewType(position) == GRID_TYPE) {
+                    argHolder.setImagePlaceholderVisibility(VISIBLE);
                     ImageLoaderUtils.getGlide(mActivity, image)
+                            .listener(new RequestListener() {
+                                @Override
+                                public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
+                                    argHolder.setImagePlaceholderVisibility(VISIBLE);
+                                    ErrorUtils.handleException(e);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                    argHolder.setImagePlaceholderVisibility(GONE);
+                                    return false;
+                                }
+                            })
                             .centerCrop()
-                            .placeholder(R.drawable.generic_podcast)
+                            .placeholder(ColorUtils.getSubscriptionBackgroundColor(argSubscription))
                             .into(argHolder.image);
                 } else {
                     ImageLoaderUtils.getGlide(mActivity, image)
@@ -403,5 +435,33 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
         return pluralNew;
+    }
+
+    /*
+    Does not work properly
+     */
+    @MainThread
+    private synchronized void preloadImages(int argWidth, int argHeight) {
+
+        if (argWidth == prefetchWidth &&  argHeight == prefetchHeight) {
+            return;
+        }
+
+        if (argWidth <= 0 || argHeight <= 0) {
+            return;
+        }
+
+        if (mSubscriptions == null) {
+            return;
+        }
+
+        prefetchWidth = argWidth;
+        prefetchHeight = argHeight;
+
+        for (int i = 0; i < mSubscriptions.size(); i++) {
+            Subscription subscription = mSubscriptions.get(i);
+            ImageLoaderUtils.getGlide(mActivity, subscription.getUrl(), ImageLoaderUtils.NO_NETWORK)
+                    .override(prefetchWidth, prefetchHeight).preload();
+        }
     }
 }

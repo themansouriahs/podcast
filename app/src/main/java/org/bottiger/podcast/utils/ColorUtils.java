@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
@@ -132,6 +133,11 @@ public class ColorUtils {
         android.support.v4.graphics.ColorUtils.colorToHSL(argColor, hsl);
 
         return hsl[2] > threshold;
+    }
+
+    public static ColorDrawable getSubscriptionBackgroundColor(@NonNull ISubscription argSubscription) {
+        @ColorInt int background = argSubscription.getPrimaryColor();
+        return new ColorDrawable(lighten(background));
     }
 
     private static @ColorInt int getColor(@NonNull Context argContext, @AttrRes int argResource) {

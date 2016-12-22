@@ -10,20 +10,32 @@
         android:layout_height="match_parent"
         android:id="@+id/subscription_container">
 
-    <org.bottiger.podcast.views.SquareImageViewFresco
-        android:id="@+id/grid_image"
-        style="@style/PodcastImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        <org.bottiger.podcast.views.SquareImageViewFresco
+            android:id="@+id/grid_image"
+            style="@style/PodcastImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 
-    <View
-        android:id="@+id/grid_item_gradient"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/footer_gradient"
-        android:visibility="gone"/>
+        <TextView
+            android:id="@+id/grid_image_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Podcats Title"
+            android:maxLines="4"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textAlignment="center"
+            />
+
+        <View
+            android:id="@+id/grid_item_gradient"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/footer_gradient"
+            android:visibility="gone"/>
 
         <FrameLayout
             android:id="@+id/subscription_text_container"

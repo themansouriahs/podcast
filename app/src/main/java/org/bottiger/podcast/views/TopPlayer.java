@@ -545,7 +545,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
 
             Log.v("MissingImage", "Setting image");
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, false);
+            ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
         }
 
         SoundWaves soundwaves = SoundWaves.getAppContext(getContext());

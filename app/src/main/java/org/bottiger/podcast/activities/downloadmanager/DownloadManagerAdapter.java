@@ -82,7 +82,7 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
 
         String artWork = episode.getArtwork(mContext);
         if (!TextUtils.isEmpty(artWork)) {
-            ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, null, true, false, true, false);
+            ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, null, true, false, true, ImageLoaderUtils.DEFAULT);
         }
     }
 

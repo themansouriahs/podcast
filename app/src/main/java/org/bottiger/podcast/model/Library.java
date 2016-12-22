@@ -15,6 +15,8 @@ import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.bumptech.glide.request.target.Target;
+
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.cloud.EventLogger;
@@ -32,6 +34,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.StrUtils;
 
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.ObservableEmitter;
@@ -50,6 +54,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import rx.Observable;
 import rx.Observer;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -685,24 +690,23 @@ public class Library {
     @MainThread
     private void loadSubscriptions() {
         Observable.just(1)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
-                .subscribe(new Action1<Integer>() {
-            @Override
-            public void call(Integer query) {
-                loadSubscriptionsInternalSync(true);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                if (throwable instanceof SQLiteCantOpenDatabaseException) {
-                    VendorCrashReporter.report("subscribeError2", throwable.toString());
-                } else {
-                    VendorCrashReporter.report("subscribeError", throwable.toString());
-                }
-                Log.d(TAG, "error: " + throwable.toString());
-            }
-        });
+                .subscribeOn(Schedulers.io())
+                .map(new Func1<Integer, Boolean>() {
+                    @Override
+                    public Boolean call(Integer integer) {
+                        loadSubscriptionsInternalSync(true);
+                        return true;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        // This is done in the adapter instead.
+                        // The reason for this is that the adapter nows the size of the views
+                        //preloadImages();
+                    }
+                });
     }
 
     @WorkerThread

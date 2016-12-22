@@ -66,7 +66,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.title.setText(subscription.getTitle());
 
         try {
-            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), null, false, true, true, true);
+            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), null, false, true, true, ImageLoaderUtils.NETWORK);
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }

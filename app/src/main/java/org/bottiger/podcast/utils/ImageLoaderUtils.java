@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -12,7 +13,6 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.BitmapRequestBuilder;
-import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.DrawableTypeRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
@@ -27,23 +27,33 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.image.NetworkDisablingLoader;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * Created by aplb on 30-09-2015.
  */
 public class ImageLoaderUtils {
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({NETWORK, NO_NETWORK, DEFAULT})
+    public @interface NetworkPolicy {}
+    public static final int NETWORK = 1;
+    public static final int NO_NETWORK = 2;
+    public static final int DEFAULT = 3;
+
     public static final DiskCacheStrategy SW_DiskCacheStrategy = DiskCacheStrategy.SOURCE;
 
     public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl) {
-        return getGlide(argContext, argUrl, false);
+        return getGlide(argContext, argUrl, DEFAULT);
     }
 
-    public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl, boolean forceNetworkConnection) {
+    public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl, @NetworkPolicy int argAllowNetwork) {
         RequestManager requestManager = Glide.with(argContext);
 
         DrawableTypeRequest drawableTypeRequest;
         BitmapRequestBuilder bitmapRequestBuilder;
-        boolean noNetwork = !forceNetworkConnection && NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK;
+        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK);
 
         if (noNetwork) {
             drawableTypeRequest = requestManager.using(new NetworkDisablingLoader()).load(argUrl);
@@ -64,8 +74,8 @@ public class ImageLoaderUtils {
                                      @Nullable String argUrl,
                                      boolean argUsePlaceholder,
                                      boolean argRoundedCorners,
-                                     boolean argForceNetworkConnection) {
-        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners, argForceNetworkConnection);
+                                     @NetworkPolicy int argNetworkPolicy) {
+        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners, argNetworkPolicy);
     }
 
     public static void loadImageInto(@NonNull View argImageView,
@@ -74,11 +84,11 @@ public class ImageLoaderUtils {
                                      boolean argDoCrop,
                                      boolean argUsePlaceholder,
                                      boolean argRoundedCorners,
-                                     boolean argForceNetworkConnection) {
+                                     @NetworkPolicy int argNetworkPolicy) {
         if (argUrl == null)
             return;
 
-        loadImageUsingGlide(argImageView, argUrl, argTransformation, argDoCrop, argUsePlaceholder, argRoundedCorners, argForceNetworkConnection);
+        loadImageUsingGlide(argImageView, argUrl, argTransformation, argDoCrop, argUsePlaceholder, argRoundedCorners, argNetworkPolicy);
     }
 
     private static void loadImageUsingGlide(final @NonNull View argTargetView,
@@ -87,7 +97,7 @@ public class ImageLoaderUtils {
                                             boolean argDoCrop,
                                             boolean argUsePlaceholder,
                                             final boolean argRounddedCorners,
-                                            boolean argForceNetworkConnection) {
+                                            @NetworkPolicy int argNetworkPolicy) {
         Context context = argTargetView.getContext();
 
         Target target;
@@ -98,7 +108,7 @@ public class ImageLoaderUtils {
             target = getViewTarget(argTargetView, argRounddedCorners);
         }
 
-        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(context, argUrl, argForceNetworkConnection);
+        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(context, argUrl, argNetworkPolicy);
 
         if (argDoCrop)
             builder.centerCrop();
