@@ -126,7 +126,8 @@ public class SoundWavesDownloadManager extends Observable {
      * Returns the status of the given FeedItem
      * @return
      */
-	public DownloadStatus getStatus(IEpisode argEpisode) {
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public DownloadStatus getStatus(IEpisode argEpisode) throws SecurityException {
         Log.v(TAG, "getStatus(): " + argEpisode);
 
 		if (argEpisode == null) {
@@ -198,241 +199,6 @@ public class SoundWavesDownloadManager extends Observable {
             mEngine.abort();
     }
 
-    @WorkerThread
-    public IDownloadEngine newEngine(@NonNull FeedItem argEpisode) {
-        return new OkHttpDownloader(mContext, argEpisode);
-    }
-
-	/**
-	 * Deletes the downloaded file and updates the database record
-	 * 
-	 * @param context
-	 */
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	private static void deleteExpireFile(@NonNull Context context, FeedItem item) throws SecurityException{
-
-		if (item == null)
-			return;
-
-		item.delFile(context);
-	}
-
-	/**
-	 * Removes all the expired downloads async
-	 */
-	public static void removeExpiredDownloadedPodcasts(Context context) {
-        removeExpiredDownloadedPodcastsTask(context);
-    }
-
-    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    public static boolean removeTmpFolderCruft(@NonNull Context argContext) throws SecurityException {
-        String tmpFolder;
-        try {
-            tmpFolder = SDCardManager.getTmpDir(argContext);
-        } catch (IOException e) {
-            Log.w(TAG, "Could not access tmp storage. removeTmpFolderCruft() returns without success"); // NoI18N
-            return false;
-        }
-        Log.d(TAG, "Cleaning tmp folder: " + tmpFolder); // NoI18N
-        File dir = new File(tmpFolder);
-        if(dir.exists() && dir.isDirectory()) {
-            return FileUtils.cleanDirectory(dir, false);
-        }
-
-        return  true;
-    }
-
-	/**
-	 * Iterates through all the downloaded episodes and deletes the ones who
-	 * exceed the download limit Runs with minimum priority
-	 *
-	 * @return Void
-	 */
-    @WorkerThread
-    private static void removeExpiredDownloadedPodcastsTask(Context context) {
-
-            if (BuildConfig.DEBUG && Looper.myLooper() == Looper.getMainLooper()) {
-                throw new IllegalStateException("Should not be executed on main thread!");
-            }
-
-			if (!SDCardManager.getSDCardStatus()) {
-				return;
-			}
-
-			SharedPreferences sharedPreferences = PreferenceManager
-					.getDefaultSharedPreferences(context);
-
-            final long initialBytesToKeep = bytesToKeep(sharedPreferences, context.getResources());
-            long bytesToKeep = initialBytesToKeep;
-
-            // In case we do not have a limit
-            if (bytesToKeep < 0) {
-                return;
-            }
-
-			try {
-                ArrayList<IEpisode> episodes = SoundWaves.getAppContext(context).getLibraryInstance().getEpisodes();
-                LinkedList<String> filesToKeep = new LinkedList<>();
-
-                if (episodes == null)
-                    return;
-
-                IEpisode episode;
-                FeedItem item;
-                File file;
-
-                // Build list of downloaded files
-                SortedMap<Long, FeedItem> sortedMap = new TreeMap<>();
-                for (int i = 0; i < episodes.size(); i++) {
-                    // Extract data.
-                    episode = episodes.get(i);
-                    try {
-                        item = (FeedItem) episode;
-                    } catch (ClassCastException cce) {
-                        continue;
-                    }
-
-                    if (item.isDownloaded()) {
-                        long key;
-
-                        file = new File(item.getAbsolutePath());
-                        key = file.lastModified();
-
-                        sortedMap.put(-key, item);
-                    }
-                }
-
-                SortedSet<Long> keys = new TreeSet<>(sortedMap.keySet());
-                for (Long key : keys) {
-                    boolean deleteFile = true;
-
-                    item = sortedMap.get(key);
-                    file = new File(item.getAbsolutePath());
-
-					if (file.exists()) {
-						bytesToKeep = bytesToKeep - item.filesize;
-
-                        // if we have exceeded our limit start deleting old
-						// items
-						if (bytesToKeep < 0) {
-							deleteExpireFile(context, item);
-						} else {
-							deleteFile = false;
-							filesToKeep.add(item.getFilename());
-						}
-					}
-
-					if (deleteFile) {
-						item.setDownloaded(false);
-					}
-				}
-
-				// Delete the remaining files which are not indexed in the
-				// database
-				// Duplicated code from DownloadManagerReceiver
-				File directory = new File(SDCardManager.getDownloadDir());
-				File[] files = directory.listFiles();
-				for (File keepFile : files) {
-					if (!filesToKeep.contains(keepFile.getName())) {
-						// Delete each file
-						keepFile.delete();
-					}
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	}
-
-    public static boolean canPerform(@Action int argAction,
-                                     @NonNull Context argContext,
-                                     @NonNull ISubscription argSubscription) {
-        Log.v(TAG, "canPerform: " + argAction);
-
-        @NetworkState int networkState = updateConnectStatus(argContext);
-
-        if (networkState == NETWORK_DISCONNECTED)
-            return false;
-
-        boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
-                R.string.pref_download_only_wifi_key,
-                R.bool.pref_download_only_wifi_default);
-
-        boolean automaticDownload = PreferenceHelper.getBooleanPreferenceValue(argContext,
-                R.string.pref_download_on_update_key,
-                R.bool.pref_download_on_update_default);
-
-        if (argSubscription instanceof Subscription) {
-            Subscription subscription = (Subscription) argSubscription;
-
-            automaticDownload = subscription.doDownloadNew(automaticDownload);
-        }
-
-        switch (argAction) {
-            case ACTION_DOWNLOAD_AUTOMATICALLY: {
-                if (!automaticDownload)
-                    return false;
-
-                if (wifiOnly)
-                    return networkState == NETWORK_OK;
-                else
-                    return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
-            }
-            case ACTION_DOWNLOAD_MANUALLY:
-            case ACTION_REFRESH_SUBSCRIPTION:
-            case ACTION_STREAM_EPISODE: {
-                return networkState == NETWORK_OK || networkState == NETWORK_RESTRICTED;
-            }
-        }
-
-        VendorCrashReporter.report(TAG, "canPerform defaults to false. Action: " + argAction);
-        return false; // FIXME this should never happen. Ensure we never get here
-    }
-
-	private static @NetworkState int updateConnectStatus(@NonNull Context argContext) {
-		Log.v(TAG, "getNetworkStatus");
-
-        ConnectivityManager cm = (ConnectivityManager) argContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (cm == null) {
-            return NETWORK_DISCONNECTED;
-        }
-
-        NetworkInfo info = cm.getActiveNetworkInfo();
-
-        if (info == null) {
-            return NETWORK_DISCONNECTED;
-        }
-
-        if (!info.isConnected()) {
-            return NETWORK_DISCONNECTED;
-        }
-
-        int networkType = info.getType();
-
-        switch (networkType) {
-            case ConnectivityManager.TYPE_ETHERNET:
-            case ConnectivityManager.TYPE_WIFI:
-            case ConnectivityManager.TYPE_WIMAX:
-            case ConnectivityManager.TYPE_VPN:
-                return NETWORK_OK;
-            case ConnectivityManager.TYPE_MOBILE:
-            case ConnectivityManager.TYPE_MOBILE_DUN:
-            case ConnectivityManager.TYPE_MOBILE_HIPRI:
-            case ConnectivityManager.TYPE_MOBILE_MMS:
-            {
-                boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
-                        R.string.pref_download_only_wifi_key,
-                        R.bool.pref_download_only_wifi_default);
-
-                return wifiOnly ? NETWORK_RESTRICTED : NETWORK_OK;
-            }
-        }
-
-        return NETWORK_OK;
-	}
-
     public void addItemToQueue(IEpisode argEpisode, @QueuePosition int argPosition) {
         addItemToQueue(argEpisode, true, argPosition);
     }
@@ -490,9 +256,7 @@ public class SoundWavesDownloadManager extends Observable {
             return megabytesToKeep;
         }
 
-        long bytesToKeep = megabytesToKeep * 1024 * 1024;
-
-        return bytesToKeep;
+        return megabytesToKeep * 1024 * 1024;
     }
 
     private class DownloadCompleteCallback implements IDownloadEngine.Callback {
@@ -503,8 +267,9 @@ public class SoundWavesDownloadManager extends Observable {
             mContext = argContext;
         }
 
+        @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         @Override
-        public void downloadCompleted(IEpisode argEpisode) {
+        public void downloadCompleted(IEpisode argEpisode) throws SecurityException {
             FeedItem item = (FeedItem) argEpisode;
             item.setDownloaded(true);
 
@@ -539,8 +304,9 @@ public class SoundWavesDownloadManager extends Observable {
             notifyDownloadComplete(argEpisode);
         }
 
+        @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         @Override
-        public void downloadInterrupted(IEpisode argEpisode) {
+        public void downloadInterrupted(IEpisode argEpisode) throws SecurityException {
             removeTopQueueItem();
             removeDownloadingEpisode(argEpisode);
             StorageUtils.removeTmpFolderCruft(mContext);
@@ -548,7 +314,7 @@ public class SoundWavesDownloadManager extends Observable {
         }
     }
 
-    public void notifyDownloadComplete(@Nullable IEpisode argFeedItem) {
+    private void notifyDownloadComplete(@Nullable IEpisode argFeedItem) {
         postQueueChangedEvent(argFeedItem, REMOVED);
     }
 
@@ -590,7 +356,7 @@ public class SoundWavesDownloadManager extends Observable {
         return amountQueued;
     }
 
-    public static boolean downloadNewEpisodeAutomatically(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+    static boolean downloadNewEpisodeAutomatically(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
         if (shouldDownloadAutomaticlly(argEpisode)) {
             SoundWavesDownloadManager downloadManager = SoundWaves.getAppContext(argContext.getApplicationContext()).getDownloadManager();
             downloadManager.addItemToQueue(argEpisode, false, ANYWHERE);
@@ -600,7 +366,7 @@ public class SoundWavesDownloadManager extends Observable {
         return false;
     }
 
-    public static List<IEpisode> episodesToDownloadAutomatically(@NonNull ISubscription argSubscription) {
+    private static List<IEpisode> episodesToDownloadAutomatically(@NonNull ISubscription argSubscription) {
 
         List<IEpisode> episodesToDownload = new LinkedList<>();
 
@@ -619,7 +385,7 @@ public class SoundWavesDownloadManager extends Observable {
         return episodesToDownload;
     }
 
-    public static boolean shouldDownloadAutomaticlly(@NonNull IEpisode argEpisode) {
+    private static boolean shouldDownloadAutomaticlly(@NonNull IEpisode argEpisode) {
         /**
          * Currently we download an episode if:
          *

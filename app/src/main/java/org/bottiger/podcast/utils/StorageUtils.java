@@ -82,11 +82,9 @@ public class StorageUtils {
     /**
      * Iterates through all the downloaded episodes and deletes the ones who
      * exceed the download limit Runs with minimum priority
-     *
-     * @return Void
      */
     @WorkerThread
-    private static void removeExpiredDownloadedPodcastsTask(Context context) {
+    private static void removeExpiredDownloadedPodcastsTask(Context context) throws SecurityException {
 
         if (BuildConfig.DEBUG && Looper.myLooper() == Looper.getMainLooper()) {
             throw new IllegalStateException("Should not be executed on main thread!");
@@ -96,83 +94,89 @@ public class StorageUtils {
             return;
         }
 
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        long bytesToKeep = SoundWavesDownloadManager.bytesToKeep(sharedPreferences, context.getResources());
+        ArrayList<IEpisode> episodes = SoundWaves.getAppContext(context).getLibraryInstance().getEpisodes();
+        LinkedList<String> filesToKeep = new LinkedList<>();
 
-        final long initialBytesToKeep = SoundWavesDownloadManager.bytesToKeep(sharedPreferences, context.getResources());
-        long bytesToKeep = initialBytesToKeep;
+        IEpisode episode;
+        FeedItem item;
+        File file;
+        boolean isFeedItem;
+        long lastModifiedKey;
 
-        try {
-            ArrayList<IEpisode> episodes = SoundWaves.getAppContext(context).getLibraryInstance().getEpisodes();
-            LinkedList<String> filesToKeep = new LinkedList<>();
+        // Build list of downloaded files
+        SortedMap<Long, FeedItem> sortedMap = new TreeMap<>();
+        for (int i = 0; i < episodes.size(); i++) {
 
-            if (episodes == null)
-                return;
+            // Extract data.
+            episode = episodes.get(i);
+            isFeedItem = episode instanceof FeedItem;
 
-            IEpisode episode;
-            FeedItem item;
-            File file;
+            if (!isFeedItem) {
+                continue;
+            }
 
-// Build list of downloaded files
-            SortedMap<Long, FeedItem> sortedMap = new TreeMap<>();
-            for (int i = 0; i < episodes.size(); i++) {
-// Extract data.
-                episode = episodes.get(i);
+            item = (FeedItem) episode;
+
+            if (item.isDownloaded()) {
                 try {
-                    item = (FeedItem) episode;
-                } catch (ClassCastException cce) {
-                    continue;
-                }
-
-                if (item.isDownloaded()) {
-                    long key;
-
                     file = new File(item.getAbsolutePath());
-                    key = file.lastModified();
-
-                    sortedMap.put(-key, item);
+                    lastModifiedKey = file.lastModified();
+                    sortedMap.put(-lastModifiedKey, item);
+                } catch (IOException e) {
+                    ErrorUtils.handleException(e);
                 }
             }
+        }
 
-            SortedSet<Long> keys = new TreeSet<>(sortedMap.keySet());
-            for (Long key : keys) {
-                boolean deleteFile = true;
+        SortedSet<Long> keys = new TreeSet<>(sortedMap.keySet());
+        for (Long key : keys) {
+            boolean deleteFile = true;
 
-                item = sortedMap.get(key);
+            item = sortedMap.get(key);
+            try {
                 file = new File(item.getAbsolutePath());
+            } catch (IOException e) {
+                ErrorUtils.handleException(e);
+                continue;
+            }
 
-                if (file.exists()) {
-                    bytesToKeep = bytesToKeep - item.filesize;
+            if (file.exists()) {
+                bytesToKeep = bytesToKeep - item.getFilesize();
 
-// if we have exceeded our limit start deleting old
-                    // items
-                    if (bytesToKeep < 0) {
-                        deleteExpireFile(context, item);
-                    } else {
-                        deleteFile = false;
-                        filesToKeep.add(item.getFilename());
-                    }
-                }
-
-                if (deleteFile) {
-                    item.setDownloaded(false);
+                // if we have exceeded our limit start deleting old
+                // items
+                if (bytesToKeep < 0) {
+                    deleteExpireFile(context, item);
+                } else {
+                    deleteFile = false;
+                    filesToKeep.add(item.getFilename());
                 }
             }
 
-            // Delete the remaining files which are not indexed in the
-            // database
-            // Duplicated code from DownloadManagerReceiver
-            File directory = new File(SDCardManager.getDownloadDir());
-            File[] files = directory.listFiles();
-            for (File keepFile : files) {
-                if (!filesToKeep.contains(keepFile.getName())) {
-                    // Delete each file
-                    keepFile.delete();
-                }
+            if (deleteFile) {
+                item.setDownloaded(false);
             }
+        }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Delete the remaining files which are not indexed in the
+        // database
+        // Duplicated code from DownloadManagerReceiver
+        File directory = null;
+        try {
+            directory = new File(SDCardManager.getDownloadDir());
+        } catch (IOException e) {
+            ErrorUtils.handleException(e);
+            return;
+        }
+
+        File[] files = directory.listFiles();
+        for (File keepFile : files) {
+            if (!filesToKeep.contains(keepFile.getName())) {
+                // Delete each file
+                keepFile.delete();
+            }
         }
     }
 
@@ -226,8 +230,7 @@ public class StorageUtils {
      *
      * @param context
      */
-    private static void deleteExpireFile(@NonNull Context context, FeedItem item) {
-
+    private static void deleteExpireFile(@NonNull Context context, FeedItem item) throws SecurityException {
         if (item == null)
             return;
 
