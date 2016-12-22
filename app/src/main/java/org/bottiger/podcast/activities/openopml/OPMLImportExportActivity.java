@@ -72,12 +72,13 @@ public class OPMLImportExportActivity extends ToolbarActivity {
                 Intent intent;
                 chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                 //Unless you have an external file manager, this not seems to work, the mimetype is wrong or something
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    chooseFile.setType("*/*");
-                    chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
-                } else {
-                    chooseFile.setType(MimeType);
-                }
+
+                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                //    chooseFile.setType("*/*");
+                //chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
+                //} else {
+                //    chooseFile.setType(MimeType);
+                //}
                 intent = Intent.createChooser(chooseFile, "Choose a file"); //this string is not important since is not shown
                 startActivityForResult(intent, ACTIVITY_CHOOSE_FILE_STATUS_CODE);
             }
