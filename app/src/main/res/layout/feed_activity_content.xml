@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/default_background">
 
-    <TextView
-        android:id="@+id/feed_recycler_view_empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_episodes_in_the_feed"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:layout_marginTop="40dp"
-        android:visibility="gone" />
-
     <View
         android:id="@+id/empty_start_column"
         android:layout_width="0dp"
@@ -31,6 +21,38 @@
         android:layout_height="wrap_content"
         android:overScrollMode="never"
         />
+
+    <LinearLayout
+        android:id="@+id/feed_recycler_view_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+    <TextView
+        android:id="@+id/feed_recycler_view_empty_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_episodes_in_the_feed"
+        android:layout_gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="10dp"
+        android:textColor="?attr/themeTextColorPrimary" />
+
+        <TextView
+            android:id="@+id/feed_recycler_view_empty_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:textColor="?attr/themeTextColorPrimary" />
+
+    </LinearLayout>
 
     <View
         android:id="@+id/empty_end_column"

@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,13 +19,12 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,29 +32,31 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
+import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.DiscoveryFeedActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
+import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
-import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
-import org.bottiger.podcast.utils.PaletteHelper;
+import org.bottiger.podcast.utils.NetworkUtils;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.FeedRecyclerView;
@@ -67,8 +66,6 @@ import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
-
-import java.util.Objects;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
@@ -101,7 +98,8 @@ public class FeedActivity extends TopActivity {
 
     private FeedViewTopImage mPhotoView;
     private RecyclerView mRecyclerView;
-    protected TextView mNoEpisodesTextView;
+    protected LinearLayout mNoEpisodesView;
+    private TextView mNoEpisodesReason;
     protected MultiShrinkScroller mMultiShrinkScroller;
     protected FloatingActionButton mFloatingButton;
     private FrameLayout mRevealLayout;
@@ -187,7 +185,8 @@ public class FeedActivity extends TopActivity {
         mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
 
         mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
-        mNoEpisodesTextView = (TextView) findViewById(R.id.feed_recycler_view_empty);
+        mNoEpisodesView = (LinearLayout) findViewById(R.id.feed_recycler_view_empty);
+        mNoEpisodesReason = (TextView) findViewById(R.id.feed_recycler_view_empty_body);
         mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
         mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
         mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
@@ -205,6 +204,7 @@ public class FeedActivity extends TopActivity {
                     mAdapter.setOrder(mAdapter.calcOrder());
                 }
             });
+
             @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
             mAdapter.setOrder(sortOrder);
         }
@@ -254,6 +254,10 @@ public class FeedActivity extends TopActivity {
         mRecyclerView.setBackgroundColor(ColorUtils.getBackgroundColor(this));
 
         mRecyclerView.setAdapter(mAdapter);
+
+        if (mAdapter.getItemCount() == 0) {
+            setNoEpisodesTextViewViewState(mSubscription);
+        }
 
         mMultiShrinkScroller.initialize(mMultiShrinkScrollerListener, mExtraMode == MODE_FULLY_EXPANDED);
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
@@ -389,7 +393,7 @@ public class FeedActivity extends TopActivity {
 
     private void setBackgroundImage(@NonNull ISubscription argSubscription) {
         String url = argSubscription.getImageURL();
-        if (mUrl == null && url != null) {
+        if (StrUtils.isValidUrl(url)) {
             mUrl = url;
             bindSubscriptionImage();
         }
@@ -505,7 +509,24 @@ public class FeedActivity extends TopActivity {
     }
 
     private void setNoEpisodesTextViewViewState(@Nullable ISubscription argSubscription) {
-        mNoEpisodesTextView.setVisibility(isEmpty(argSubscription) ? View.VISIBLE : View.GONE);
+        mNoEpisodesView.setVisibility(isEmpty(argSubscription) ? View.VISIBLE : View.GONE);
+
+        CharSequence reason = "";
+        @SoundWavesDownloadManager.NetworkState int networkState = NetworkUtils.getNetworkStatus(this, false);
+
+        if (networkState != SoundWavesDownloadManager.NETWORK_OK) {
+            reason = getResources().getString(R.string.feed_empty_no_network);
+        } else {
+            reason = String.format(getResources().getString(R.string.feed_empty_parse_error), ApplicationConfiguration.ACRA_MAIL);
+        }
+
+        if (!TextUtils.isEmpty(reason)) {
+            mNoEpisodesReason.setText(reason);
+            mNoEpisodesReason.setVisibility(View.VISIBLE);
+        } else {
+            mNoEpisodesReason.setVisibility(View.GONE);
+        }
+
     }
 
     private static boolean isEmpty(@Nullable ISubscription argSubscription) {

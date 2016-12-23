@@ -24,7 +24,6 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 
 import java.net.MalformedURLException;
@@ -44,7 +43,7 @@ public class DiscoveryFeedActivity extends FeedActivity {
         Log.v(TAG, "Starting DiscoveryFeedActivity"); // NoI18N
         super.onCreate(savedInstanceState);
 
-        mNoEpisodesTextView.setVisibility(View.INVISIBLE);
+        mNoEpisodesView.setVisibility(View.INVISIBLE);
 
         ISubscription subscription = getSubscription();
         if (subscription != null) {
