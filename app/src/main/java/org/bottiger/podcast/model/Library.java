@@ -375,7 +375,6 @@ public class Library {
                     }
                 }
             }
-
         } finally {
             mEpisodeLock.unlock();
         }
@@ -846,7 +845,6 @@ public class Library {
     }
 
     public void subscribe(@NonNull ISubscription argSubscription) {
-
         Observable
                 .just(argSubscription)
                 .map(new Func1<ISubscription, Subscription>() {

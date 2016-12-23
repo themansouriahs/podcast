@@ -67,6 +67,7 @@
             android:layout_alignStart="@id/radioNone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
             android:layout_marginTop="20dp"
             android:text="@string/playlist_empty_mode_two" />

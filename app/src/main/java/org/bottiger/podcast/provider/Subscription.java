@@ -71,7 +71,6 @@ public class Subscription extends BasePodcastSubscription {
     /**
      * See SubscriptionColumns for documentation
      */
-	public long id;
 	public String comment;
 	public String sync_id;
 	public long status;
@@ -354,14 +353,6 @@ public class Subscription extends BasePodcastSubscription {
     public String getURLString() {
         return mUrlString;
     }
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long argId) {
-		this.id = argId;
-	}
 
 	@Deprecated
 	public String getArtwork(Context context) {

@@ -8,7 +8,16 @@ import org.bottiger.podcast.provider.base.BaseSubscription;
 
 public abstract class PersistedSubscription extends BaseSubscription implements IPersistedSub {
 
+    public long id;
     private int mClicks = 0;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long argId) {
+        this.id = argId;
+    }
 
     public int getScore() {
         return mClicks;

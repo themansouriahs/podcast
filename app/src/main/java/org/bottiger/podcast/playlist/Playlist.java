@@ -22,7 +22,9 @@ import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.DatabaseHelper;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.PersistedSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
@@ -30,6 +32,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -61,6 +64,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     private SubscriptionFilter mSubscriptionFilter;
 
+    private ReentrantLock mInternalPlaylistLock = new ReentrantLock();
 	private ArrayList<IEpisode> mInternalPlaylist = new ArrayList<>();
 	private SharedPreferences sharedPreferences;
 
@@ -136,7 +140,10 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
                     @Override
                     public void call(EpisodeChanged episodeChanged) {
                         IEpisode episode = mLibrary.getEpisode(episodeChanged.getId());
-                        maybeInsert(episode);
+                        boolean inserted = maybeInsert(episode);
+
+                        if (inserted)
+                            notifyPlaylistChanged();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -266,26 +273,75 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
      * @param argEpisode
      * @return if the episode was inserted into the playlist
      */
-    public boolean maybeInsert(@Nullable IEpisode argEpisode) {
+    private boolean maybeInsert(@Nullable IEpisode argEpisode) {
         if (argEpisode == null)
             return false;
 
-        IEpisode lastItem = mInternalPlaylist.get(mInternalPlaylist.size()-1);
+        IEpisode lastItem = null;
+        try {
+            mInternalPlaylistLock.lock();
+            if (mInternalPlaylist.size() > 0) {
+                lastItem = mInternalPlaylist.get(mInternalPlaylist.size() - 1);
+            }
+        } finally {
+            mInternalPlaylistLock.unlock();
+        }
 
-        if (lastItem.getPriority() > argEpisode.getPriority())
-            return false;
+        if (lastItem == null) {
+            ISubscription isubscription = argEpisode.getSubscription(mContext);
+            if (isubscription instanceof PersistedSubscription) {
+                PersistedSubscription persistedSubscription = (PersistedSubscription) isubscription;
+                boolean doInsert = mSubscriptionFilter.isShown(persistedSubscription.getId());
+                if (doInsert) {
+                    return insertEpisodeInternal(argEpisode);
+                }
 
-        if (lastItem.newerThan(argEpisode))
-            return false;
+                return doInsert;
+            }
+        } else {
+            if (lastItem.getPriority() > argEpisode.getPriority())
+                return false;
 
+            if (lastItem.newerThan(argEpisode) && size() >= MAX_SIZE)
+                return false;
+        }
+
+        return insertEpisodeInternal(argEpisode);
+    }
+
+    /**
+     * Should only be called from maybeInsert
+     * @param argEpisode
+     */
+    private boolean insertEpisodeInternal(@NonNull IEpisode argEpisode) {
         IEpisode currentItem;
-        for (int i = 0; i < mInternalPlaylist.size(); i++) {
-            currentItem = mInternalPlaylist.get(i);
-            if (comparePlaylistOrder(argEpisode, currentItem) < 0) {
-                setItem(i, argEpisode);
-                removeItem(mInternalPlaylist.size()-1);
+        try {
+            mInternalPlaylistLock.lock();
+            int playlistSize = mInternalPlaylist.size();
+
+            if (playlistSize ==  0) {
+                setItem(0, argEpisode);
                 return true;
             }
+
+            for (int i = 0; i < playlistSize; i++) {
+                currentItem = mInternalPlaylist.get(i);
+                if (comparePlaylistOrder(argEpisode, currentItem) < 0) {
+                    setItem(i, argEpisode);
+
+                    if (playlistSize > MAX_SIZE) {
+                        removeItem(mInternalPlaylist.size() - 1);
+                    }
+                    return true;
+                }
+            }
+
+            if (playlistSize < MAX_SIZE) {
+                setItem(playlistSize, argEpisode);
+                return true;
+            }
+        } finally {
+            mInternalPlaylistLock.unlock();
         }
 
         return false;

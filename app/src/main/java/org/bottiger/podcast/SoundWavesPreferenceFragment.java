@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
-    private static final String TAG = "SWPreferenceFrag";
+    private static final String TAG = SoundWavesPreferenceFragment.class.getSimpleName();
 
     public static final String CURRENT_VERSION = "pref_current_version";
 
