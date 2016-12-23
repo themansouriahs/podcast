@@ -19,8 +19,6 @@
             android:layout_alignParentTop="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:layout_centerHorizontal="true"
-            android:textAlignment="center"
-            android:gravity="center_horizontal"
             android:text="@string/intro_settings_title"
             android:layout_margin="32dp"/>
 
@@ -31,36 +29,10 @@
             android:layout_below="@id/mi_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:layout_centerHorizontal="true"
-            android:textAlignment="center"
-            android:gravity="center_horizontal"
             android:text="@string/appintro_settings_description"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp"/>
-
-        <CheckedTextView
-            android:id="@+id/intro_settings_auto_download"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/intro_settings_description"
-            android:hint="@string/intro_settings_auto_download"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_margin="28dp"
-            android:onClick="@{(theView) -> autodownload.onClick(theView)}"
-            android:checked="@{autodownload.isChecked}"/>
-
-        <CheckedTextView
-            android:id="@+id/intro_settings_download_wifi_only"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/intro_settings_auto_download"
-            android:hint="@string/intro_settings_wifi_download"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_margin="28dp"
-            android:onClick="@{(theView) -> wifionly.onClick(theView)}"
-            android:checked="@{wifionly.isChecked}"/>
 
         <TextView
             android:id="@+id/intro_settings_done"
@@ -72,6 +44,38 @@
             android:textAlignment="center"
             android:gravity="center_horizontal"
             android:text="@string/intro_settings_done" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/intro_settings_description"
+            android:layout_above="@+id/intro_settings_done"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <CheckedTextView
+                android:id="@+id/intro_settings_auto_download"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/intro_settings_auto_download"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_margin="18dp"
+                android:onClick="@{(theView) -> autodownload.onClick(theView)}"
+                android:checked="@{autodownload.isChecked}"/>
+
+            <CheckedTextView
+                android:id="@+id/intro_settings_download_wifi_only"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/intro_settings_wifi_download"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_margin="18dp"
+                android:onClick="@{(theView) -> wifionly.onClick(theView)}"
+                android:checked="@{wifionly.isChecked}"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 </layout>

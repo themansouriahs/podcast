@@ -17,7 +17,7 @@
     <string name="pref_downloaded_expire_title">Podcast download limit</string>
     <string name="dialog_title_add_sub">Add podcast</string>
     <string name="dialog_message_add_sub">Please enter an URL:</string>
-    <string name="title_section3">Playlist</string>
+    <string name="title_section3">Player</string>
     <string name="title_section2">Discover</string>
     <string name="title_section1">Subscriptions</string>
     <string name="hello_world">Hello World!</string>
@@ -262,7 +262,7 @@
     <string name="intro_settings_done">That\'s it! Happy podcasting</string>
     <string name="app_intro_welcome_title">Welcome to SoundWaves</string>
     <string name="app_intro_welcome_description">Please spend 10 seconds reading these intro pages</string>
-    <string name="appintro_settings_description">SoundWaves Podcast is completely free, and do not charge for advanced features such as \'Download new episodes when available\'. However, you should review your datasettings before start using it in order to avoid unwanted data consumption</string>
+    <string name="appintro_settings_description">Please review these settings in order to avoid unwanted data consumption</string>
 
     <string name="webservices_discovery_engine_gpodder">gPodder</string>
     <string name="webservices_discovery_engine_itunes">iTunes</string>
