@@ -155,10 +155,12 @@ public class SoundWaves extends MultiDexApplication {
     private void firstRun(@NonNull Context argContext) {
         SharedPreferences sharedPref = argContext.getSharedPreferences(ApplicationConfiguration.packageName, Context.MODE_PRIVATE);
         String key = getString(R.string.preference_first_run_key);
+        String dateKet = getString(R.string.pref_app_first_start_date_key);
         boolean firstRun = sharedPref.getBoolean(key, true);
         if (firstRun) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(key, false);
+            editor.putLong(dateKet, System.currentTimeMillis());
             editor.apply();
         }
         mFirstRun = firstRun;

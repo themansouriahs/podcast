@@ -40,6 +40,8 @@
     <string name="pref_audioengine_automatic_gain_control_key" translatable="false">pref_audioengine_automatic_gain_control</string>
     <string name="pref_skip_intro_key" translatable="false">pref_skip_intro</string>
     <string name="pref_subscription_sort_order_key" translatable="false">pref_subscription_sort_order</string>
+    <string name="pref_app_start_count_key" translatable="false">pref_app_start_count</string>
+    <string name="pref_app_first_start_date_key" translatable="false">pref_app_first_start_date</string>
 
 
 </resources>

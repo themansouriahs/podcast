@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
@@ -59,6 +60,8 @@ public class MainActivity extends FragmentContainerActivity {
 		}
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		incrementAppStarts(this, prefs);
+
 		currentTheme = UIUtils.getTheme(this);
 
 		if (ApplicationConfiguration.TRACE_STARTUP) {
@@ -146,5 +149,11 @@ public class MainActivity extends FragmentContainerActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	private static void incrementAppStarts(@NonNull Context argContext, @NonNull SharedPreferences argSharedPreferences) {
+		String startCountKey = argContext.getString(R.string.pref_app_start_count_key);
+		long startCount = argSharedPreferences.getLong(startCountKey, 0) + 1;
+		argSharedPreferences.edit().putLong(startCountKey, startCount).apply();
 	}
 }
