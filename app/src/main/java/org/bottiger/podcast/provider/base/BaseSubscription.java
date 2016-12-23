@@ -25,6 +25,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 
 import java.util.Date;
@@ -140,6 +141,11 @@ public abstract class BaseSubscription implements ISubscription {
     @Override
     public EpisodeList<IEpisode> getEpisodes() {
         return mEpisodes;
+    }
+
+    @NonNull
+    public String getTitle() {
+        return StrUtils.formatUrl(mTitle);
     }
 
     @Override

@@ -169,9 +169,8 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         CharSequence pluralNew = getNewEpisodesString(newEpisodeCount);
         boolean hasNewEpisodes = newEpisodeCount > 0;
         boolean hasImage = !TextUtils.isEmpty(logo);
-        int visibility = hasNewEpisodes || !hasImage ? View.VISIBLE : GONE;
+        int visibility = hasNewEpisodes ? View.VISIBLE : GONE;
         Uri imageURI = hasImage ? Uri.parse(logo) : null;
-        int generic_image_margin = 100;
         int position = argHolder.getAdapterPosition();
 
         if (argSubscription.getLastItemUpdated() > 0 && argHolder.subTitle != null) {
@@ -180,6 +179,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             argHolder.subTitle.setText(String.format("%s %s", updatedAt, reportDate));
         }
 
+        // Gridview
         if (argHolder.new_episodes_counter != null && argHolder.new_episodes != null) {
 
             if (hasNewEpisodes) {
@@ -190,6 +190,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             argHolder.new_episodes_counter.setVisibility(visibility);
             argHolder.new_episodes.setVisibility(visibility);
         } else {
+            // Listview
             String title = String.valueOf(newEpisodeCount) + " " + pluralNew;
             if (hasNewEpisodes && !isListView() && hasImage) {
                 argHolder.title.setText(title);
@@ -259,16 +260,17 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
             }
         } else {
-            argHolder.image.setPadding(generic_image_margin, generic_image_margin, generic_image_margin, generic_image_margin);
-            Glide.with(mActivity).load(R.drawable.generic_podcast).centerCrop().into(argHolder.image);
+            Glide.with(mActivity).load("").placeholder(ColorUtils.getSubscriptionBackgroundColor(argSubscription)).into(argHolder.image);
         }
 
         if (argHolder.text_container != null) {
             argHolder.text_container.setVisibility(visibility);
         }
 
-        if (isListView() || !hasImage) {
+        if (isListView()) {
             argHolder.title.setText(argSubscription.getTitle());
+        } else if (!hasImage) {
+            argHolder.title.setText("");
         }
 
 

@@ -29,6 +29,7 @@ public class AudioBook extends BaseSubscription {
         mURL = argUrl;
     }
 
+    @NonNull
     @Override
     public String getTitle() {
         return mTitle;

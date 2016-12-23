@@ -21,6 +21,7 @@ import org.unbescape.html.HtmlEscapeType;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -46,10 +47,17 @@ public class StrUtils {
     }
 
 	public static String formatUrl(@Nullable String argUrl) {
-		if (TextUtils.isEmpty(argUrl))
-			return "";
+		if (!StrUtils.isValidUrl(argUrl)) {
+			return argUrl;
+		}
 
-		return argUrl.replace("http://", "").replace("https://", "");
+		assert argUrl != null;
+
+		try {
+			return new URL(argUrl).getHost();
+		} catch (MalformedURLException e) {
+			return argUrl.split("/")[0]; //NoI18N
+		}
 	}
 
 	public static boolean isValidUrl(@Nullable URL argURL) {

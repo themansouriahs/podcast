@@ -339,7 +339,8 @@ public class Subscription extends BasePodcastSubscription {
         return getImageURL();
     }
 
-    public URL getURL() {
+    @NonNull
+	public URL getURL() {
 		try {
 			return new URL(mUrlString);
 		} catch (MalformedURLException e) {
@@ -485,11 +486,6 @@ public class Subscription extends BasePodcastSubscription {
 			return mEpisodes.size();
 
 		return episode_count_cache;
-	}
-
-	@Override
-	public String getTitle() {
-		return StrUtils.formatUrl(mTitle);
 	}
 
 	/**
