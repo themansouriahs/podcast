@@ -64,7 +64,7 @@
             android:title="@string/pref_subscriptions_category_title"
             android:key="pref_subscriptions_category">
 
-            <ListPreference
+            <org.bottiger.podcast.utils.ListPreferenceCompat
                 android:key="pref_subscriptions_columns"
                 android:defaultValue="2"
                 android:dialogTitle="@string/pref_subscriptions_columns_dialog_title"
