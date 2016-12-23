@@ -161,6 +161,12 @@
             android:summary="@string/pref_only_wifi_description"
             android:title="@string/pref_only_wifi_title" />
 
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_refresh_only_wifi_default"
+                android:key="@string/pref_refresh_only_wifi_key"
+                android:summary="@string/pref_refresh_only_wifi_description"
+                android:title="@string/pref_refresh_only_wifi_title" />
+
         </PreferenceCategory>
 
         <PreferenceCategory

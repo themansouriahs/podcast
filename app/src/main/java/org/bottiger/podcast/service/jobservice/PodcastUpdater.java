@@ -59,8 +59,8 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
 
         ComponentName receiver = new ComponentName(argContext, PodcastUpdateJobService.class);
         boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
-                R.string.pref_download_only_wifi_key,
-                R.bool.pref_delete_when_finished_default);
+                R.string.pref_refresh_only_wifi_key,
+                R.bool.pref_refresh_only_wifi_default);
         int networkType = wifiOnly ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY;
         long updateFrequencyMs = alarmInterval(UPDATE_FREQUENCY_MIN); // to ms
 
@@ -83,15 +83,14 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
 
     @TargetApi(21)
     private JobInfo getJobInfo(@NonNull ComponentName argComponentName, int argNetworkType, long argUpdateFrequencyMs) {
-        JobInfo refreshFeedsTask = new JobInfo.Builder(PodcastUpdaterId, argComponentName)
+
+        return new JobInfo.Builder(PodcastUpdaterId, argComponentName)
                 .setRequiredNetworkType(argNetworkType)
                 .setPersisted(true) // Persist across boots
                 .setRequiresCharging(false)
                 .setRequiresDeviceIdle(false)
                 .setPeriodic(argUpdateFrequencyMs)
                 .build();
-
-        return refreshFeedsTask;
     }
 
     /**
@@ -127,7 +126,7 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
         long minutes = prefs.getLong("interval", (long)UPDATE_FREQUENCY_MIN);
 
         PendingIntent pi = getAlarmIntent(context);
-        setAlarm(context, pi, 15, minutes);
+        setAlarm(context, pi, (long) UPDATE_FREQUENCY_MIN, minutes);
     }
 
     /**

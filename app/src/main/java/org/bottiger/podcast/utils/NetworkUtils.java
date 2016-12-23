@@ -1,9 +1,11 @@
 package org.bottiger.podcast.utils;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
@@ -24,8 +26,20 @@ public class NetworkUtils {
 
     private static final String TAG = StorageUtils.class.getSimpleName();
 
+    public static boolean isWiFiOnly(@NonNull Context argContext, boolean argIsLargeFile) {
+        if (argIsLargeFile) {
+            return PreferenceHelper.getBooleanPreferenceValue(argContext,
+                    R.string.pref_download_only_wifi_key,
+                    R.bool.pref_download_only_wifi_default);
+        }
+
+        return PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_refresh_only_wifi_key,
+                R.bool.pref_refresh_only_wifi_default);
+    }
+
     public static @SoundWavesDownloadManager.NetworkState
-    int getNetworkStatus(@NonNull Context argContext) {
+    int getNetworkStatus(@NonNull Context argContext, boolean argIsLargeFile) {
 		Log.v(TAG, "getNetworkStatus");
 
         ConnectivityManager cm = (ConnectivityManager) argContext
@@ -58,26 +72,23 @@ public class NetworkUtils {
             case ConnectivityManager.TYPE_MOBILE_HIPRI:
             case ConnectivityManager.TYPE_MOBILE_MMS:
             {
-                boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
-                        R.string.pref_download_only_wifi_key,
-                        R.bool.pref_download_only_wifi_default);
-
-                return wifiOnly ? SoundWavesDownloadManager.NETWORK_RESTRICTED : SoundWavesDownloadManager.NETWORK_OK;
+                return isWiFiOnly(argContext, argIsLargeFile) ? SoundWavesDownloadManager.NETWORK_RESTRICTED : SoundWavesDownloadManager.NETWORK_OK;
             }
         }
 
         return SoundWavesDownloadManager.NETWORK_OK;
 	}
 
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     public static boolean canDownload(QueueEpisode nextInQueue,
                                       @NonNull Context argContext,
-                                      @NonNull ReentrantLock argLock) {
+                                      @NonNull ReentrantLock argLock) throws SecurityException {
         // Make sure we have access to external storage
         if (!SDCardManager.getSDCardStatusAndCreate()) {
             return false;
         }
 
-        @SoundWavesDownloadManager.NetworkState int networkState = getNetworkStatus(argContext);
+        @SoundWavesDownloadManager.NetworkState int networkState = getNetworkStatus(argContext, true);
 
         FeedItem downloadingItem;
         try {

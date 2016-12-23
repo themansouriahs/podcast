@@ -53,7 +53,7 @@ public class ImageLoaderUtils {
 
         DrawableTypeRequest drawableTypeRequest;
         BitmapRequestBuilder bitmapRequestBuilder;
-        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext) != SoundWavesDownloadManager.NETWORK_OK);
+        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext, false) != SoundWavesDownloadManager.NETWORK_OK);
 
         if (noNetwork) {
             drawableTypeRequest = requestManager.using(new NetworkDisablingLoader()).load(argUrl);

@@ -33,8 +33,8 @@ public class PodcastUpdateJobService extends JobService {
 
                 boolean downloadOnUpdate = PreferenceHelper.getBooleanPreferenceValue(
                         getApplicationContext(),
-                        R.string.pref_download_on_update_key,
-                        R.bool.pref_download_on_update_default);
+                        R.string.pref_refresh_only_wifi_key,
+                        R.bool.pref_refresh_only_wifi_default);
 
                 // Override the default download setting if needed.
                 if (argSubscription instanceof Subscription) {
@@ -49,7 +49,6 @@ public class PodcastUpdateJobService extends JobService {
 
 
                 jobFinished(params, true);
-                //SoundWavesDownloadManager.removeExpiredDownloadedPodcasts(PodcastUpdateJobService.this);
 
             }
         });

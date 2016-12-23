@@ -185,7 +185,8 @@ public class StorageUtils {
                                      @NonNull ISubscription argSubscription) {
         Log.v(TAG, "canPerform: " + argAction);
 
-        @SoundWavesDownloadManager.NetworkState int networkState = NetworkUtils.getNetworkStatus(argContext);
+        boolean isLargeFile = argAction == SoundWavesDownloadManager.ACTION_DOWNLOAD_AUTOMATICALLY;
+        @SoundWavesDownloadManager.NetworkState int networkState = NetworkUtils.getNetworkStatus(argContext, isLargeFile);
 
         if (networkState == SoundWavesDownloadManager.NETWORK_DISCONNECTED)
             return false;
