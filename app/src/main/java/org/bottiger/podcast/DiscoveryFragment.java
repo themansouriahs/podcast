@@ -1,9 +1,14 @@
 package org.bottiger.podcast;
 
+import android.*;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -12,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,13 +32,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.bottiger.podcast.activities.discovery.DiscoverySearchAdapter;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
+import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.IntUtils;
+import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
@@ -42,6 +53,7 @@ import org.bottiger.podcast.webservices.directories.generic.GenericSearchParamet
 import org.bottiger.podcast.webservices.directories.gpodder.GPodder;
 import org.bottiger.podcast.webservices.directories.itunes.ITunes;
 
+import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -488,6 +500,13 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         }
 
         return new String[] {mSpinnerByAuthor};
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FeedActivity.FEED_ACTIVITY_CANCELED) {
+            UIUtils.disPlayBottomSnackBar(getView(), R.string.feed_activity_loading_canceled, null, false);
+        }
     }
 
     @Override

@@ -275,6 +275,7 @@
     <string name="import_subscription_confirm">Import</string>
     <string name="feed_empty_no_network">No network connection detected. The feed might have a problem loading</string>
     <string name="feed_empty_parse_error">The feed might be malform or the server could be down. If you think it should work and the problem persists. Please contact %1$s</string>
+    <string name="feed_activity_loading_canceled">Fetching feed content aborted</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

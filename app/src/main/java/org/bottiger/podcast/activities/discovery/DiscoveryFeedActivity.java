@@ -1,6 +1,7 @@
 package org.bottiger.podcast.activities.discovery;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -34,7 +35,8 @@ import java.net.URL;
  */
 public class DiscoveryFeedActivity extends FeedActivity {
 
-    private static final String TAG = "DiscoveryFeedActivity";
+    private static final String TAG = DiscoveryFeedActivity.class.getSimpleName();
+    public static final String WAS_DISMISSED = "dismissed";
 
     private boolean mIsSubscribed;
 
@@ -108,6 +110,16 @@ public class DiscoveryFeedActivity extends FeedActivity {
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
+        //mProgress.setCancelable(false);
+        mProgress.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                Intent intent = new Intent();
+                intent.putExtra(WAS_DISMISSED, true);
+                setResult(RESULT_OK, intent);
+                DiscoveryFeedActivity.this.finish();
+            }
+        });
         mProgress.show();
         adapter = new FeedViewDiscoveryAdapter(this, mSubscription);
         SoundWaves.getAppContext(this).getRefreshManager().refresh(mSubscription, getIDownloadCompleteCallback());

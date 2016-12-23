@@ -78,6 +78,7 @@ import rx.schedulers.Schedulers;
  */
 public class FeedActivity extends TopActivity {
 
+    public static final int FEED_ACTIVITY_CANCELED = 456;
     public static final int MODE_FULLY_EXPANDED = 4;
 
     private static final String TAG = FeedActivity.class.getSimpleName();
@@ -154,7 +155,7 @@ public class FeedActivity extends TopActivity {
 
     public static void start(@NonNull Activity argActivity, @NonNull ISubscription argSubscription) {
         Intent intent = getIntent(argActivity, argSubscription);
-        argActivity.startActivity(intent);
+        argActivity.startActivityForResult(intent, FEED_ACTIVITY_CANCELED);
         argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
 
