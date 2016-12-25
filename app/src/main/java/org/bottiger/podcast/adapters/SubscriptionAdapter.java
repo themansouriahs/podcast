@@ -141,10 +141,12 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         switch (getItemViewType(position)) {
             case AUTHENTICATE_TYPE: {
                 onBindAuthenticationHolder((AuthenticationViewHolder) argHolder, subscription);
+                break;
             }
             case GRID_TYPE:
             case LIST_TYPE:{
                 onBindDefaultHolder((SubscriptionViewHolder)argHolder, subscription);
+                break;
             }
         }
     }
