@@ -15,7 +15,7 @@ public class PlaybackSpeed {
     public static final float DEFAULT = 1.0f;
     public static final float UNDEFINED = -1.0f;
 
-    public static final float sSpeedMaximum = 2.0f;
+    public static final float sSpeedMaximum = 3.0f;
     public static final float sSpeedMinimum = 0.5f;
     public static final float sSpeedIncrements = 0.1f;
 
