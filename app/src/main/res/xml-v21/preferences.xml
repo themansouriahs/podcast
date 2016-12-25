@@ -171,6 +171,12 @@
                 android:summary="@string/pref_refresh_only_wifi_description"
                 android:title="@string/pref_refresh_only_wifi_title" />
 
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_download_only_when_charging_default"
+                android:key="@string/pref_download_only_when_charging_key"
+                android:title="@string/pref_download_only_when_charging_title"
+                android:summary="@string/pref_download_only_when_charging_description"/>
+
         </PreferenceCategory>
 
         <PreferenceCategory

@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -61,6 +62,11 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
         boolean wifiOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
                 R.string.pref_refresh_only_wifi_key,
                 R.bool.pref_refresh_only_wifi_default);
+
+        boolean chargingOnly = PreferenceHelper.getBooleanPreferenceValue(argContext,
+                R.string.pref_download_only_when_charging_key,
+                R.bool.pref_download_only_wifi_default);
+
         int networkType = wifiOnly ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY;
         long updateFrequencyMs = alarmInterval(UPDATE_FREQUENCY_MIN); // to ms
 
@@ -75,19 +81,19 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
             }
         }
 
-        JobInfo refreshFeedsTask = getJobInfo(receiver, networkType, updateFrequencyMs);
+        JobInfo refreshFeedsTask = getJobInfo(receiver, networkType, updateFrequencyMs, chargingOnly);
 
         jobScheduler.cancel(PodcastUpdaterId);
         return jobScheduler.schedule(refreshFeedsTask) == JobScheduler.RESULT_SUCCESS;
     }
 
     @TargetApi(21)
-    private JobInfo getJobInfo(@NonNull ComponentName argComponentName, int argNetworkType, long argUpdateFrequencyMs) {
+    private JobInfo getJobInfo(@NonNull ComponentName argComponentName, int argNetworkType, long argUpdateFrequencyMs, boolean requiresCharging) {
 
         return new JobInfo.Builder(PodcastUpdaterId, argComponentName)
                 .setRequiredNetworkType(argNetworkType)
                 .setPersisted(true) // Persist across boots
-                .setRequiresCharging(false)
+                .setRequiresCharging(requiresCharging)
                 .setRequiresDeviceIdle(false)
                 .setPeriodic(argUpdateFrequencyMs)
                 .build();
@@ -156,9 +162,11 @@ public class PodcastUpdater implements SharedPreferences.OnSharedPreferenceChang
             return;
         }
 
-        String wifiKey = SoundWaves.getAppContext(mContext).getResources().getString(R.string.pref_download_only_wifi_key);
+        Resources resources = SoundWaves.getAppContext(mContext).getResources();
+        String wifiKey = resources.getString(R.string.pref_download_only_wifi_key);
+        String chargingKey = resources.getString(R.string.pref_download_only_when_charging_key);
 
-        if (wifiKey.equals(key)) {
+        if (wifiKey.equals(key) || chargingKey.equals(key)) {
             scheduleUpdateUsingJobScheduler(SoundWaves.getAppContext(mContext));
         }
     }

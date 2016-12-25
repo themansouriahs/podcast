@@ -282,6 +282,8 @@
     <string name="pref_import_opml_summary">An OPML file can be exported from most podcasting applications</string>
     <string name="pref_export_opml_title">Export OPML file</string>
     <string name="pref_export_opml_summary">Export your current list of subscriptions into a OPML file</string>
+    <string name="pref_download_only_when_charging_title">Download only when charging</string>
+    <string name="pref_download_only_when_charging_description">New episodes will only be downloaded when the phone is charging</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

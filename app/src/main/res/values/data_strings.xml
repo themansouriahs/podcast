@@ -44,6 +44,7 @@
     <string name="pref_subscription_sort_order_key" translatable="false">pref_subscription_sort_order</string>
     <string name="pref_app_start_count_key" translatable="false">pref_app_start_count</string>
     <string name="pref_app_first_start_date_key" translatable="false">pref_app_first_start_date</string>
+    <string name="pref_download_only_when_charging_key" translatable="false">pref_download_only_when_charging</string>
 
 
 </resources>
