@@ -6,7 +6,7 @@ Free Libre and Open Source Podcast player (podcatcher)
 This is my contribution to the Android ecosystem and podcast lovers. It's a modern, free podcatcher application which does not collect any of your data, asks for creepy permissions or other malicious things.
 
 <b>Selected Features</b>
-* All the basic features you except
+* All the basic features you expect
 * Free and open source
 * Modern (material) design
 * full gpodder.net support
