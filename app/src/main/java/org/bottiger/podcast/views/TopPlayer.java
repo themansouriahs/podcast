@@ -577,7 +577,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
                         mBackgroundColor = ColorUtils.adjustToTheme(getResources(), mBackgroundColor);
 
-                        if (mBackgroundColor != -1) {
+                        if (mBackgroundColor != -1 && !UIUtils.isInNightMode(getResources())) {
                             setBackgroundColor(mBackgroundColor);
                         }
 

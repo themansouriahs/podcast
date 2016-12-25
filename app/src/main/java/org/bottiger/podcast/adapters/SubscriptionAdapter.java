@@ -238,7 +238,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                                 }
                             })
                             .centerCrop()
-                            .placeholder(ColorUtils.getSubscriptionBackgroundColor(argSubscription))
+                            .placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription))
                             .into(argHolder.image);
                 } else {
                     ImageLoaderUtils.getGlide(mActivity, image)
@@ -260,7 +260,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
             }
         } else {
-            Glide.with(mActivity).load("").placeholder(ColorUtils.getSubscriptionBackgroundColor(argSubscription)).into(argHolder.image);
+            Glide.with(mActivity).load("").placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription)).into(argHolder.image);
         }
 
         if (argHolder.text_container != null) {

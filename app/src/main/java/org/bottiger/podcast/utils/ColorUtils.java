@@ -23,6 +23,8 @@ import org.bottiger.podcast.provider.ISubscription;
  */
 public class ColorUtils {
 
+    @Nullable private static ColorDrawable sBlackColorDrawable = null;
+
     public static @ColorInt int getTextColor(@NonNull Context argContext) {
         return getColor(argContext, R.attr.themeTextColorPrimary);
     }
@@ -135,7 +137,15 @@ public class ColorUtils {
         return hsl[2] > threshold;
     }
 
-    public static ColorDrawable getSubscriptionBackgroundColor(@NonNull ISubscription argSubscription) {
+    public static ColorDrawable getSubscriptionBackgroundColor(@NonNull Resources argResources, @NonNull ISubscription argSubscription) {
+        if (UIUtils.isInNightMode(argResources)) {
+            if (sBlackColorDrawable == null) {
+                sBlackColorDrawable =  new ColorDrawable(Color.BLACK);
+            }
+
+            return sBlackColorDrawable;
+        }
+
         @ColorInt int background = argSubscription.getPrimaryColor();
         return new ColorDrawable(lighten(background));
     }

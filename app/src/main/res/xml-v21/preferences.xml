@@ -214,7 +214,7 @@
         android:icon="@drawable/ic_import_export_24dp">
 
         <org.bottiger.podcast.ToolbarPreference
-            android:key="cloud"
+            android:key="import_export"
             android:title="@string/preferences_category_import_export" />
 
         <PreferenceCategory

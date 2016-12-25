@@ -61,15 +61,7 @@
 
         <item name="android:textColorPrimary">@color/white_opaque</item>
 
-        <!--
-        They are here because 4.1.2 will crash otherwise
-        http://stackoverflow.com/questions/21822523/java-lang-unsupportedoperationexception-cant-convert-to-dimension-type-0x12
-
-        Therefore I set it manually in TopActivity for now
-
-        <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item> <!- actionbar and  bottom navigation ->
-        <item name="android:windowTranslucentStatus" tools:targetApi="19">true</item> <!- top statusbar ->
-        -->
+        <item name="android:windowBackground">@color/pitch_black</item>
 
         <item name="android:statusBarColor" tools:targetApi="21">@color/pitch_black</item>
 
