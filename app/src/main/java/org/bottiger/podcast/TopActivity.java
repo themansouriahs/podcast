@@ -1,5 +1,6 @@
 package org.bottiger.podcast;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -10,6 +11,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -117,6 +119,12 @@ public class TopActivity extends AppCompatActivity {
         if (SoundWaves.sAnalytics != null)
             SoundWaves.sAnalytics.activityResume();
         initDownloadManagerOptionsMenu(mMenu);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        requestStoragePermission(this);
     }
 
     public static SharedPreferences getPreferences() {
@@ -242,6 +250,17 @@ public class TopActivity extends AppCompatActivity {
     {
         MenuItem item = TopActivity.this.mMenu.findItem(R.id.menu_download_manager);
         item.setVisible(event.queueSize > 0);
+    }
+
+    private static void requestStoragePermission(@NonNull Activity argActivity) {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(argActivity,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(argActivity,
+                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_TO_DOWNLOAD);
+        }
     }
 
 }
