@@ -35,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.ApplicationConfiguration;
@@ -304,7 +305,7 @@ public class FeedActivity extends TopActivity {
 
         if (mPhotoView.getDrawable() == null) {
             ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
-            ImageLoaderUtils.getGlide(this, mUrl)
+            ImageLoaderUtils.getGlide(getApplicationContext(), mUrl)
                     .placeholder(cd)
                     .fitCenter()
                     .into(new BitmapImageViewTarget(mPhotoView) {
