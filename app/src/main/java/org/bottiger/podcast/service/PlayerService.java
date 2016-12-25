@@ -48,6 +48,7 @@ import android.util.Log;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -249,7 +250,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	@Override
 	public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-		result.sendResult(null);
+		result.sendResult(new LinkedList<MediaBrowserCompat.MediaItem>());
 	}
 
 	/**
