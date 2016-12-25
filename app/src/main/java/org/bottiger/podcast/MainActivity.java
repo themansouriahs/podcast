@@ -24,6 +24,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 import org.bottiger.podcast.activities.intro.Intro;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.PlayerService;
@@ -40,7 +41,9 @@ import java.text.ParseException;
 // Sliding
 public class MainActivity extends FragmentContainerActivity {
 
-	private static final String TAG = "MainActivity";
+	private static final String TAG = MainActivity.class.getSimpleName();
+
+	private static boolean showIntro = true;
 
     private PreferenceHelper mPreferenceHelper = new PreferenceHelper();
 
@@ -54,9 +57,15 @@ public class MainActivity extends FragmentContainerActivity {
 		Log.v(TAG, "App start time: " + System.currentTimeMillis());
 		super.onCreate(savedInstanceState);
 
-		if (SoundWaves.getAppContext(this).IsFirstRun()) {
+		boolean firstRun = SoundWaves.getAppContext(this).IsFirstRun();
+		if (firstRun && showIntro) {
+			showIntro = false;
 			Intent intent = new Intent(MainActivity.this, Intro.class);
 			startActivity(intent);
+		}
+
+		if (firstRun && !showIntro) {
+			VendorCrashReporter.report("ShowWrongIntro", "Something is wrong");
 		}
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
