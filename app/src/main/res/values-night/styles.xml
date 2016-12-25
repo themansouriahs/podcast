@@ -55,9 +55,9 @@
         <item name="themeTextColorPrimary">@color/white_opaque</item>
         <item name="themeTextColorFaded">@color/grayDark</item>
 
-        <item name="colorPrimary">@color/night_primary</item>
-        <item name="colorPrimaryDark">@color/night_secondary</item>
-        <item name="colorAccent">@color/night_accent</item>
+        <item name="colorPrimary">@color/pitch_black</item>
+        <item name="colorPrimaryDark">@color/pitch_black</item>
+        <item name="colorAccent">@color/white_opaque</item>
 
         <item name="android:textColorPrimary">@color/white_opaque</item>
 
