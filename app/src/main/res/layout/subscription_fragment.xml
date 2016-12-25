@@ -48,8 +48,7 @@
             android:layout_below="@id/subscription_empty_text"
             android:layout_marginTop="15dp"
             android:layout_centerHorizontal="true"
-            android:text="@string/opml_radio_import"
-            android:visibility="gone"/>
+            android:text="@string/opml_radio_import" />
 
     </RelativeLayout>
 

@@ -205,6 +205,43 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="import_export"
+        android:title="@string/preferences_category_import_export"
+        android:icon="@drawable/ic_import_export_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="cloud"
+            android:title="@string/preferences_category_import_export" />
+
+        <PreferenceCategory
+            android:title="@string/pref_import_export_category_title"
+            android:key="pref_import_export_category_import_export">
+
+            <Preference
+                android:key="@string/pref_import_opml_key"
+                android:title="@string/pref_import_opml_title"
+                android:summary="@string/pref_import_opml_summary">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:targetPackage="org.bottiger.podcast"
+                    android:targetClass="org.bottiger.podcast.activities.openopml.OPMLImportExportActivity" />
+            </Preference>
+
+            <Preference
+                android:key="@string/pref_export_opml_key"
+                android:title="@string/pref_export_opml_title"
+                android:summary="@string/pref_export_opml_summary">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:targetPackage="org.bottiger.podcast"
+                    android:targetClass="org.bottiger.podcast.activities.openopml.OPMLImportExportActivity" />
+            </Preference>
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
         android:key="cloud"
         android:title="@string/preferences_category_cloud">
 

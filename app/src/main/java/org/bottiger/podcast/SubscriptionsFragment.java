@@ -227,7 +227,7 @@ public class SubscriptionsFragment extends Fragment {
             public void onClick(View v) {
                 if (getActivity() instanceof TopActivity) {
                     Intent i = new Intent(mActivity.getApplicationContext(), OPMLImportExportActivity.class);
-                    startActivityForResult(i, 999);
+                    startActivityForResult(i, OPML_ACTIVITY_STATUS_CODE);
                 } else {
                     Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
                 }
