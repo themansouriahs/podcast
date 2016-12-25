@@ -1,11 +1,14 @@
 package org.bottiger.podcast;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -36,7 +39,11 @@ import java.util.List;
 
 public class WebScannerActivity extends MediaRouterPlaybackActivity {
 
-    private static final String TAG = "WebScannerActivity";
+    private static final String TAG = WebScannerActivity.class.getSimpleName();
+
+    public static final int SCAN_QR_REQUEST = 466;
+    private static final String HAS_CAMERA_PERMISSION = "hasPermission";
+    private static final String HAS_SCANNED_QR_CODE = "hasScannedCode";
 
     private static final boolean DO_BEEP = true;
 
@@ -46,6 +53,8 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        checkCameraPermission();
 
         TextView instructions = (TextView) findViewById(R.id.barcode_instructions);
         instructions.setText(fromHtml(getString(R.string.web_scanner_instructions)));
@@ -123,9 +132,6 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
     private void handleResult(@Nullable String argResult) {
 
         mBeepManager.playBeepSoundAndVibrate();
-
-        //Toast.makeText(this, "Scanned: " + argResult, Toast.LENGTH_LONG).show();
-        //UIUtils.disPlayBottomSnackBar(mDecoratedBarcodeView, R.string.web_scanner_qr_scanned, null, false);
         Toast.makeText(this, R.string.web_scanner_qr_scanned, Toast.LENGTH_LONG);
 
         IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().getItem(0);
@@ -136,7 +142,30 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
             Toast.makeText(this, "ParseError: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
+        Intent result = getResult(true, false);
+        setResult(Activity.RESULT_OK, result);
+
         finish();
+    }
+
+    private void checkCameraPermission() {
+        boolean hasCameraPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+
+        if (hasCameraPermission) {
+            return;
+        }
+
+        Intent result = getResult(hasCameraPermission, false);
+        setResult(Activity.RESULT_OK, result);
+        finish();
+    }
+
+    private Intent getResult(boolean argHasPermission, boolean argDidScan) {
+        Intent intent = new Intent();
+        intent.putExtra(HAS_CAMERA_PERMISSION, argHasPermission);
+        intent.putExtra(HAS_SCANNED_QR_CODE, argDidScan);
+
+        return intent;
     }
 
 }

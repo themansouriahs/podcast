@@ -78,3 +78,6 @@ Required in order to control the media player.
 Legacy permission which will be removed in the near future.
 * VIBRATE
 * DOWNLOAD_WITHOUT_NOTIFICATION
+
+In order to scan a QR code and authenticate to the web player
+* CAMERA

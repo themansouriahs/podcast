@@ -43,10 +43,11 @@ public class TopActivity extends AppCompatActivity {
 
     // Filesystem Permisssion
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({PERMISSION_TO_DOWNLOAD, PERMISSION_TO_IMPORT_EXPORT})
+    @IntDef({PERMISSION_TO_DOWNLOAD, PERMISSION_TO_IMPORT_EXPORT, PERMISSION_TO_USE_CAMERA})
     public @interface PermissionCallback {}
     public static final int PERMISSION_TO_DOWNLOAD = 1;
     public static final int PERMISSION_TO_IMPORT_EXPORT = 2;
+    public static final int PERMISSION_TO_USE_CAMERA = 3;
 	
 	private static SharedPreferences prefs;
     private Menu mMenu;
@@ -155,6 +156,7 @@ public class TopActivity extends AppCompatActivity {
     public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults) {
 
         if (PermissionDenied(grantResults)) {
+            handlePermissionDenied(requestCode);
             return;
         }
 
@@ -167,6 +169,24 @@ public class TopActivity extends AppCompatActivity {
             case PERMISSION_TO_IMPORT_EXPORT: {
                 //Cannot call the activity from a static context
                 //SubscriptionsFragment.openImportExportActivity(this);
+                return;
+            }
+            case PERMISSION_TO_USE_CAMERA: {
+                TransitionUtils.startWebScannerActivity(this);
+                return;
+            }
+        }
+    }
+
+    private void handlePermissionDenied(int argRequestCode) {
+        switch (argRequestCode) {
+            case PERMISSION_TO_DOWNLOAD: {
+                return;
+            }
+            case PERMISSION_TO_IMPORT_EXPORT: {
+                return;
+            }
+            case PERMISSION_TO_USE_CAMERA: {
                 return;
             }
         }
