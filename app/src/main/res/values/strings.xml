@@ -69,7 +69,7 @@
     <string name="pref_help_static_field_description">If you would like to help out, there are plenty of things to do. It could be programming or it could be something completely different. I need help with translations, UI, icons/graphics, building a website, and so forth. Head over to the project page on GitHub (github.com/bottiger/SoundWaves) or send me an email: bottiger@gmail.com</string>
     <string name="episode_title_unknown">No Title :(</string>
     <string name="podcast_title_unknown">Unknown podcast title</string>
-    <string name="subscription_instruction">Add new podcasts by using the Discovery page to the right.\n\nYou can also import an OPML file or sync with gPodder by going to the settings</string>
+    <string name="subscription_instruction">Add new podcasts by using the Discovery page to the right.\n\nYou can also import an OPML file or sync with gpodder.net by going to the settings</string>
     <string name="filter_show_listened">Show Listened</string>
     <string name="auto_start_next">Auto Start Next</string>
     <string name="drawer_playlist_filters">Playlist Filters</string>
@@ -150,7 +150,7 @@
     <string name="action_filter">Filter Playlist</string>
     <string name="snackbar_change">Change</string>
     <string name="apply_filters">Apply filters</string>
-    <string name="pref_gpodder_support_title">GPodder</string>
+    <string name="pref_gpodder_support_title">gpodder.net</string>
     <string name="gpodder_username">username</string>
     <string name="gpodder_password">password</string>
     <string name="gpodder_device">Device name</string>
@@ -264,7 +264,7 @@
     <string name="app_intro_welcome_description">Please spend 10 seconds reading these intro pages</string>
     <string name="appintro_settings_description">Please review these settings in order to avoid unwanted data consumption</string>
 
-    <string name="webservices_discovery_engine_gpodder">gPodder</string>
+    <string name="webservices_discovery_engine_gpodder">gpodder.net</string>
     <string name="webservices_discovery_engine_itunes">iTunes</string>
     <string name="webservices_discovery_engine_audiosearch">AudioSear.ch</string>
     <string name="webservices_discovery_engine_unknown">Unknown search engine</string>
