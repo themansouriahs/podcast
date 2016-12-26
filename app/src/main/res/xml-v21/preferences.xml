@@ -334,14 +334,7 @@
         android:title="@string/preferences_category_about"
         android:icon="@drawable/ic_info_outline_24dp">
 
-        <org.bottiger.podcast.ToolbarPreference
-            android:key="about"
-            android:title="@string/preferences_category_about" />
-
-        <Preference
-            android:defaultValue="true"
-            android:key="pref_current_version"
-            android:title="@string/pref_current_version_title" />
+        <intent android:action="org.bottiger.podcast.VIEW_ABOUT"/>
 
     </PreferenceScreen>
 

@@ -19,7 +19,7 @@ import java.util.LinkedList;
  */
 public class NavigationDrawerMenuGenerator {
 
-    private static final String FEEDBACK = "[Feedback]"; // NoI18N
+    public static final String FEEDBACK = "[Feedback]"; // NoI18N
 
     private final LinkedList<NavItem> mItems = new LinkedList<>();
 

@@ -55,20 +55,6 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        Preference prefVersion = findPreference(CURRENT_VERSION);
-        String packageName = getActivity().getApplicationContext().getPackageName();
-        String version = "Unknown";
-        try {
-            version = getActivity().getPackageManager().getPackageInfo(packageName, 0).versionName;
-            version += "." + getActivity().getPackageManager().getPackageInfo(packageName, 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        version += "-" + BuildConfig.FLAVOR + "-" + BuildConfig.BUILD_TYPE;
-
-        prefVersion.setSummary(version);
     }
 
     @Override
@@ -92,19 +78,20 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         }
     }
 
-    private @NonNull
-    String getVersion(@Nullable Context context) {
+    public @NonNull
+    static String getVersion(@NonNull Context context) {
+        String packageName = context.getApplicationContext().getPackageName();
+        String version = "Unknown";
         try {
-            if (context == null) return "";
-
-            String app     = context.getString(R.string.app_name);
-            String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-
-            return String.format("%s %s", app, version);
+            version = context.getApplicationContext().getPackageManager().getPackageInfo(packageName, 0).versionName;
+            version += "." + context.getApplicationContext().getPackageManager().getPackageInfo(packageName, 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-            Log.w(TAG, e);
-            return context.getString(R.string.app_name);
+            e.printStackTrace();
         }
+
+        version += "-" + BuildConfig.FLAVOR + "-" + BuildConfig.BUILD_TYPE;
+
+        return version;
     }
 
     private void addSearchEnginePreference() {

@@ -216,6 +216,19 @@
                 android:value=".activities.feedview.FeedActivity" />
         </activity>
 
+        <activity android:name=".activities.about.AboutActivity"
+            android:parentActivityName=".SettingsActivity">
+
+            <intent-filter>
+                <action android:name="org.bottiger.podcast.VIEW_ABOUT"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SettingsActivity"/>
+
+        </activity>
 
         <service
             android:name=".service.PlayerService"
