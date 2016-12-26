@@ -43,7 +43,7 @@ public class GPodder extends GenericDirectory {
     private Call mCall;
 
     public GPodder(@NonNull Context argContext) {
-        super(NAME);
+        super(NAME, argContext);
         mGPodderAPI = new GPodderAPI(argContext, GPodderUtils.getServer(null));
     }
 

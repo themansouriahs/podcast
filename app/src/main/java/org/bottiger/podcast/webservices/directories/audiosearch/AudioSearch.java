@@ -1,5 +1,6 @@
 package org.bottiger.podcast.webservices.directories.audiosearch;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.util.Base64;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.ErrorUtils;
+import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
@@ -74,8 +76,8 @@ public class AudioSearch extends GenericDirectory {
     private Retrofit authInstance;
     private AudioSearchEndpoint mService;
 
-    public AudioSearch() {
-        super(NAME);
+    public AudioSearch(@NonNull Context argContext) {
+        super(NAME, argContext);
 
         AUTH_SIGNATURE = getSignature();
         // Initialize AuthorizationClient with Authorization interceptor
@@ -89,29 +91,9 @@ public class AudioSearch extends GenericDirectory {
 
         mAuthorizationService = authInstance.create(AuthorizationService.class);
 
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request original = chain.request();
-
-                if (AUTH_TOKEN == null) {
-                    Authorize();
-                }
-
-                Request.Builder requestBuilder = original.newBuilder()
-                        //.header("Accept", "application/json")
-                        .header("Authorization", AUTH_TOKEN)
-                        .method(original.method(), original.body());
-
-                Request request = requestBuilder.build();
-
-                return chain.proceed(request);
-            }
-        }).build();
-
         Retrofit mRetrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .client(client)
+                .client(getOkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -247,5 +229,30 @@ public class AudioSearch extends GenericDirectory {
     private static String getSignature() {
         String unencoded = AUDIOSEARCH_APP_ID +":"+ AUDIOSEARCH_SECRET;
         return "Basic " + StrUtils.toBase64(unencoded).replaceAll("(\\r|\\n)", ""); // Base64Encode.encode(unencoded).replaceAll("(\\r|\\n)", "");
+    }
+
+    @Override
+    protected OkHttpClient createOkHttpClient() {
+        return HttpUtils
+                .getNewDefaultOkHttpClientBuilder(getContext())
+                .addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+
+                if (AUTH_TOKEN == null) {
+                    Authorize();
+                }
+
+                Request.Builder requestBuilder = original.newBuilder()
+                        //.header("Accept", "application/json")
+                        .header("Authorization", AUTH_TOKEN)
+                        .method(original.method(), original.body());
+
+                Request request = requestBuilder.build();
+
+                return chain.proceed(request);
+            }
+        }).build();
     }
 }

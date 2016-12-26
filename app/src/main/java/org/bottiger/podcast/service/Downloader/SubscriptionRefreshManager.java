@@ -19,6 +19,7 @@ import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ErrorUtils;
+import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
@@ -58,13 +59,7 @@ public class SubscriptionRefreshManager {
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
         mainHandler = new Handler(argContext.getMainLooper());
-
-        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
-        okHttpBuilder.interceptors().add(new UserAgentInterceptor(argContext));
-        okHttpBuilder.connectTimeout(20, TimeUnit.SECONDS)
-                     .writeTimeout(20, TimeUnit.SECONDS)
-                     .readTimeout(30, TimeUnit.SECONDS);
-        mOkClient = okHttpBuilder.build();
+        mOkClient = HttpUtils.getNewDefaultOkHttpClientBuilder(argContext).build();
     }
 
     public void refreshAll() {

@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
@@ -64,6 +65,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -425,10 +427,10 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 directoryProvider = new GPodder(argContext);
                 break;
             case DiscoveryFragment.ITUNES_INDEX:
-                directoryProvider = new ITunes();
+                directoryProvider = new ITunes(argContext);
                 break;
             case DiscoveryFragment.AUDIOSEARCH_INDEX:
-                directoryProvider = new AudioSearch();
+                directoryProvider = new AudioSearch(argContext);
                 break;
         }
 
@@ -451,12 +453,12 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 break;
             }
             case ITUNES_INDEX: {
-                mDirectoryProvider = new ITunes();
+                mDirectoryProvider = new ITunes(context);
                 mSearchEngineButton.setImageResource(R.drawable.discovery_itunes);
                 break;
             }
             case AUDIOSEARCH_INDEX: {
-                mDirectoryProvider = new AudioSearch();
+                mDirectoryProvider = new AudioSearch(context);
                 mSearchEngineButton.setImageResource(R.drawable.audiosearch_logo);
                 break;
             }
@@ -565,5 +567,10 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 }
             }
         }
+    }
+
+    @RestrictTo(RestrictTo.Scope.TESTS)
+    public OkHttpClient getOkHttpClient() {
+        return mDirectoryProvider.getOkHttpClient();
     }
 }

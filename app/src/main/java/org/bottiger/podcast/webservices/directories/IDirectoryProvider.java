@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.WorkerThread;
 
+import okhttp3.OkHttpClient;
+
 /**
  * Created by apl on 13-04-2015.
  */
@@ -30,5 +32,7 @@ public interface IDirectoryProvider {
 
     @MainThread void toplist(@NonNull Callback argCallback);
     @MainThread void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback);
+
+    @NonNull OkHttpClient getOkHttpClient();
 
 }

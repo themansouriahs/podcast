@@ -1,5 +1,6 @@
 package org.bottiger.podcast.webservices.directories.itunes;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -64,8 +65,8 @@ public class ITunes extends GenericDirectory {
     private ObjectMapper mapper = new ObjectMapper(); // create once, reuse
     private QueryITunes asyncTask = null;
 
-    public ITunes() {
-        super(NAME);
+    public ITunes(@NonNull Context argContext) {
+        super(NAME, argContext);
         // to prevent exception when encountering unknown property:
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // to allow coercion of JSON empty String ("") to null Object value:

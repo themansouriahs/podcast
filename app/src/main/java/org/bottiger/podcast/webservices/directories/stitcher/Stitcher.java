@@ -1,5 +1,6 @@
 package org.bottiger.podcast.webservices.directories.stitcher;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,8 +17,8 @@ public class Stitcher extends GenericDirectory {
 
     private static final String NAME = "Stitcher";
 
-    public Stitcher() {
-        super(NAME);
+    public Stitcher(@NonNull Context argContext) {
+        super(NAME, argContext);
     }
 
     @Override
