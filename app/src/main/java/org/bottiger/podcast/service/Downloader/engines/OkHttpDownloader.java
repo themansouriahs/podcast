@@ -92,7 +92,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
         File finalFile;
         try {
             tmpFile = new File(episode.getAbsoluteTmpPath(mContext));
-            finalFile = new File(episode.getAbsolutePath());
+            finalFile = new File(episode.getAbsolutePath(mContext));
         } catch (IOException e) {
             e.printStackTrace();
             return;

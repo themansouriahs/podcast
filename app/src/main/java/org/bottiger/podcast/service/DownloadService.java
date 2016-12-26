@@ -16,8 +16,10 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.NetworkUtils;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -114,7 +116,12 @@ public class DownloadService extends IntentService {
                 episode = sQueue.getFirst();
 
                 if (episode != null) {
-                    boolean canDownload = NetworkUtils.canDownload(episode, this, sLock);
+                    boolean canDownload = false;
+                    try {
+                        canDownload = NetworkUtils.canDownload(episode, this, sLock);
+                    } catch (IOException e) {
+                        ErrorUtils.handleException(e);
+                    }
                     if (canDownload) {
                         downloadStarted = true;
                     } else {

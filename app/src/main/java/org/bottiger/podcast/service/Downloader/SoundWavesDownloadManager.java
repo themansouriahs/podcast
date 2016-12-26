@@ -151,7 +151,7 @@ public class SoundWavesDownloadManager extends Observable {
             }
         }
 
-		if (item.isDownloaded()) {
+		if (item.isDownloaded(mContext)) {
 			return DownloadStatus.DONE;
 		} else if (item.chunkFilesize > 0) {
 			return DownloadStatus.ERROR;
@@ -275,7 +275,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             String mimetype = null;
             try {
-                mimetype = StorageUtils.getMimeType(item.getAbsolutePath());
+                mimetype = StorageUtils.getMimeType(item.getAbsolutePath(mContext));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -286,7 +286,7 @@ public class SoundWavesDownloadManager extends Observable {
 
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             try {
-                intent.setData(Uri.fromFile(new File(item.getAbsolutePath())));
+                intent.setData(Uri.fromFile(new File(item.getAbsolutePath(mContext))));
             } catch (IOException e) {
                 Log.w(TAG, "Could not add file to media scanner"); // NoI18N
                 e.printStackTrace();

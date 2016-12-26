@@ -6,6 +6,7 @@
     <bool name="pref_open_video_externally_default">false</bool>
     <bool name="pref_delete_when_finished_default">false</bool>
     <bool name="pref_continuously_playing_default">false</bool>
+    <bool name="pref_store_on_sdcard_default">false</bool>
     <bool name="pref_show_listened_default">false</bool>
     <bool name="pref_download_only_when_charging_default">false</bool>
     <string name="pref_theme_default">1</string>

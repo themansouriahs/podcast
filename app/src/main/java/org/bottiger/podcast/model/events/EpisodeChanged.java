@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 public class EpisodeChanged implements ItemChanged {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({ADDED, REMOVED, CHANGED, PARSED, PLAYING_PROGRESS, DOWNLOADED, DOWNLOAD_PROGRESS})
+    @IntDef({ADDED, REMOVED, CHANGED, PARSED, PLAYING_PROGRESS, DOWNLOADED, DOWNLOAD_PROGRESS, FILE_DELETED})
     public @interface Action {}
     public static final int ADDED = 1;
     public static final int REMOVED = 2;
@@ -21,6 +21,7 @@ public class EpisodeChanged implements ItemChanged {
     public static final int PLAYING_PROGRESS = 5;
     public static final int DOWNLOADED = 6;
     public static final int DOWNLOAD_PROGRESS = 7;
+    public static final int FILE_DELETED = 8;
 
     private long id;
     private String url;

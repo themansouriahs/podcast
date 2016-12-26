@@ -3,13 +3,18 @@ package org.bottiger.podcast.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.content.ContextCompat;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
 
@@ -25,6 +30,8 @@ public class SDCardManager {
     public static final String CACHE_DIR = "/cache";
     public static final String THUMBNAIL_CACHE = "/thumbnails";
 
+    @Nullable
+    private static File sSdCardDir = null;
     private static String sSDCardDirCache = null;
 
     public static boolean getSDCardStatus() {
@@ -32,10 +39,10 @@ public class SDCardManager {
     }
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    public static boolean getSDCardStatusAndCreate() throws SecurityException {
+    public static boolean getSDCardStatusAndCreate(@NonNull Context argContext) throws SecurityException, IOException {
         boolean b = getSDCardStatus();
         if (b)
-            createDir();
+            createDir(argContext);
         return b;
     }
 
@@ -50,11 +57,52 @@ public class SDCardManager {
     }
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-	public static String getDownloadDir() throws IOException, SecurityException {
-		//return getSDCardDir() + DOWNLOAD_DIR;
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PODCASTS).toString();
-	}
+	public static File getDownloadDir(@NonNull Context argContext) throws IOException, SecurityException {
+        boolean useSDCard = PreferenceHelper.getBooleanPreferenceValue(argContext, R.string.pref_delete_when_finished_key, R.bool.pref_store_on_sdcard_default);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return !useSDCard ? getLocalDownloadDir() : getRemovableDownloadDir(argContext);
+        }
+
+        return getLocalDownloadDir();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    public static File getRemovableDownloadDir(@NonNull Context argContext) throws SecurityException {
+
+        if (sSdCardDir != null) {
+            return sSdCardDir;
+        }
+
+        File[] dirs = argContext.getExternalFilesDirs(Environment.DIRECTORY_PODCASTS);
+        File localDir = getLocalDownloadDir();
+
+        int shortestPrefix = Integer.MAX_VALUE;
+
+        // The SD card is probably the second in the array.
+        // But to be sure we find the path with the shortest common prefix with the local dir
+        if (dirs.length > 1) {
+            for (int i = 0; i < dirs.length; i++) {
+                File sdcardDirTest = dirs[i];
+
+                String prefix = StrUtils.greatestCommonPrefix(localDir.toString(), sdcardDirTest.toString());
+                int prefixLenght = prefix.length();
+
+                if (prefixLenght < shortestPrefix) {
+                    shortestPrefix = prefixLenght;
+                    sSdCardDir = sdcardDirTest;
+                }
+            }
+        }
+
+        return sSdCardDir;
+    }
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    public static File getLocalDownloadDir() throws SecurityException {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS);
+    }
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 	public static String getTmpDir(@NonNull Context argContext) throws IOException, SecurityException {
@@ -137,13 +185,8 @@ public class SDCardManager {
 
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	private static boolean createDir() throws SecurityException {
-        File file = null;
-        try {
-            file = new File(getDownloadDir());
-        } catch (IOException e) {
-            return false;
-        }
+	private static boolean createDir(@NonNull Context argContext) throws SecurityException, IOException {
+        File file = getDownloadDir(argContext);
         boolean exists = (file.exists());
         if (!exists) {
             return file.mkdirs();
@@ -153,11 +196,11 @@ public class SDCardManager {
     }
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public static String pathFromFilename(FeedItem item) throws IOException, SecurityException {
+	public static String pathFromFilename(FeedItem item, @NonNull Context argContext) throws IOException, SecurityException {
 		if (item.getFilename() == null || item.getFilename().equals("")) {
 			return "";
 		} else {
-			return pathFromFilename(item.getFilename());
+			return pathFromFilename(item.getFilename(), argContext);
 		}
 	}
 	
@@ -177,8 +220,8 @@ public class SDCardManager {
 	}
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public static String pathFromFilename(String item) throws IOException, SecurityException {
-		String folder = SDCardManager.getDownloadDir();
+	public static String pathFromFilename(String item, @NonNull Context argContext) throws IOException, SecurityException {
+		String folder = SDCardManager.getDownloadDir(argContext).toString();
 		returnDir(folder);
 		return folder + "/" + item;
 	}

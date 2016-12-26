@@ -89,14 +89,14 @@ public class ChapterUtil {
 
         List<Chapter> chapters = new LinkedList<>();
 
-        if (!argEpisode.isDownloaded()) {
+        if (!argEpisode.isDownloaded(argContext)) {
             return chapters;
         }
 
         FeedItem item = (FeedItem)argEpisode;
         Uri path;
         try {
-            path = Uri.parse((item.getAbsolutePath()));
+            path = Uri.parse((item.getAbsolutePath(argContext)));
         } catch (IOException e) {
             VendorCrashReporter.handleException(e);
             e.printStackTrace();

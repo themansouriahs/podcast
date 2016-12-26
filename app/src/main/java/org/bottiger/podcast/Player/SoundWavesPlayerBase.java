@@ -305,7 +305,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         String url = sub != null ? sub.getURLString() : "";
         EventLogger.postEvent(mPlayerService,
                 EventLogger.LISTEN_EPISODE,
-                mPlayerService.getCurrentItem().isDownloaded() ? 1 : null,
+                mPlayerService.getCurrentItem().isDownloaded(mContext) ? 1 : null,
                 mPlayerService.getCurrentItem().getURL(),
                 url);
 
@@ -329,14 +329,14 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
         return offset;
     }
 
-    static String getDataSourceUrl(@NonNull IEpisode argEpisode) throws SecurityException {
+    static String getDataSourceUrl(@NonNull IEpisode argEpisode, @NonNull Context argContext) throws SecurityException {
         String dataSource = argEpisode.getURL();
         boolean isFeedItem = argEpisode instanceof FeedItem;
 
         try {
-            if (argEpisode.isDownloaded() && isFeedItem) {
+            if (argEpisode.isDownloaded(argContext) && isFeedItem) {
                 FeedItem feedItem = (FeedItem) argEpisode;
-                String path = feedItem.getAbsolutePath();
+                String path = feedItem.getAbsolutePath(argContext);
                 File file = new File(path);
                 if (file.exists()) {
                     dataSource = path;

@@ -119,9 +119,9 @@ public class StorageUtils {
 
             item = (FeedItem) episode;
 
-            if (item.isDownloaded()) {
+            if (item.isDownloaded(context)) {
                 try {
-                    file = new File(item.getAbsolutePath());
+                    file = new File(item.getAbsolutePath(context));
                     lastModifiedKey = file.lastModified();
                     sortedMap.put(-lastModifiedKey, item);
                 } catch (IOException e) {
@@ -136,7 +136,7 @@ public class StorageUtils {
 
             item = sortedMap.get(key);
             try {
-                file = new File(item.getAbsolutePath());
+                file = new File(item.getAbsolutePath(context));
             } catch (IOException e) {
                 ErrorUtils.handleException(e);
                 continue;
@@ -163,9 +163,9 @@ public class StorageUtils {
         // Delete the remaining files which are not indexed in the
         // database
         // Duplicated code from DownloadManagerReceiver
-        File directory = null;
+        File directory;
         try {
-            directory = new File(SDCardManager.getDownloadDir());
+            directory = SDCardManager.getDownloadDir(context);
         } catch (IOException e) {
             ErrorUtils.handleException(e);
             return;

@@ -17,6 +17,7 @@ import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
 
+import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -82,9 +83,9 @@ public class NetworkUtils {
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     public static boolean canDownload(QueueEpisode nextInQueue,
                                       @NonNull Context argContext,
-                                      @NonNull ReentrantLock argLock) throws SecurityException {
+                                      @NonNull ReentrantLock argLock) throws SecurityException, IOException {
         // Make sure we have access to external storage
-        if (!SDCardManager.getSDCardStatusAndCreate()) {
+        if (!SDCardManager.getSDCardStatusAndCreate(argContext)) {
             return false;
         }
 

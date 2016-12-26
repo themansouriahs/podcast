@@ -82,7 +82,7 @@ public class PlayerHelper {
 
     public static long setDuration(@NonNull IEpisode argEpisode, @NonNull TextView argTextView) {
         MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-        Uri location = argEpisode.getFileLocation(IEpisode.PREFER_LOCAL);
+        Uri location = argEpisode.getFileLocation(IEpisode.PREFER_LOCAL, argTextView.getContext());
 
         if (location == null) {
             argTextView.setText("");

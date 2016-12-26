@@ -303,7 +303,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         if (episode == null)
             return PlayerButtonView.STATE_DOWNLOAD;
 
-        if (episode.isDownloaded()) {
+        if (episode.isDownloaded(getContext())) {
             return PlayerButtonView.STATE_DELETE;
         }
 

@@ -386,7 +386,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			try {
 				setDownloaded(false);
 				update(argContext);
-				File file = new File(getAbsolutePath());
+				File file = new File(getAbsolutePath(argContext));
 				if (file.exists() && file.delete()) {
 					// FIXME Investigate this
                     //DownloadProgressPublisher.deleteEpisode(this);
@@ -403,8 +403,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public void downloadSuccess(ContentResolver contentResolver) throws SecurityException {
-		filesize = getCurrentFileSize();
+	public void downloadSuccess(@NonNull Context argContext) throws SecurityException {
+		filesize = getCurrentFileSize(argContext);
 		notifyPropertyChanged();
 	}
 
@@ -418,10 +418,10 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
     }
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public long getCurrentFileSize() throws SecurityException {
+	public long getCurrentFileSize(@NonNull Context argContext) throws SecurityException {
 		String file = null;
 		try {
-			file = getAbsolutePath();
+			file = getAbsolutePath(argContext);
 		} catch (IOException e) {
 			return -1;
 		}
@@ -460,8 +460,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
 	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public String getAbsolutePath() throws IOException, SecurityException {
-		return SDCardManager.pathFromFilename(this);
+	public String getAbsolutePath(@NonNull Context argContext) throws IOException, SecurityException {
+		return SDCardManager.pathFromFilename(this, argContext);
 	}
 
 	public String getAbsoluteTmpPath(@NonNull Context argContext) throws IOException {
@@ -470,8 +470,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 	@Nullable
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public Uri getFileLocation(@Location int argLocation) throws SecurityException {
-		boolean isDownloaded = isDownloaded();
+	public Uri getFileLocation(@Location int argLocation, @NonNull Context argContext) throws SecurityException {
+		boolean isDownloaded = isDownloaded(argContext);
 
 		if (!isDownloaded && argLocation == REQUIRE_LOCAL)
 			return null;
@@ -490,7 +490,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 				//builder.path("/" + getAbsolutePath());
 				// uri = builder.build();
 
-				File file = new File(getAbsolutePath());
+				File file = new File(getAbsolutePath(argContext));
 				uri = Uri.fromFile(file);
 
 				//uri = Uri.parse(getAbsolutePath());
@@ -574,7 +574,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * @return whether the item is downloaded to the phone
 	 */
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public boolean isDownloaded() throws SecurityException {
+	public boolean isDownloaded(@NonNull Context argContext) throws SecurityException {
 		try {
             if (isDownloaded != null)
                 return isDownloaded;
@@ -584,7 +584,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 		File f = null;
 		try {
-			f = new File(getAbsolutePath());
+			f = new File(getAbsolutePath(argContext));
 		} catch (IOException e) {
 			return false;
 		}
@@ -619,7 +619,11 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 		isDownloaded = argIsDownloaded;
 		setHasBeenDownloadedOnce(true);
-		notifyPropertyChanged(EpisodeChanged.DOWNLOADED);
+		if (argIsDownloaded) {
+			notifyPropertyChanged(EpisodeChanged.DOWNLOADED);
+		} else {
+			notifyPropertyChanged(EpisodeChanged.FILE_DELETED);
+		}
 	}
 
 	/**
@@ -1100,13 +1104,8 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		EpisodeChanged ec = new EpisodeChanged(getId(), getURL(), argAction);
 		SoundWaves.getRxBus().send(ec);
 
-		if (argAction == EpisodeChanged.DOWNLOADED) {
-			boolean isDownloaded = false;
-            try {
-                isDownloaded = isDownloaded();
-            } catch (SecurityException se) {
-                VendorCrashReporter.report("IsDownloaded", "SecurityException");
-            }
+		if (argAction == EpisodeChanged.DOWNLOADED || argAction == EpisodeChanged.FILE_DELETED) {
+			boolean isDownloaded = argAction == EpisodeChanged.DOWNLOADED;
 			DownloadStatus downloadStatus = isDownloaded ? DownloadStatus.DONE : DownloadStatus.DELETED;
 			int progress = isDownloaded ? 100 : 0;
 			progressChanged = new DownloadProgress(this, downloadStatus, progress);

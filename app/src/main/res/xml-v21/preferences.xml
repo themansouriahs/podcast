@@ -198,6 +198,12 @@
                 android:summary="@string/pref_downloaded_expire_description"
                 android:title="@string/pref_downloaded_expire_title" />
 
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_store_on_sdcard_default"
+                android:key="@string/pref_delete_when_finished_key"
+                android:title="@string/pref_store_on_sdcard_title"
+                android:summary="@string/pref_store_on_sdcard_description" />
+
         </PreferenceCategory>
 
         <PreferenceCategory

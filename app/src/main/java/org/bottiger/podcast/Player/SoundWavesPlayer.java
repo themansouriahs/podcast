@@ -155,7 +155,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         try {
 
-            String path = getDataSourceUrl(argEpisode);
+            String path = getDataSourceUrl(argEpisode, mContext);
             File f = new File(path);
             mIsStreaming = !f.exists();
 

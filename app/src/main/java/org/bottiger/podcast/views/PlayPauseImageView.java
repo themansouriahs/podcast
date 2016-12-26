@@ -571,13 +571,13 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
     }
 
     public static void openVideoExternally(@NonNull IEpisode argEpisode, @NonNull Context argContext) {
-        Uri uri = argEpisode.getFileLocation(IEpisode.PREFER_LOCAL);
+        Uri uri = argEpisode.getFileLocation(IEpisode.PREFER_LOCAL, argContext);
 
         String mimetype;
-        if (argEpisode.isDownloaded()) {
-            mimetype = StorageUtils.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL).toString());
+        if (argEpisode.isDownloaded(argContext)) {
+            mimetype = StorageUtils.getMimeType(argEpisode.getFileLocation(IEpisode.REQUIRE_LOCAL, argContext).toString());
         } else {
-            String extension = MimeTypeMap.getFileExtensionFromUrl(argEpisode.getFileLocation(IEpisode.REQUIRE_REMOTE).toString());
+            String extension = MimeTypeMap.getFileExtensionFromUrl(argEpisode.getFileLocation(IEpisode.REQUIRE_REMOTE, argContext).toString());
             mimetype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         }
 

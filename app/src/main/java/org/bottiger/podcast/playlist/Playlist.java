@@ -696,7 +696,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
             }
 
             // Filter based on donwload state
-            if (!showOnlyDownloadedVal || episode.isDownloaded()) {
+            if (!showOnlyDownloadedVal || episode.isDownloaded(mContext)) {
                 downloadStateIsShown = true;
             }
 

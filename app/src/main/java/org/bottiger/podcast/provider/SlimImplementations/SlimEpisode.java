@@ -213,7 +213,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
 
     @Nullable
     @Override
-    public Uri getFileLocation(@Location int argLocation) {
+    public Uri getFileLocation(@Location int argLocation, @NonNull Context argContext) {
         if (argLocation == REQUIRE_LOCAL || mUrl == null)
             return null;
 
@@ -221,7 +221,7 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
     }
 
     @Override
-    public boolean isDownloaded() {
+    public boolean isDownloaded(@NonNull Context argContext) {
         return false;
     }
 

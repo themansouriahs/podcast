@@ -67,7 +67,7 @@ public interface IEpisode extends IDbItem {
     String getURL();
 
     @Nullable
-    Uri getFileLocation(@Location int argLocation);
+    Uri getFileLocation(@Location int argLocation, @NonNull Context argContext);
 
     /**
      * -1 => nothing
@@ -82,7 +82,7 @@ public interface IEpisode extends IDbItem {
     void removePriority();
 
     boolean canDownload();
-    boolean isDownloaded();
+    boolean isDownloaded(@NonNull Context argContext);
     boolean isMarkedAsListened();
     boolean isNew();
     boolean isPlaying();

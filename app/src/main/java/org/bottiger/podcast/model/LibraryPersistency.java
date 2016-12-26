@@ -261,7 +261,7 @@ public class LibraryPersistency {
         cv.put(ItemColumns.LISTENED, argItem.getListenedValue());
         cv.put(ItemColumns.PRIORITY, argItem.getPriority());
         cv.put(ItemColumns.IMAGE_URL, argItem.getArtwork(mContext));
-        cv.put(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded());
+        cv.put(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded(mContext));
 
         Date date = argItem.getDateTime();
         if (date != null) {
@@ -288,7 +288,7 @@ public class LibraryPersistency {
         map.add(new Pair<String, Object>(ItemColumns.LISTENED, argItem.getListenedValue()));
         map.add(new Pair<String, Object>(ItemColumns.PRIORITY, argItem.getPriority()));
         map.add(new Pair<String, Object>(ItemColumns.IMAGE_URL, argItem.getArtwork(argContext)));
-        map.add(new Pair<String, Object>(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded()));
+        map.add(new Pair<String, Object>(ItemColumns.IS_DOWNLOADED, argItem.isDownloaded(argContext)));
 
         Date date = argItem.getDateTime();
         long time = date != null ? date.getTime() : System.currentTimeMillis();
