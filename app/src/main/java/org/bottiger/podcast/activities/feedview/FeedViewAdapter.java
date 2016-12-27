@@ -31,6 +31,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.views.PlayPauseImageView;
 
 import java.lang.annotation.Retention;
@@ -167,28 +168,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
 
-        getPalette(episodeViewHolder);
-
         episodeViewHolder.mDownloadButton.setEpisode(item);
 
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
-        ISubscription subscription = item.getSubscription(mActivity);
-        if (subscription != null) {
-            subscription.getColors(mActivity)
-                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
-
-                        @Override
-                        public void onSuccess(ColorExtractor value) {
-                            episodeViewHolder.mPlayPauseButton.setColor(value);
-                            episodeViewHolder.mQueueButton.onPaletteFound(value);
-                            episodeViewHolder.mDownloadButton.onPaletteFound(value);
-                        }
-                    });
-        }
+        getPalette(viewHolder);
 
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
 
@@ -201,21 +186,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         } else {
             mExpanededItems.remove(Integer.valueOf(dataPosition));
         }
-    }
-
-    protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
-        mSubscription.getColors(mActivity)
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
-
-                    @Override
-                    public void onSuccess(ColorExtractor value) {
-                        episodeViewHolder.mPlayPauseButton.setColor(value);
-                        episodeViewHolder.mQueueButton.onPaletteFound(value);
-                        episodeViewHolder.mDownloadButton.onPaletteFound(value);
-                    }
-                });
     }
 
     @Override
@@ -268,24 +238,42 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     private String getSecondaryText(@NonNull IEpisode argItem) {
         mStringBuilder.setLength(0);
+
+        Date date = argItem.getDateTime();
+        if (date != null) {
+            int flags = DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NO_MIDNIGHT;
+            //mStringBuilder.append(DateUtils.formatDateTime(mActivity, argItem.getDateTime().getTime(), flags));
+            mStringBuilder.append(DateUtils.getRelativeTimeSpanString(argItem.getDateTime().getTime()));
+            mStringBuilder.append(", ");
+        }
+
         if (argItem.getDuration() > 0) {
-            mStringBuilder.append(DateUtils.formatElapsedTime(argItem.getDuration() / 1000));
+            //mStringBuilder.append(DateUtils.formatElapsedTime(argItem.getDuration() / 1000));
+            mStringBuilder.append(StrUtils.formatTimeText(argItem.getDuration(), true));
             mStringBuilder.append(", ");
         }
 
         long filesize = argItem.getFilesize();
         if (filesize > 0) {
             mStringBuilder.append(Formatter.formatShortFileSize(mActivity, argItem.getFilesize()));
-            mStringBuilder.append(", ");
-        }
-
-        Date date = argItem.getDateTime();
-        if (date != null) {
-            int flags = DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_NO_MIDNIGHT;
-            mStringBuilder.append(DateUtils.formatDateTime(mActivity, argItem.getDateTime().getTime(), flags));
         }
 
         return mStringBuilder.toString();
+    }
+
+    protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
+        mSubscription.getColors(mActivity)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        episodeViewHolder.mPlayPauseButton.setColor(value);
+                        episodeViewHolder.mQueueButton.onPaletteFound(value);
+                        episodeViewHolder.mDownloadButton.onPaletteFound(value);
+                    }
+                });
     }
 
     public @Order int calcOrder() {

@@ -156,6 +156,43 @@ public class StrUtils {
 		return stringBuilder.toString();
 	}
 
+	/*
+Fast but not so readable.
+From here: http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
+ */
+	public static String formatTimeText(final long argMillis, boolean argIncludeSeconds) {
+
+		long millis = Math.abs(argMillis);
+
+		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
+				- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
+				- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+		long hours = TimeUnit.MILLISECONDS.toHours(millis);
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		if (argMillis < 0) {
+			stringBuilder.append("-");
+		}
+
+		if (hours > 0) {
+			stringBuilder.append(hours < 10 ? String.valueOf("" + hours) : String.valueOf(hours));
+			stringBuilder.append("h");
+		}
+
+		stringBuilder.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) :
+				String.valueOf(minutes));
+		stringBuilder.append("m");
+
+		if (argIncludeSeconds) {
+			stringBuilder.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) :
+					String.valueOf(seconds));
+			stringBuilder.append("s");
+		}
+		return stringBuilder.toString();
+	}
+
 	public static String fromHtmlCompat(@Nullable String argString) {
 		if (TextUtils.isEmpty(argString)) {
 			new SpannedString("");
