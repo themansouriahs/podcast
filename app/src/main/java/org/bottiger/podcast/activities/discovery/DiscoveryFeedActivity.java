@@ -111,9 +111,9 @@ public class DiscoveryFeedActivity extends FeedActivity {
         mProgress = new ProgressDialog(this);
         mProgress.setMessage(getString(R.string.discovery_progress_loading_podcast_content));
         //mProgress.setCancelable(false);
-        mProgress.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        mProgress.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
-            public void onDismiss(DialogInterface dialogInterface) {
+            public void onCancel(DialogInterface dialogInterface) {
                 Intent intent = new Intent();
                 intent.putExtra(WAS_DISMISSED, true);
                 setResult(RESULT_OK, intent);
