@@ -58,7 +58,8 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
         }
         ActionBar actionbar = getSupportActionBar();
-        if (actionbar != null) actionbar.setDisplayHomeAsUpEnabled(true);
+        if (actionbar != null)
+            actionbar.setDisplayHomeAsUpEnabled(true);
 
         mLibrary = SoundWaves.getAppContext(this).getLibraryInstance();
 

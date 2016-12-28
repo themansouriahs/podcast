@@ -74,7 +74,7 @@ public class OPMLImportExportActivity extends ToolbarActivity {
                 //Unless you have an external file manager, this not seems to work, the mimetype is wrong or something
 
                 //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                //    chooseFile.setType("*/*");
+                    chooseFile.setType("*/*");
                 //chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
                 //} else {
                 //    chooseFile.setType(MimeType);

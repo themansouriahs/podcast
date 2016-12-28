@@ -177,7 +177,13 @@
 
         <activity
             android:name=".activities.openopml.OpenOpmlFromIntentActivity"
-            android:configChanges="keyboardHidden|orientation">
+            android:configChanges="keyboardHidden|orientation"
+            android:parentActivityName=".activities.openopml.OPMLImportExportActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.openopml.OPMLImportExportActivity" />
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
