@@ -86,10 +86,8 @@ public class DialogChapters extends DialogFragment {
         mActivity = getActivity();
 
         long episodeID = getArguments().getLong(scopeName, no_chapters);
-        boolean hasEpisode = episodeID > 0;
-        final IEpisode episode = hasEpisode ?
-                SoundWaves.getAppContext(mActivity).getLibraryInstance().getEpisode(episodeID) :
-                null;
+        final IEpisode episode = SoundWaves.getAppContext(mActivity).getLibraryInstance().getEpisode(episodeID);
+        boolean hasEpisode = episode != null;
 
         final List<Chapter> chapters = hasEpisode ? episode.getChapters() : new LinkedList<Chapter>();
         final long offset = hasEpisode ? episode.getOffset() : 0;
@@ -135,7 +133,6 @@ public class DialogChapters extends DialogFragment {
                         mAdapter.setActive(integer);
 
                         if (chapter != null && chapter.getStart() >= 0) {
-                            //SoundWaves.getAppContext(mActivity).getPlayer().seekTo(chapter.getStart());
                             episode.seekTo(chapter.getStart());
                         }
                     }

@@ -504,7 +504,11 @@ public class Library {
 
     @Nullable
     public FeedItem getEpisode(long argId) {
-        return mEpisodesIdLUT.get(argId);
+        if (mEpisodesIdLUT.containsKey(argId)) {
+            return mEpisodesIdLUT.get(argId);
+        }
+
+        return null;
     }
 
     public SortedList<IEpisode> newEpisodeSortedList(SortedList.Callback<IEpisode> argCallback) {
