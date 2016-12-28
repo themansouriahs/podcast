@@ -330,6 +330,8 @@ public class SoundWaves extends MultiDexApplication {
             public void onConnectionSuspended() {
                 // We were connected, but no longer :-(
                 VendorCrashReporter.report("onConnectionSuspended", "it happend");
+                mPlayerHelper.setMediaControllerCompat(null);
+                super.onConnectionSuspended();
             }
 
             @Override
@@ -337,6 +339,7 @@ public class SoundWaves extends MultiDexApplication {
                 // The attempt to connect failed completely.
                 // Check the ComponentName!
                 VendorCrashReporter.report("onConnectionFailed", "it happend");
+                super.onConnectionFailed();
             }
         };
     }

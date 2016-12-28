@@ -3,6 +3,7 @@ package org.bottiger.podcast.utils;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -19,10 +20,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PlayerHelper {
 
-    private MediaControllerCompat mMediaControllerCompat;
+    private @Nullable MediaControllerCompat mMediaControllerCompat;
     private ReentrantLock mLock = new ReentrantLock();
 
-    public void setMediaControllerCompat(@NonNull MediaControllerCompat argMediaControllerCompat) {
+    public void setMediaControllerCompat(@Nullable MediaControllerCompat argMediaControllerCompat) {
         try {
             mLock.lock();
             mMediaControllerCompat = argMediaControllerCompat;

@@ -58,14 +58,15 @@ public class MainActivity extends FragmentContainerActivity {
 		super.onCreate(savedInstanceState);
 
 		boolean firstRun = SoundWaves.getAppContext(this).IsFirstRun();
+
+		if (firstRun && !showIntro) {
+			VendorCrashReporter.report("ShowWrongIntro", "Something is wrong");
+		}
+
 		if (firstRun && showIntro) {
 			showIntro = false;
 			Intent intent = new Intent(MainActivity.this, Intro.class);
 			startActivity(intent);
-		}
-
-		if (firstRun && !showIntro) {
-			VendorCrashReporter.report("ShowWrongIntro", "Something is wrong");
 		}
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
