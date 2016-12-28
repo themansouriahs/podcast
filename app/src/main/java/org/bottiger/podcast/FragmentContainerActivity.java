@@ -2,6 +2,8 @@ package org.bottiger.podcast;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -45,7 +47,7 @@ public class FragmentContainerActivity extends DrawerActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		mFragmentManager = getSupportFragmentManager(); // getSupportFragmentManager();
+		mFragmentManager = getSupportFragmentManager();
 
 		if (ApplicationConfiguration.DEBUGGING)
 			mFragmentManager.enableDebugLogging(true);
@@ -59,7 +61,6 @@ public class FragmentContainerActivity extends DrawerActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(mFragmentManager, mViewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3); // 3
-
 
         mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 1"));
         mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 2"));
@@ -148,4 +149,10 @@ public class FragmentContainerActivity extends DrawerActivity {
 		}
 
     }
+
+	@RestrictTo(RestrictTo.Scope.TESTS)
+	@NonNull
+	public SectionsPagerAdapter getSectionsPagerAdapter() {
+		return mSectionsPagerAdapter;
+	}
 }

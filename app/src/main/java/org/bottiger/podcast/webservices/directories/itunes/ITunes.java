@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
@@ -24,9 +25,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
+
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by apl on 13-04-2015.
@@ -41,7 +46,8 @@ import java.util.List;
  */
 public class ITunes extends GenericDirectory {
 
-    private static final String NAME = "iTunes";
+    private static final String NAME = ITunes.class.getSimpleName();
+    private static final String ENCODING = "UTF-8";
 
     private static final String jsonTest = "{\n" +
             " \"resultCount\":50,\n" +
@@ -123,7 +129,7 @@ public class ITunes extends GenericDirectory {
 
     private String generateTerm(@NonNull ISearchParameters argParameters) throws UnsupportedEncodingException {
         String joinedKeywords = TextUtils.join(QUERY_SEPARATOR, argParameters.getKeywords());
-        return URLEncoder.encode(joinedKeywords, "UTF-8");
+        return URLEncoder.encode(joinedKeywords, ENCODING);
     }
 
     @Override
@@ -150,8 +156,11 @@ public class ITunes extends GenericDirectory {
             List<ITunesSlimSubscription> list = new LinkedList<>();
 
             try {
-                //node = mapper.readTree(jsonTest);
-                node = mapper.readTree(mURL);
+                Request request = new Request.Builder().url(mURL).get().build();
+                Response response = getOkHttpClient().newCall(request).execute();
+
+                //node = mapper.readTree(mURL);
+                node = mapper.readTree(response.body().bytes());
                 node = node.get("results");
                 list = mapper.readValue(node.traverse(), typeRef);
             } catch (IOException e) {
@@ -159,7 +168,13 @@ public class ITunes extends GenericDirectory {
                 mCallback.error(e);
             }
 
-            GenericSearchResult result = new GenericSearchResult(mKeywords);
+            GenericSearchResult result = null;
+            try {
+                result = new GenericSearchResult(URLDecoder.decode(mKeywords, ENCODING));
+            } catch (UnsupportedEncodingException e) {
+                ErrorUtils.handleException(e);
+                result = new GenericSearchResult(mKeywords.replace("+", " "));
+            }
 
             for (ITunesSlimSubscription slimSubscription : list) {
 

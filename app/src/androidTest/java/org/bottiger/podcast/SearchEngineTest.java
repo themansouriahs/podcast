@@ -1,7 +1,10 @@
 package org.bottiger.podcast;
 
 
+import android.app.FragmentManager;
+import android.support.annotation.NonNull;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import org.bottiger.podcast.TestUtils.TestUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -27,6 +31,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withContentDesc
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.bottiger.podcast.TestUtils.RecyclerTestUtils.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -44,6 +49,23 @@ public class SearchEngineTest {
                 allOf(withText("DISCOVER"), isDisplayed()));
         appCompatTextView5.perform(click());
 
+        ViewInteraction appCompatImageButton7 = onView(
+                allOf(withId(R.id.discovery_searchIcon), withContentDescription("Podcast directory (search engine)"),
+                        withParent(allOf(withId(R.id.discovery_searchView_container_relative),
+                                withParent(withId(R.id.discovery_searchView_container)))),
+                        isDisplayed()));
+        appCompatImageButton7.perform(click());
+
+        String itunes = mActivityTestRule
+                .getActivity()
+                .getResources()
+                .getString(R.string.webservices_discovery_engine_itunes);
+        ViewInteraction appCompatTextView4 = onView(allOf(withId(android.R.id.text1),
+                withText(itunes)))
+                .check(matches(isDisplayed()));
+        appCompatTextView4.perform(click());
+
+
         ViewInteraction searchAutoComplete = onView(
                 allOf(withId(R.id.search_src_text),
                         withParent(allOf(withId(R.id.search_plate),
@@ -52,16 +74,11 @@ public class SearchEngineTest {
 
         searchAutoComplete.perform(replaceText("harry potter"), closeSoftKeyboard());
 
-        ViewInteraction textView = onView(
-                allOf(withId(R.id.result_title), withText("MuggleCast: the Harry Potter podcast"),
-                        childAtPosition(
-                                allOf(withId(R.id.result_container),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        textView.check(matches(isDisplayed()));
+        waitForSearchResult(mActivityTestRule.getActivity());
+
+        onView(withRecyclerView(R.id.search_result_view)
+                .atPositionOnView(0, R.id.result_title))
+                .check(matches(withText("MuggleCast: the Harry Potter podcast")));
 
         ViewInteraction appCompatImageView = onView(
                 allOf(withId(R.id.search_close_btn), withContentDescription("Clear query"),
@@ -77,13 +94,14 @@ public class SearchEngineTest {
                         isDisplayed()));
         appCompatImageButton5.perform(click());
 
-        ViewInteraction appCompatTextView = onView(
-                allOf(withId(android.R.id.text1), withText("gPodder"),
-                        childAtPosition(
-                                allOf(withClassName(is("com.android.internal.app.AlertController$RecycleListView")),
-                                        withParent(withClassName(is("android.widget.LinearLayout")))),
-                                0),
-                        isDisplayed()));
+        String gpodder = mActivityTestRule
+                .getActivity()
+                .getResources()
+                .getString(R.string.webservices_discovery_engine_gpodder);
+        ViewInteraction appCompatTextView = onView(allOf(withId(android.R.id.text1),
+                withText(gpodder)))
+                .check(matches(isDisplayed()));
+
         appCompatTextView.perform(click());
 
         ViewInteraction searchAutoComplete2 = onView(
@@ -93,23 +111,11 @@ public class SearchEngineTest {
                         isDisplayed()));
         searchAutoComplete2.perform(replaceText("nerd"), closeSoftKeyboard());
 
-        ViewInteraction searchAutoComplete3 = onView(
-                allOf(withId(R.id.search_src_text), withText("nerd"),
-                        withParent(allOf(withId(R.id.search_plate),
-                                withParent(withId(R.id.search_edit_frame)))),
-                        isDisplayed()));
-        searchAutoComplete3.perform(click());
+        waitForSearchResult(mActivityTestRule.getActivity());
 
-        ViewInteraction textView2 = onView(
-                allOf(withId(R.id.result_title), withText("Jovem Nerd"),
-                        childAtPosition(
-                                allOf(withId(R.id.result_container),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        textView2.check(matches(isDisplayed()));
+        onView(withRecyclerView(R.id.search_result_view)
+                .atPositionOnView(0, R.id.result_title))
+                .check(matches(withText("Jovem Nerd")));
 
         ViewInteraction appCompatImageView2 = onView(
                 allOf(withId(R.id.search_close_btn), withContentDescription("Clear query"),
@@ -125,13 +131,14 @@ public class SearchEngineTest {
                         isDisplayed()));
         appCompatImageButton6.perform(click());
 
-        ViewInteraction appCompatTextView2 = onView(
-                allOf(withId(android.R.id.text1), withText("AudioSear.ch"),
-                        childAtPosition(
-                                allOf(withClassName(is("com.android.internal.app.AlertController$RecycleListView")),
-                                        withParent(withClassName(is("android.widget.LinearLayout")))),
-                                2),
-                        isDisplayed()));
+        String audiosearch = mActivityTestRule
+                .getActivity()
+                .getResources()
+                .getString(R.string.webservices_discovery_engine_audiosearch);
+        ViewInteraction appCompatTextView2 = onView(allOf(withId(android.R.id.text1),
+                withText(audiosearch)))
+                .check(matches(isDisplayed()));
+
         appCompatTextView2.perform(click());
 
         ViewInteraction searchAutoComplete4 = onView(
@@ -146,18 +153,13 @@ public class SearchEngineTest {
                         withParent(allOf(withId(R.id.search_plate),
                                 withParent(withId(R.id.search_edit_frame)))),
                         isDisplayed()));
-        searchAutoComplete5.perform(replaceText("tech"), closeSoftKeyboard());
+        searchAutoComplete5.perform(replaceText("Android"), closeSoftKeyboard());
 
-        ViewInteraction relativeLayout = onView(
-                allOf(withId(R.id.container),
-                        childAtPosition(
-                                allOf(withId(R.id.search_result_view),
-                                        childAtPosition(
-                                                withId(R.id.discovery_container),
-                                                1)),
-                                0),
-                        isDisplayed()));
-        relativeLayout.check(matches(isDisplayed()));
+        waitForSearchResult(mActivityTestRule.getActivity());
+
+        onView(withRecyclerView(R.id.search_result_view)
+                .atPositionOnView(0, R.id.result_title))
+                .check(matches(withText("Android Police")));
 
     }
 
@@ -178,5 +180,23 @@ public class SearchEngineTest {
                         && view.equals(((ViewGroup) parent).getChildAt(position));
             }
         };
+    }
+
+    private static void waitForSearchResult(@NonNull FragmentContainerActivity argActivity) {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        FragmentContainerActivity.SectionsPagerAdapter sectionsPagerAdapter = argActivity.getSectionsPagerAdapter();
+        DiscoveryFragment discoveryFragment = (DiscoveryFragment) sectionsPagerAdapter.getItem(2);
+        TestUtils.waitForOkHttp(discoveryFragment.getOkHttpClient());
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

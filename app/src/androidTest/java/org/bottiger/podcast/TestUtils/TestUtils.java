@@ -51,7 +51,11 @@ public class TestUtils {
     public static void waitForSubscriptionRefresh(@NonNull Activity argActivity) {
         Context context = argActivity.getApplicationContext();
         OkHttpClient client = SoundWaves.getAppContext(context).getRefreshManager().getHttpClient();
-        IdlingResource resource = OkHttp3IdlingResource.create("OkHttp", client);
+        waitForOkHttp(client);
+    }
+
+    public static void waitForOkHttp(@NonNull OkHttpClient argClient) {
+        IdlingResource resource = OkHttp3IdlingResource.create("OkHttpClient", argClient);
 
         Espresso.registerIdlingResources(resource);
     }

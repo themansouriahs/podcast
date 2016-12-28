@@ -74,13 +74,6 @@ public class SubscribeToPodcastTest {
         appCompatTextView5.perform(click());
 
         TestUtils.waitForSubscriptionRefresh(mActivityTestRule.getActivity());
-        /*
-        Context context = mActivityTestRule.getActivity().getApplicationContext();
-        OkHttpClient client = SoundWaves.getAppContext(context).getRefreshManager().getHttpClient();
-        IdlingResource resource = OkHttp3IdlingResource.create("OkHttp", client);
-
-        Espresso.registerIdlingResources(resource);
-        */
 
         // Open the subscription
         onView(withId(R.id.gridview)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
