@@ -257,4 +257,12 @@ public class StorageUtils {
         String extension = MimeTypeMap.getFileExtensionFromUrl(fileUrl);
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
     }
+
+    public static int getStorageCapacityGB(@NonNull Context argContext) {
+        String collectionSize = PreferenceHelper.getStringPreferenceValue(argContext,
+                R.string.pref_podcast_collection_size_key,
+                R.string.pref_download_collection_size_default);
+
+        return (int) (Long.valueOf(collectionSize) / 1000);
+    }
 }

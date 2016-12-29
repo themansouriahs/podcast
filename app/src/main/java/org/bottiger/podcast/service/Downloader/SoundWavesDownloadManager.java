@@ -213,6 +213,9 @@ public class SoundWavesDownloadManager extends Observable {
             return;
         }
 
+        if (argEpisode.isDownloaded(mContext))
+            return;
+
         DownloadService.download(argEpisode, startedManually, mContext);
 	}
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:padding="@dimen/material_component_dialogs_padding_around_content_area"
     android:layout_gravity="center_horizontal">
 
     <TextView
@@ -15,40 +15,97 @@
         android:text="@string/bulk_download_instructions"
         />
 
-    <RadioGroup
+    <RelativeLayout
         android:id="@+id/radio_bulk_download_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_below="@id/dialog_bulk_download_text">
 
-    <RadioButton
+        <RadioButton
+            android:id="@+id/radio_top_episodes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingRight="0dp" />
+
+        <RadioButton
+            android:id="@+id/radio_day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/radio_top_episodes"
+            android:padding="10dp"
+            android:text="@string/bulk_download_day" />
+
+        <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:id="@+id/radio_playlist" />
+            android:text="@string/bulk_download_week"
+            android:id="@+id/radio_week"
+            android:layout_below="@id/radio_day" />
 
-    <RadioButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="@string/bulk_download_day"
-        android:id="@+id/radio_day" />
-
-    <RadioButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="@string/bulk_download_week"
-        android:id="@+id/radio_week" />
-
-    <RadioButton
+        <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:text="@string/bulk_download_month"
-            android:id="@+id/radio_month" />
+            android:id="@+id/radio_month"
+            android:layout_below="@id/radio_week"/>
 
-    </RadioGroup>
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/bulk_download_all"
+            android:id="@+id/radio_all"
+            android:layout_below="@id/radio_month"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/radio_top_episodes_text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/radio_top_episodes"
+            android:layout_toRightOf="@+id/radio_top_episodes"
+            android:layout_toEndOf="@+id/radio_top_episodes"
+            style="@style/Widget.AppCompat.CompoundButton.RadioButton"
+            android:text="@string/top_n_episodes_first"/>
+
+        <EditText
+            android:id="@+id/radio_top_episodes_edittext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/radio_top_episodes"
+            android:layout_toRightOf="@+id/radio_top_episodes_text1"
+            android:layout_toEndOf="@+id/radio_top_episodes_text1"
+            android:text="20"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            />
+
+        <TextView
+            android:id="@+id/radio_top_episodes_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/radio_top_episodes"
+            android:layout_toRightOf="@+id/radio_top_episodes_edittext"
+            android:layout_toEndOf="@+id/radio_top_episodes_edittext"
+            style="@style/Widget.AppCompat.CompoundButton.RadioButton"
+            android:text="@string/top_n_episodes_last"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/dialog_bulk_download_warning"
+        android:layout_below="@id/radio_bulk_download_action"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        android:visibility="visible"/>
+
+</RelativeLayout>
