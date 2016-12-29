@@ -1,5 +1,6 @@
 package org.bottiger.podcast.service.Downloader.engines;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.provider.FeedItem;
@@ -9,12 +10,12 @@ import org.bottiger.podcast.provider.FeedItem;
  */
 public class AndroidDownloader extends DownloadEngineBase {
 
-    public AndroidDownloader(@NonNull FeedItem argEpisode) {
-        super(argEpisode);
+    public AndroidDownloader(@NonNull Context argContext, @NonNull FeedItem argEpisode) {
+        super(argContext, argEpisode);
     }
 
     @Override
-    public void startDownload() {
+    public void startDownload(boolean argIsLast) {
 
     }
 

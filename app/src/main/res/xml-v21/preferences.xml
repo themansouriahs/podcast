@@ -221,6 +221,35 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="notifications"
+        android:title="@string/preferences_category_notifications"
+        android:icon="@drawable/ic_chat_bubble_outline_24dp">
+
+        <org.bottiger.podcast.ToolbarPreference
+            android:key="notifications"
+            android:title="@string/preferences_category_notifications" />
+
+        <PreferenceCategory
+            android:title="@string/pref_notifications_category_title"
+            android:key="pref_notifications_category_download_notifications">
+
+            <CheckBoxPreference
+                android:key="@string/pref_download_notification_key"
+                android:title="@string/pref_download_notification_title"
+                android:summary="@string/pref_download_notification_summary"
+                android:defaultValue="@bool/pref_download_notification_default" />
+
+            <CheckBoxPreference
+                android:key="@string/pref_new_episode_notification_key"
+                android:title="@string/pref_new_episode_notification_title"
+                android:summary="@string/pref_new_episode_notification_summary"
+                android:defaultValue="@bool/pref_new_episode_notification_default" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
         android:key="import_export"
         android:title="@string/preferences_category_import_export"
         android:icon="@drawable/ic_import_export_24dp">

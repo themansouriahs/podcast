@@ -7,7 +7,7 @@ import org.bottiger.podcast.provider.IEpisode;
  */
 public interface IDownloadEngine {
 
-    void startDownload();
+    void startDownload(boolean argIsLast);
     float getProgress();
     IEpisode getEpisode();
     void addCallback(Callback argCallback);

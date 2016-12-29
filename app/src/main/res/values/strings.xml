@@ -305,6 +305,12 @@
     <!-- The text after the number in the string: "Top 20 episodes" -->
     <string name="top_n_episodes_last">episodes</string>
     <string name="bulk_download_capacaity_warning">You currently have a maximum storage capacity setting of %1$d GB. If the files exceed this limit when downloaded some of them will be removed.</string>
+    <string name="preferences_category_notifications">Notifications</string>
+    <string name="pref_notifications_category_title">Notifications</string>
+    <string name="pref_download_notification_title">Download progress</string>
+    <string name="pref_download_notification_summary">Display file download progress in a notification</string>
+    <string name="pref_new_episode_notification_title">New episodes</string>
+    <string name="pref_new_episode_notification_summary">Notify when your subscriptions are updated with new episodes</string>
 
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>

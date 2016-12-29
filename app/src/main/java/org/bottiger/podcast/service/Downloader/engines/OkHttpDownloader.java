@@ -51,23 +51,19 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
     private volatile boolean mAborted = false;
 
-    @NonNull private Context mContext;
     @Nullable private final URL mURL;
-
-    private double mProgress = 0;
 
     @WorkerThread
     public OkHttpDownloader(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
-        super(argEpisode);
-        mContext = argContext;
+        super(argContext, argEpisode);
         mURL = argEpisode.getUrl();
     }
 
     @WorkerThread
     @Override
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    public void startDownload() throws SecurityException {
-        mProgress = 0;
+    public void startDownload(boolean argIsLast) throws SecurityException {
+        setProgress(0);
 
         if (!StrUtils.isValidUrl(mURL)) {
             Log.d(TAG, "no URL, return");
@@ -91,8 +87,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
         File tmpFile;
         File finalFile;
         try {
-            tmpFile = new File(episode.getAbsoluteTmpPath(mContext));
-            finalFile = new File(episode.getAbsolutePath(mContext));
+            tmpFile = new File(episode.getAbsoluteTmpPath(getContext()));
+            finalFile = new File(episode.getAbsolutePath(getContext()));
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -106,7 +102,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
             Request request = new Request.Builder()
                     .url(mURL.toString())
-                    .header("User-Agent", HttpUtils.getUserAgent(mContext))
+                    .header("User-Agent", HttpUtils.getUserAgent(getContext()))
                     .build();
 
             Response response = mOkHttpClient.newCall(request).execute();
@@ -124,6 +120,9 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
             Log.d(TAG, "starting file transfer");
 
+            long startRead = System.currentTimeMillis();
+            long endRead = System.currentTimeMillis();
+            long byteReadCounter = 0;
             for (long bytesRead; (bytesRead = source.read(sinkBuffer, bufferSize)) != -1; ) {
 
                 if (mAborted) {
@@ -135,8 +134,18 @@ public class OkHttpDownloader extends DownloadEngineBase {
 
                 sink.emit();
                 totalBytesRead += bytesRead;
-                mProgress = ((totalBytesRead * 100) / contentLength);
-                getEpisode().setProgress(mProgress);
+                double progress = ((totalBytesRead * 100) / contentLength);
+
+                endRead = System.currentTimeMillis();
+                byteReadCounter += bytesRead;
+                long readTimeMs = endRead-startRead;
+                if (readTimeMs > 1000) {
+                    startRead = System.currentTimeMillis();
+                    long Bps = readTimeMs > 0 ? byteReadCounter * 1000 / readTimeMs : 0;
+                    setSpeed(Bps);
+                    byteReadCounter = 0;
+                }
+                setProgress((float) progress);
             }
 
             Log.d(TAG, "filetransfer done");
@@ -168,6 +177,10 @@ public class OkHttpDownloader extends DownloadEngineBase {
             VendorCrashReporter.handleException(e, keys, values);
         } finally{
             closeConnection(source, sink);
+
+            if (argIsLast) {
+                removeNotification();
+            }
         }
     }
 
@@ -184,11 +197,6 @@ public class OkHttpDownloader extends DownloadEngineBase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public float getProgress() {
-        return (float)mProgress;
     }
 
     @Override

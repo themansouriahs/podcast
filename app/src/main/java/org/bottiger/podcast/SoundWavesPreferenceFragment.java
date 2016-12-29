@@ -45,6 +45,12 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         Preference submitDebugLog = this.findPreference(key);
         submitDebugLog.setOnPreferenceClickListener(new SubmitDebugLogListener());
         submitDebugLog.setSummary(getVersion(getActivity()));
+    }
+
+    @Override
+    public void onAttach (Context argContext) {
+        mContext = argContext;
+        super.onAttach(argContext);
 
         String saveOnSdCardKey = getResources().getString(R.string.pref_store_on_sdcard_key);
         Preference saveOnSdCardPreference = this.findPreference(saveOnSdCardKey);
@@ -52,12 +58,6 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
             PreferenceCategory category = (PreferenceCategory) findPreference("pref_network_category_storage");
             category.removePreference(saveOnSdCardPreference);
         }
-    }
-
-    @Override
-    public void onAttach (Context argContext) {
-        mContext = argContext;
-        super.onAttach(argContext);
     }
 
     @Override

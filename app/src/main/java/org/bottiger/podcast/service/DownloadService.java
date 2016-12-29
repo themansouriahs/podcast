@@ -155,7 +155,7 @@ public class DownloadService extends IntentService {
         mEngine.addCallback(mSoundWavesDownloadManager.getIDownloadEngineCallback());
 
         Log.d(TAG, "Start downloading: " + feedItem);
-        mEngine.startDownload();
+        mEngine.startDownload(sQueue.size() > 0);
         mProgressPublisher.addEpisode(feedItem);
     }
 
