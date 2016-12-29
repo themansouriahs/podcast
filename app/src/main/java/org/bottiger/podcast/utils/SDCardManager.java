@@ -77,6 +77,7 @@ public class SDCardManager {
 
         File[] dirs = argContext.getExternalFilesDirs(Environment.DIRECTORY_PODCASTS);
         File localDir = getLocalDownloadDir();
+        sSdCardDir = localDir;
 
         int shortestPrefix = Integer.MAX_VALUE;
 
@@ -187,7 +188,7 @@ public class SDCardManager {
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 	private static boolean createDir(@NonNull Context argContext) throws SecurityException, IOException {
         File file = getDownloadDir(argContext);
-        boolean exists = (file.exists());
+        boolean exists = file.exists();
         if (!exists) {
             return file.mkdirs();
         }
