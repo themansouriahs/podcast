@@ -57,6 +57,7 @@ public class SDCardManager {
     }
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    @NonNull
 	public static File getDownloadDir(@NonNull Context argContext) throws IOException, SecurityException {
         boolean useSDCard = PreferenceHelper.getBooleanPreferenceValue(argContext, R.string.pref_delete_when_finished_key, R.bool.pref_store_on_sdcard_default);
 
@@ -98,6 +99,16 @@ public class SDCardManager {
         }
 
         return sSdCardDir;
+    }
+
+    public static boolean hasSdCard(@NonNull Context argContext) {
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
+            return false;
+        }
+
+        File[] dirs = argContext.getExternalFilesDirs(Environment.DIRECTORY_PODCASTS);
+        return dirs != null && dirs.length > 1;
     }
 
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)

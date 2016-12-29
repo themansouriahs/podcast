@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import org.bottiger.podcast.activities.pastelog.LogSubmitActivity;
 import org.bottiger.podcast.utils.IntUtils;
+import org.bottiger.podcast.utils.SDCardManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +45,13 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         Preference submitDebugLog = this.findPreference(key);
         submitDebugLog.setOnPreferenceClickListener(new SubmitDebugLogListener());
         submitDebugLog.setSummary(getVersion(getActivity()));
+
+        String saveOnSdCardKey = getResources().getString(R.string.pref_store_on_sdcard_key);
+        Preference saveOnSdCardPreference = this.findPreference(saveOnSdCardKey);
+        if (saveOnSdCardPreference != null && !SDCardManager.hasSdCard(mContext)) {
+            PreferenceCategory category = (PreferenceCategory) findPreference("pref_network_category_storage");
+            category.removePreference(saveOnSdCardPreference);
+        }
     }
 
     @Override

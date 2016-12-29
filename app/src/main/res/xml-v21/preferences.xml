@@ -190,7 +190,7 @@
                 android:title="@string/pref_delete_when_finished_title" />
 
             <ListPreference
-                android:defaultValue="1000"
+                android:defaultValue="@string/pref_download_collection_size_default"
                 android:dialogTitle="@string/pref_downloaded_expire_title"
                 android:entries="@array/entries_download_file_expire"
                 android:entryValues="@array/entryvalues_downlaod_file_expire"
@@ -200,7 +200,7 @@
 
             <CheckBoxPreference
                 android:defaultValue="@bool/pref_store_on_sdcard_default"
-                android:key="@string/pref_delete_when_finished_key"
+                android:key="@string/pref_store_on_sdcard_key"
                 android:title="@string/pref_store_on_sdcard_title"
                 android:summary="@string/pref_store_on_sdcard_description" />
 
