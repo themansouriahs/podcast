@@ -24,6 +24,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.model.events.ItemChanged;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.notification.NewEpisodesNotification;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -88,6 +89,8 @@ public class Library {
 
     private final ReentrantLock mEpisodeLock = new ReentrantLock();
     private final ReentrantLock mSubscriptionLock = new ReentrantLock();
+
+    private final NewEpisodesNotification mNewEpisodesNotification = new NewEpisodesNotification();
 
     @NonNull
     private final ArrayList<IEpisode> mEpisodes = new ArrayList<>();
@@ -297,11 +300,18 @@ public class Library {
             //long end = System.currentTimeMillis();
             //Log.d(TAG, "insert time: " + (end-start) + " ms (#" + unpersistedEpisodes.size() + ")");
 
+            mNewEpisodesNotification.show(mContext, unpersistedEpisodes);
+
         } finally {
             mEpisodeLock.unlock();
         }
 
         return true;
+    }
+
+    public void clearNewEpisodeNotification() {
+        Log.d(TAG, "clear new notification");
+        mNewEpisodesNotification.removeNotification(mContext);
     }
 
     /*

@@ -1,5 +1,6 @@
 package org.bottiger.podcast.notification;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -24,12 +25,16 @@ public class ProgressNotification {
 
         String speed = argSpeedBps > 0 ? Formatter.formatFileSize(argContext, argSpeedBps) + "/s" : "";
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(argContext)
-                        .setOngoing(true)
-                        .setSmallIcon(android.R.drawable.stat_sys_download)
-                        .setContentTitle(argEpisode.getTitle())
-                        .setContentText(speed);
+        NotificationCompat.Builder mBuilder = new NotificationCompat
+                .Builder(argContext)
+                .setOngoing(true)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle(argEpisode.getTitle())
+                .setContentText(speed);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setCategory(Notification.CATEGORY_PROGRESS);
+        }
 
         mBuilder.setProgress(100, progress, false);
 

@@ -1,8 +1,11 @@
 package org.bottiger.podcast;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,9 +19,17 @@ import android.view.ViewGroup;
 
 import org.bottiger.podcast.utils.UIUtils;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 
 public class FragmentContainerActivity extends DrawerActivity {
 
+	public static final String STARTUP_FRAGMENT_KEY = "STARTUP_FRAGMENT";
+
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({PLAYLIST, SUBSCRIPTION, DISCOVER})
+	public @interface FragmentNumber {}
     public static final int PLAYLIST = 0;
     public static final int SUBSCRIPTION = 1;
     public static final int DISCOVER = 2;
@@ -62,14 +73,25 @@ public class FragmentContainerActivity extends DrawerActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3); // 3
 
+		/*
         mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 1"));
         mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 2"));
         mPagerTaps.addTab(mPagerTaps.newTab().setText("Tab 3"));
+        */
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mPagerTaps));
         mPagerTaps.setupWithViewPager(mViewPager);
 
-        if (((SoundWaves)getApplication()).IsFirstRun())
-            mViewPager.setCurrentItem(DISCOVER);
+        if (((SoundWaves)getApplication()).IsFirstRun()) {
+			mViewPager.setCurrentItem(DISCOVER);
+		} else {
+			setInitialPage(getIntent());
+		}
+	}
+
+	@Override
+	protected void onNewIntent (Intent intent) {
+		super.onNewIntent(intent);
+		setInitialPage(intent);
 	}
 
     /**
@@ -149,6 +171,20 @@ public class FragmentContainerActivity extends DrawerActivity {
 		}
 
     }
+
+	private boolean setInitialPage(@Nullable Intent argIntent) {
+		if (argIntent == null) {
+			return false;
+		}
+
+		int startFragment = argIntent.getIntExtra(STARTUP_FRAGMENT_KEY, -1);
+		if (startFragment > 0) {
+			mViewPager.setCurrentItem(startFragment);
+			return true;
+		}
+
+		return false;
+	}
 
 	@RestrictTo(RestrictTo.Scope.TESTS)
 	@NonNull

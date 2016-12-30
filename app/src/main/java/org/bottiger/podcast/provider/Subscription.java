@@ -16,6 +16,7 @@ import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.base.BasePodcastSubscription;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.StrUtils;
 
 import java.lang.annotation.Retention;
@@ -564,9 +565,11 @@ public class Subscription extends BasePodcastSubscription {
 		notifyPropertyChanged(null);
 	}
 
-	public boolean doNotifyOnNew() {
+	public boolean doNotifyOnNew(@NonNull Context argContext) {
 		if (!IsSettingEnabled(NOTIFY_ON_NEW_SET))
-			return false;
+			return PreferenceHelper.getBooleanPreferenceValue(argContext,
+					R.string.pref_new_episode_notification_key,
+					R.bool.pref_new_episode_notification_default);
 
 		return IsSettingEnabled(NOTIFY_ON_NEW);
 	}

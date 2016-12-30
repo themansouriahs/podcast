@@ -12,6 +12,7 @@ import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.notification.NewEpisodesNotification;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -82,7 +83,6 @@ public class SubscriptionRefreshManager {
             Log.d(TAG, "refresh aborted, not allowed"); // NoI18N
             return;
         }
-
 
         if (argSubscription != null) {
             addSubscriptionToQueue(mContext, argSubscription, argCallback);

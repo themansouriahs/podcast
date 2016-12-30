@@ -73,7 +73,7 @@ public class SubscriptionSettingsUtils {
         mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened(context.getResources()));
         mListOldestFirst.setChecked(mSubscription.isListOldestFirst(context.getResources()));
         mSkipIntro.setChecked(mSubscription.doSkipIntro());
-        mNotifyOnNew.setChecked(mSubscription.doNotifyOnNew());
+        mNotifyOnNew.setChecked(mSubscription.doNotifyOnNew(context));
 
         mShowDescription.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

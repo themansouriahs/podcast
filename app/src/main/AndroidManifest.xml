@@ -280,6 +280,12 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <receiver android:name=".receiver.NotificationBroadcastReceiver">
+            <intent-filter>
+                <action android:name="org.bottiger.soundwaves.NOTIFICATION_DELETED"/>
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".PodcastUpdateManager"
             android:process=":remote"></receiver>
