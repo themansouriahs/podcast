@@ -46,6 +46,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -428,6 +429,27 @@ public class Library {
         try {
             if (argSubscription == null)
                 return;
+
+            mEpisodeLock.lock();
+            try {
+                for (Iterator<IEpisode> iterator = mEpisodes.iterator(); iterator.hasNext();) {
+                    IEpisode episode = iterator.next();
+                    boolean doRemove = episode.getSubscription(mContext).equals(argSubscription);
+                    if (doRemove) {
+                        if (episode instanceof FeedItem) {
+                            FeedItem feedItem = (FeedItem) episode;
+                            mEpisodesIdLUT.remove(feedItem.getId());
+                        }
+
+                        mEpisodesUrlLUT.remove(episode.getURL());
+                        // Remove the current element from the iterator and the list.
+                        iterator.remove();
+                    }
+                }
+
+            } finally {
+                mEpisodeLock.unlock();
+            }
 
             VendorCrashReporter.report("remove", argSubscription.getUrl());
 
