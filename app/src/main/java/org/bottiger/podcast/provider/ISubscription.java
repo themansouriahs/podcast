@@ -90,6 +90,10 @@ public interface ISubscription extends PaletteListener, IDbItem {
     @ColorInt int getPrimaryTintColor();
     @ColorInt int getSecondaryColor();
 
+    void setPrimaryColor(@ColorInt int argColor);
+    void setPrimaryTintColor(@ColorInt int argColor);
+    void setSecondaryColor(@ColorInt int argColor);
+
     Single<ColorExtractor> getColors(@NonNull final Context argContext);
 
     void cacheImage(@NonNull final Context argContext);

@@ -153,6 +153,11 @@ public class ColorExtractor {
 
     private void loadSecondaryColor(@Nullable Palette argPalette) {
         Palette.Swatch swatch = argPalette != null ? argPalette.getDarkMutedSwatch() : null;
+
+        if (swatch == null) {
+            swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null;
+        }
+
         mSecondary = getColor(swatch, R.color.colorSecondary);
     }
 

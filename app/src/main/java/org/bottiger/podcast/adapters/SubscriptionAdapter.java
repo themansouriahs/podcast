@@ -229,7 +229,9 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                                 @Override
                                 public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
                                     argHolder.setImagePlaceholderVisibility(VISIBLE);
-                                    ErrorUtils.handleException(e);
+                                    if (e != null) {
+                                        ErrorUtils.handleException(e);
+                                    }
                                     return false;
                                 }
 

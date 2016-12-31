@@ -241,27 +241,21 @@ public class Subscription extends BasePodcastSubscription {
 		VendorCrashReporter.report("updateURL failed", "Unable to change subscription mUrlString to: " + argNewUrl); // NoI18N
 	}
 
+	@Override
     public void setPrimaryColor(int argColor) {
-		if (mPrimaryColor == argColor)
-			return;
-
-        mPrimaryColor = argColor;
+		super.setPrimaryColor(argColor);
 		notifyPropertyChanged(null);
     }
 
+	@Override
     public void setPrimaryTintColor(int argColor) {
-		if (mPrimaryTintColor == argColor)
-			return;
-
-        mPrimaryTintColor = argColor;
+		super.setPrimaryTintColor(argColor);
 		notifyPropertyChanged(null);
     }
 
+	@Override
     public void setSecondaryColor(int argColor) {
-		if (mSecondaryColor == argColor)
-			return;
-
-        mSecondaryColor = argColor;
+		super.setSecondaryColor(argColor);
 		notifyPropertyChanged(null);
     }
 

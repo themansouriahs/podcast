@@ -2,6 +2,7 @@ package org.bottiger.podcast.provider.base;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.ColorInt;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -214,11 +215,9 @@ public abstract class BaseSubscription implements ISubscription {
     @WorkerThread
     private ColorExtractor getColorExtractor(@NonNull Context argContext) {
 
-        /*
         if (mPrimaryColor != -1 && mPrimaryTintColor != -1 && mSecondaryColor != -1) {
             return new ColorExtractor(mPrimaryColor, mPrimaryTintColor, mSecondaryColor);
         }
-        */
 
         Bitmap bitmap;
         Palette palette = null;
@@ -234,7 +233,45 @@ public abstract class BaseSubscription implements ISubscription {
             e.printStackTrace();
         }
 
-        return new ColorExtractor(palette);
+        ColorExtractor colorExtractor = new ColorExtractor(palette);
+
+        if (mPrimaryColor == -1) {
+            setPrimaryColor(colorExtractor.getPrimary());
+        }
+
+        if (mPrimaryTintColor == -1) {
+            setPrimaryTintColor(colorExtractor.getPrimaryTint());
+        }
+
+        if (mSecondaryColor == -1) {
+            setSecondaryColor(colorExtractor.getSecondary());
+        }
+
+        return colorExtractor;
+    }
+
+    @Override
+    public void setPrimaryColor(@ColorInt int argColor) {
+        if (mPrimaryColor == argColor)
+            return;
+
+        mPrimaryColor = argColor;
+    }
+
+    @Override
+    public void setPrimaryTintColor(@ColorInt int argColor) {
+        if (mPrimaryTintColor == argColor)
+            return;
+
+        mPrimaryTintColor = argColor;
+    }
+
+    @Override
+    public void setSecondaryColor(@ColorInt int argColor) {
+        if (mSecondaryColor == argColor)
+            return;
+
+        mSecondaryColor = argColor;
     }
 
     @MainThread

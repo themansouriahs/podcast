@@ -22,6 +22,7 @@ import org.bottiger.podcast.utils.ColorUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -70,6 +71,7 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
             case R.id.unsubscribe:
                 actionMode.finish();
 
+                List<Subscription> toBeRemoved = new LinkedList<>();
                 for (int i = 0; i < positions.size(); i++) {
                     int position = positions.get(i);
                     Subscription subscription = subscriptions.get(position);
@@ -77,8 +79,16 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
                     if (subscription == null)
                         return false;
 
+                    toBeRemoved.add(subscription);
+                }
+
+                for (int i = 0; i < toBeRemoved.size(); i++) {
+                    Subscription subscription = toBeRemoved.get(i);
                     subscription.unsubscribe("Unsubscribe:context");
-                    mAdapter.notifyItemRemoved(position);
+                }
+
+                if (toBeRemoved.size() > 0) {
+                    mAdapter.notifyDataSetChanged();
                 }
 
                 mMultiSelector.clearSelections();

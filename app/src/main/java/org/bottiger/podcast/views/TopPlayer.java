@@ -510,12 +510,11 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         String artworkURL = argEpisode.getArtwork(getContext());
 
-        if (iSubscription != null && !TextUtils.isEmpty(iSubscription.getImageURL())) {
+        if (!TextUtils.isEmpty(iSubscription.getImageURL())) {
             artworkURL = iSubscription.getImageURL();
         }
 
-        if (iSubscription != null) {
-            iSubscription.getColors(mContext)
+        iSubscription.getColors(mContext)
                     .subscribeOn(io.reactivex.schedulers.Schedulers.io())
                     .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
                     .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
@@ -544,9 +543,8 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                     });
 
 
-            Log.v("MissingImage", "Setting image");
-            ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
-        }
+        Log.v("MissingImage", "Setting image");
+        ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
 
         SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
 
