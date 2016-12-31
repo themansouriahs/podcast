@@ -37,8 +37,4 @@
     <item>並び順: 最新から</item>
     <item>並び順: 古いものから</item>
   </string-array>
-  <string-array name="entries_webservices_discovery_engine">
-    <item>gPodder</item>
-    <item>iTunes</item>
-  </string-array>
 </resources>

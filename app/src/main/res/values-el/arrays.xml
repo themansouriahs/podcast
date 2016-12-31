@@ -8,8 +8,4 @@
     <item>5 GB</item>
     <item>Απεριοριστα</item>
   </string-array>
-  <string-array name="entries_webservices_discovery_engine">
-    <item>gPodder</item>
-    <item>iTunes</item>
-  </string-array>
 </resources>

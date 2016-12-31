@@ -12,7 +12,6 @@
   <string name="pref_downloaded_expire_title">Speicher für heruntergeladene Folgen</string>
   <string name="dialog_title_add_sub">Podcast hinzufügen</string>
   <string name="dialog_message_add_sub">Bitte geben Sie eine URL ein:</string>
-  <string name="title_section3">Wiedergabeliste</string>
   <string name="title_section2">Entdecken</string>
   <string name="title_section1">Abonnements</string>
   <string name="hello_world">Hallo Welt!</string>
@@ -63,7 +62,6 @@
   <string name="pref_help_static_field_description">Sie können auf vielerlei Art helfen: Programmieren, Übersetzen, UI, Icons/Grafik, Erstellen einer Webseite usw. Schauen Sie auf der Projektseite auf GitHub nach (github.com/bottiger/SoundWaves) oder schicken Sie mir eine E-Mail: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Ohne Titel :(</string>
   <string name="podcast_title_unknown">Unbekannter Podcast-Titel</string>
-  <string name="subscription_instruction">Fügen Sie neue Podcasts hinzu, indem Sie die Entdecken-Seite rechts nutzen.\n\nSie können in den Einstellungen auch eine OPML-Datei importieren oder mit gPodder synchronisieren</string>
   <string name="filter_show_listened">Bereits gespielte anzeigen</string>
   <string name="auto_start_next">Automatisch nächste starten</string>
   <string name="drawer_playlist_filters">Filter</string>
@@ -132,7 +130,6 @@
   <string name="action_filter">Wiedergabeliste filtern</string>
   <string name="snackbar_change">Ändern</string>
   <string name="apply_filters">Filter anwenden</string>
-  <string name="pref_gpodder_support_title">gPodder</string>
   <string name="gpodder_username">Benutzername</string>
   <string name="gpodder_password">Passwort</string>
   <string name="gpodder_device">Gerätebezeichnung</string>
@@ -166,7 +163,6 @@
   <string name="pref_help_beta_description">Wenn Sie als BETA-Tester beim Testen neuer Funktionen helfen wollen, besuchen Sie https://play.google.com/apps/testing/org.bottiger.podcast</string>
   <string name="activity_download_name">Download Manager</string>
   <string name="opml_import_toolbar_title">OPML Inhalt</string>
-  <string name="opml_import_toolbar_description">Podcasts auswählen, die abonniert werden sollen</string>
   <string name="download_manager_toolbar_title">Download-Warteschlange</string>
   <string name="download_manager_toolbar_description">Herunterzuladende Folgen</string>
   <string name="menu_clear_download">Leeren</string>
@@ -202,7 +198,7 @@
   <!--The audio engine has an option to remove periods of silence in an audio file.-->
   <string name="dialog_playback_removile_silence">Stille entfernen</string>
   <string name="menu_web_player">Webplayer (beta)</string>
-  <string name="menu_subscriptions_order">sortieren nach</string>
+  <string name="menu_subscriptions_order">Sortieren nach</string>
   <string name="menu_subscriptions_order_alphabetically">Name (A-Z)</string>
   <string name="menu_subscriptions_order_alphabetically_reverse">Name absteigend (Z-A)</string>
   <string name="menu_subscriptions_order_updated">zuletzt aktualisiert</string>
@@ -231,7 +227,8 @@
   <string name="intro_settings_done">Das war\'s. Happy Podcasting</string>
   <string name="app_intro_welcome_title">Willkommen bei SoundWaves</string>
   <string name="app_intro_welcome_description">Bitte schauen Sie sich diese Einführungsseiten kurz an.</string>
-  <string name="appintro_settings_description">SoundWaves Podcast ist absolut frei und es entstehen keine Kosten für erweiterte Funktionen wie \"Neue Folgen herunterladen wenn verfügbar\". Trotzdem sollten Sie Ihre Einstellungen überprüfen, bevor Sie beginnen es zu nutzen, um ungewünschten Datenverbrauch zu verhindern.</string>
+  <!--The text before the number in the string: "Top 20 episodes"-->
+  <!--The text after the number in the string: "Top 20 episodes"-->
   <plurals name="player_sleep">
     <item quantity="one">Player wird in %d Minute schlafen</item>
     <item quantity="other">Player wird in %d Minuten schlafen</item>

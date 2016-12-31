@@ -1,13 +1,15 @@
+Reproductor de Podcasts SoundWaves
+
 Reproductor de podcasts libre y de código abierto (podcatcher)
 
 <b>Sobre la app</b>
 He aquí mi contribución al mundo de los amantes de los podcasts en Android. Les presento un podcatcher moderno, que no recopila datos ni pide permisos innecesarios
 
 <b>Funcionalidades Seleccionadas</b>
-* Todas las funcionalidades que esperas
+* All the basic features you expect
 * Gratuito y de código abierto
 * Diseño moderno (material design)
-* Compatibilidad total con gPodder
+* full gpodder.net support
 * Compatibilidad con chromecast
 * Compatibilidad con Sonos
 * No se piden permisos extraños ni se recolectan tus datos sin tu consentimiento

@@ -3,7 +3,9 @@
   <string name="app_name">SoundWaves</string>
   <string name="unsubscribe">Cancelar subscrição</string>
   <string name="pref_only_wifi_description">Apenas descarregar ficheiros por ligações Wi-Fi</string>
+  <string name="pref_refresh_only_wifi_description">Restringir atualização de fontes em segundo plano</string>
   <string name="pref_only_wifi_title">Apenas por Wi-Fi</string>
+  <string name="pref_refresh_only_wifi_title">Restringir todos os dados</string>
   <string name="pref_dark_theme">Ativar tema escuro para maior contraste</string>
   <string name="pref_dark_theme_title">Tema</string>
   <string name="pref_download_on_update_title">Descarga automática</string>
@@ -12,7 +14,7 @@
   <string name="pref_downloaded_expire_title">Limite para descargas</string>
   <string name="dialog_title_add_sub">Adicionar podcast</string>
   <string name="dialog_message_add_sub">Por favor digite um URL:</string>
-  <string name="title_section3">Lista de reprodução</string>
+  <string name="title_section3">Reprodutor</string>
   <string name="title_section2">Descobrir</string>
   <string name="title_section1">Subscrições</string>
   <string name="hello_world">Olá mundo!</string>
@@ -63,7 +65,7 @@
   <string name="pref_help_static_field_description">Se você quiser ajudar, existem imensas coisas que pode fazer. Pode ajudar na programação ou em algo completamente diferente. Pode ajudar na tradução, na criação de ícones e imagens, um sítio web e muito mais. Aceda à nossa página no GitHub (github.com/bottiger/SoundWaves) ou envie uma mensagem para: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Sem título :(</string>
   <string name="podcast_title_unknown">Título desconhecido</string>
-  <string name="subscription_instruction">Adicione podcasts utilizando a página Descobrir à direita.\n\nTambém pode importar um ficheiro OPML ou sincronizar os seus podcasts do gPodder.</string>
+  <string name="subscription_instruction">Adicione podcasts utilizando a página Descobrir à direita.\n\nTambém pode importar um ficheiro OPML ou sincronizar as subscrições do gpodder.net através das definições.</string>
   <string name="filter_show_listened">Mostrar reproduzidos</string>
   <string name="auto_start_next">Reprodução contínua</string>
   <string name="drawer_playlist_filters">Filtros da lista de reprodução</string>
@@ -83,6 +85,13 @@
   <string name="pref_network_category_storage_experimental">Experimental</string>
   <string name="pref_delete_when_finished_title">Eliminar automaticamente</string>
   <string name="pref_delete_when_finished_description">Eliminar episódios após a sua reprodução</string>
+  <string name="opml_import_export_toolbar_title">Importar/exportar ficheiro OPML</string>
+  <string name="import_export_explanation">Importar as suas subscrições</string>
+  <string name="opml_import_explanation">Selecione o ficheiro OPML do seu armazenamento</string>
+  <string name="opml_export_explanation">Exportar as suas subscrições para o armazenamento. O ficheiro será guardado em /STORAGE/podcasts.opml</string>
+  <string name="opml_import_button">Importar OPML</string>
+  <string name="opml_export_button">Exportar para o armazenamento</string>
+  <string name="opml_exported_to_toast">Exportado para</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
   <string name="bulk_download_instructions">Descarregar episódios</string>
@@ -107,11 +116,11 @@
   <!--When downloading and parsing the content of a feed-->
   <string name="discovery_progress_loading_podcast_content">Obtendo conteúdo do podcast</string>
   <!--Search engine for searching for new podcasts-->
-  <string name="discovery_select_backend">Selecione o mecanismo de pesquisa</string>
+  <string name="discovery_select_backend">Selecione o motor de pesquisa</string>
   <string name="pref_cloud_category_cloud_title">Suporte Cloud</string>
   <string name="pref_cloud_category_services_title">Serviços web</string>
-  <string name="pref_webservices_dialog_title">Mecanismo de procura de podcasts</string>
-  <string name="pref_webservices_discovery_title">Mecanismo de procura de podcasts</string>
+  <string name="pref_webservices_dialog_title">Motor de pesquisa de podcasts</string>
+  <string name="pref_webservices_discovery_title">Motor de pesquisa de podcasts</string>
   <string name="pref_webservices_discovery_description">Os serviços web utilizados para procurar podcasts</string>
   <string name="playlist_filter_introducion">Preencher lista de reprodução com os episódios mais recentes de</string>
   <string name="playlist_filter_none">Não preencher</string>
@@ -132,7 +141,7 @@
   <string name="action_filter">Filtrar lista de reprodução</string>
   <string name="snackbar_change">Alterar</string>
   <string name="apply_filters">Aplicar filtros</string>
-  <string name="pref_gpodder_support_title">GPodder</string>
+  <string name="pref_gpodder_support_title">gpodder.net</string>
   <string name="gpodder_username">nome de utilizador</string>
   <string name="gpodder_password">palavra-passe</string>
   <string name="gpodder_device">Nome do dispositivo</string>
@@ -166,7 +175,7 @@
   <string name="pref_help_beta_description">Para experimentar as versões Beta e testar as alterações mais recentes, aceda a esta página: https://play.google.com/apps/testing/org.bottiger.podcast</string>
   <string name="activity_download_name">Gestor de descargas</string>
   <string name="opml_import_toolbar_title">Conteúdo OPML</string>
-  <string name="opml_import_toolbar_description">Selecione os podcasts que deseja subscrever</string>
+  <string name="opml_import_toolbar_description">Podcasts que deseja subscrever</string>
   <string name="download_manager_toolbar_title">Fila de descargas</string>
   <string name="download_manager_toolbar_description">Episódios agendados para descarga</string>
   <string name="menu_clear_download">Limpar</string>
@@ -196,7 +205,7 @@
   <string name="authenticate_feed_password">Palavra-passe</string>
   <!--Used for 1.1X speed-->
   <string name="speed_multiplier">%1$.1f X</string>
-  <string name="discovery_directory_icon">Diretório de podcasts (mecanismo de pesquisa)</string>
+  <string name="discovery_directory_icon">Diretório de podcasts (motor de pesquisa)</string>
   <string name="subscription_instruction_title">Ainda não subscreveu a quaisquer podcasts</string>
   <string name="dialog_playback_boost_volume">Aumentar volume</string>
   <!--The audio engine has an option to remove periods of silence in an audio file.-->
@@ -231,7 +240,41 @@
   <string name="intro_settings_done">E é isto. Desfrute!</string>
   <string name="app_intro_welcome_title">Bem-vindo ao SoundWaves</string>
   <string name="app_intro_welcome_description">Por favor dispense alguns segundos para ler esta introdução</string>
-  <string name="appintro_settings_description">O SoundWaves é totalmente gratuito e não cobra por funcionalidades avançadas, tais como \'Descarregar novos episódios assim que fiquem disponíveis\'. No entanto, deve rever as definições antes de iniciar a sua utilização para evitar o consumo de dados móveis.</string>
+  <string name="appintro_settings_description">Por favor reveja estas definições para evitar o consumeo de dados móveis.</string>
+  <string name="webservices_discovery_engine_gpodder">gpodder.net</string>
+  <string name="webservices_discovery_engine_itunes">iTunes</string>
+  <string name="webservices_discovery_engine_audiosearch">AudioSear.ch</string>
+  <string name="webservices_discovery_engine_unknown">Motor de pesquisa desconhecido</string>
+  <string name="subscription_authentication_required">Requer autenticação</string>
+  <string name="subscription_press_to_authenticate">Prima para autenticar</string>
+  <string name="star_subscription">Adicionar estrela</string>
+  <string name="remove_episode_from_playlist">Remover episódio da lista de reprodução</string>
+  <string name="import_subscription_confirm">Importar</string>
+  <string name="feed_empty_no_network">Ligação de rede não detetada. Podem haver problemas ao carregar as fontes.</string>
+  <string name="feed_empty_parse_error">A fonte pode estar mal formada ou então o servidor está em baixo. Se acha que esta fonte está correta e que deveria funcionar, faça o favor de contactar %1$s.</string>
+  <string name="feed_activity_loading_canceled">Abortada a obtenção do conteúdo da fonte</string>
+  <string name="preferences_category_import_export">Importar/Exportar</string>
+  <string name="pref_import_export_category_title"><![CDATA[Importar e exportar]]></string>
+  <string name="pref_import_opml_title">Importar ficheiro OPML</string>
+  <string name="pref_import_opml_summary">A maioria das aplicações de podcasts conseguem exportar ficheiros OPML</string>
+  <string name="pref_export_opml_title">Exportar ficheiro OPML</string>
+  <string name="pref_export_opml_summary">Exportar a lista de subscrições para um ficheiro OPML</string>
+  <string name="pref_download_only_when_charging_title">Descarregar apenas se a carregar</string>
+  <string name="pref_download_only_when_charging_description">Apenas descarregar novos episódios se o telefone estiver a ser carregado</string>
+  <string name="pref_store_on_sdcard_title">Guardar podcasts no cartão SD</string>
+  <string name="pref_store_on_sdcard_description">Se guardar os podcasts fora da pasta padrão, as outras aplicações podem não os encontrar</string>
+  <string name="pref_license_title">Licença</string>
+  <string name="about_author">Autor</string>
+  <string name="author_country">Dinamarca</string>
+  <string name="github">Github</string>
+  <string name="twitter">Twitter</string>
+  <string name="reddit">Reddit</string>
+  <string name="email">E-mail</string>
+  <string name="about_github_subtext">github.com/bottiger/SoundWaves</string>
+  <string name="about_twitter_subtext">\@arvidbottiger</string>
+  <string name="about_reddit_subtext">/r/soundwavesapp</string>
+  <!--The text before the number in the string: "Top 20 episodes"-->
+  <!--The text after the number in the string: "Top 20 episodes"-->
   <plurals name="player_sleep">
     <item quantity="one">O reprodutor parará em %d minuto</item>
     <item quantity="other">O reprodutor parará em %d minutos</item>

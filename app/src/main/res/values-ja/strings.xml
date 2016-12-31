@@ -3,7 +3,9 @@
   <string name="app_name">SoundWaves</string>
   <string name="unsubscribe">購読の解除</string>
   <string name="pref_only_wifi_description">ファイルをダウンロードするため Wi-Fi に接続されるまで待ちます</string>
+  <string name="pref_refresh_only_wifi_description">フィードがバックグラウンドでリフレッシュするのを制限します</string>
   <string name="pref_only_wifi_title">Wi-Fi のみダウンロード</string>
+  <string name="pref_refresh_only_wifi_title">すべてのデータを制限する</string>
   <string name="pref_dark_theme">より高いコントラストのダークテーマを有効にします</string>
   <string name="pref_dark_theme_title">テーマ</string>
   <string name="pref_download_on_update_title">自動ダウンロード</string>
@@ -12,7 +14,7 @@
   <string name="pref_downloaded_expire_title">ポッドキャスト ダウンロード限度</string>
   <string name="dialog_title_add_sub">ポッドキャストを追加</string>
   <string name="dialog_message_add_sub">URL を入力してください:</string>
-  <string name="title_section3">プレイリスト</string>
+  <string name="title_section3">プレーヤー</string>
   <string name="title_section2">探索</string>
   <string name="title_section1">購読</string>
   <string name="hello_world">ようこそ!</string>
@@ -63,7 +65,7 @@
   <string name="pref_help_static_field_description">あなたが支援していただけるのであれば、行うことはたくさんあります。これは、プログラミングであったり、完全に異なるものである可能性があります。翻訳、UI、アイコン/グラフィックス、ウェブサイトの構築などの支援が必要です。 GitHub (github.com/bottiger/SoundWaves) のプロジェクトページを参照するか、私にメールをお送りください: bottiger@gmail.com</string>
   <string name="episode_title_unknown">タイトルなし :(</string>
   <string name="podcast_title_unknown">不明なポッドキャスト タイトル</string>
-  <string name="subscription_instruction">右の探索ページを使用して、新しいポッドキャストを追加してください。\n\n設定に移動して、OPML ファイルをインポート、または gPodder と同期することもできます</string>
+  <string name="subscription_instruction">右の探索ページを使用して、新しいポッドキャストを追加してください。\n\n設定に移動して、OPML ファイルをインポートしたり、gpodder.net と同期することもできます</string>
   <string name="filter_show_listened">視聴済を表示</string>
   <string name="auto_start_next">次を自動開始</string>
   <string name="drawer_playlist_filters">プレイリスト フィルター</string>
@@ -83,6 +85,13 @@
   <string name="pref_network_category_storage_experimental">実験的</string>
   <string name="pref_delete_when_finished_title">再生後に削除</string>
   <string name="pref_delete_when_finished_description">エピソードを再生した後に自動的に削除します</string>
+  <string name="opml_import_export_toolbar_title">OPML ファイルのインポート / エクスポート</string>
+  <string name="import_export_explanation">購読をインポート</string>
+  <string name="opml_import_explanation">内部ストレージから OPML ファイルを選択</string>
+  <string name="opml_export_explanation">購読を内部ストレージにエクスポートします。 /STORAGE/podcasts.opml に格納されます。</string>
+  <string name="opml_import_button">OPML のインポート</string>
+  <string name="opml_export_button">ストレージにエクスポート</string>
+  <string name="opml_exported_to_toast">エクスポート...</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">キャスト</string>
   <string name="bulk_download_instructions">一致するすべてのエピソードをダウンロード</string>
@@ -132,7 +141,7 @@
   <string name="action_filter">プレイリストをフィルター</string>
   <string name="snackbar_change">変更</string>
   <string name="apply_filters">フィルターを適用</string>
-  <string name="pref_gpodder_support_title">GPodder</string>
+  <string name="pref_gpodder_support_title">gpodder.net</string>
   <string name="gpodder_username">ユーザー名</string>
   <string name="gpodder_password">パスワード</string>
   <string name="gpodder_device">デバイス名</string>
@@ -166,7 +175,7 @@
   <string name="pref_help_beta_description">新機能のベータテストを支援したい場合、このページを訪問してください: https://play.google.com/apps/testing/org.bottiger.podcast</string>
   <string name="activity_download_name">ダウンロード マネージャー</string>
   <string name="opml_import_toolbar_title">OPML コンテンツ</string>
-  <string name="opml_import_toolbar_description">購読したいポッドキャストを選択してください</string>
+  <string name="opml_import_toolbar_description">購読したいポッドキャスト</string>
   <string name="download_manager_toolbar_title">ダウンロード キュー</string>
   <string name="download_manager_toolbar_description">エピソードのダウンロードをスケジュールしました</string>
   <string name="menu_clear_download">クリア</string>
@@ -230,7 +239,41 @@
   <string name="intro_settings_done">これでおしまいです! ポッドキャスティングをお楽しみください</string>
   <string name="app_intro_welcome_title">SoundWaves へようこそ</string>
   <string name="app_intro_welcome_description">この紹介ページを読むために 10 秒時間をください</string>
-  <string name="appintro_settings_description">SoundWaves ポッドキャストは完全無料で、「新しいエピソードが利用可能なときにダウンロードする」などの高度な機能も無料です。 ただし、不要なデータ通信を防止するために、使用する前にデータの設定を確認する必要があります</string>
+  <string name="appintro_settings_description">これらの設定を確認して、不要なデータ通信を消費しないようにしてください</string>
+  <string name="webservices_discovery_engine_gpodder">gpodder.net</string>
+  <string name="webservices_discovery_engine_itunes">iTunes</string>
+  <string name="webservices_discovery_engine_audiosearch">AudioSear.ch</string>
+  <string name="webservices_discovery_engine_unknown">検索エンジン不明</string>
+  <string name="subscription_authentication_required">認証が必要です</string>
+  <string name="subscription_press_to_authenticate">押して認証します</string>
+  <string name="star_subscription">購読にスターを付ける</string>
+  <string name="remove_episode_from_playlist">プレイリストからエピソードを削除</string>
+  <string name="import_subscription_confirm">インポート</string>
+  <string name="feed_empty_no_network">ネットワーク接続が検出されませんでした。 フィードの読み込みに問題がある可能性があります</string>
+  <string name="feed_empty_parse_error">フィードが誤っているか、サーバーが停止している可能性があります。 正しく機能すると考えられるのに問題が解決しない場合は、 %1$s にお問い合わせください</string>
+  <string name="feed_activity_loading_canceled">フィードのコンテンツの取得を中断しました</string>
+  <string name="preferences_category_import_export">インポート/エクスポート</string>
+  <string name="pref_import_export_category_title"><![CDATA[インポートとエクスポート]]></string>
+  <string name="pref_import_opml_title">OPML ファイルをインポート</string>
+  <string name="pref_import_opml_summary">ほとんどのポッドキャスティングアプリケーションから OPML ファイルをエクスポートすることができます</string>
+  <string name="pref_export_opml_title">OPML ファイルをエクスポート</string>
+  <string name="pref_export_opml_summary">現在の購読のリストを OPML ファイルにエクスポートします</string>
+  <string name="pref_download_only_when_charging_title">充電中にのみダウンロード</string>
+  <string name="pref_download_only_when_charging_description">電話の充電中にのみ、新しいエピソードをダウンロードします</string>
+  <string name="pref_store_on_sdcard_title">ポッドキャストを SD カードに保存</string>
+  <string name="pref_store_on_sdcard_description">デフォルトのフォルダー以外にポッドキャストを保存すると、他のアプリがそれを見つけられなくなる可能性があります</string>
+  <string name="pref_license_title">ライセンス</string>
+  <string name="about_author">作者</string>
+  <string name="author_country">デンマーク</string>
+  <string name="github">Github</string>
+  <string name="twitter">Twitter</string>
+  <string name="reddit">Reddit</string>
+  <string name="email">メール</string>
+  <string name="about_github_subtext">github.com/bottiger/SoundWaves</string>
+  <string name="about_twitter_subtext">\@arvidbottiger</string>
+  <string name="about_reddit_subtext">/r/soundwavesapp</string>
+  <!--The text before the number in the string: "Top 20 episodes"-->
+  <!--The text after the number in the string: "Top 20 episodes"-->
   <plurals name="player_sleep">
     <item quantity="other">プレーヤーは %d 分でスリープします</item>
   </plurals>

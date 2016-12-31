@@ -12,7 +12,6 @@
   <string name="pref_downloaded_expire_title">Límit d\'episodis descarregats</string>
   <string name="dialog_title_add_sub">Afegir podcast</string>
   <string name="dialog_message_add_sub">Introdueix la URL:</string>
-  <string name="title_section3">Llista de reproducció</string>
   <string name="title_section2">Descobrir</string>
   <string name="title_section1">Subscripcions</string>
   <string name="hello_world">Hola món!</string>
@@ -63,7 +62,6 @@
   <string name="pref_help_static_field_description">Si t\'interessa ajudar, hi ha molta feina a fer, pot ser programant o fent algo completament diferent. Necessitem ajuda amb les traduccions, interfície, icones, gràfics, pàgina web i més. Pots trobar més informació a la pàgina de GitHub del projecte (github.com/bottiger/SoundWaves) o envia\'m un e-mail: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Sense títol</string>
   <string name="podcast_title_unknown">Podcast sense títol</string>
-  <string name="subscription_instruction">Afegeix podcasts nous usant l\'eina de Descobreix, a la dreta. \n\nPots importar arxius en format OPML o sincronitzar el teu compte amb gPodder.</string>
   <string name="filter_show_listened">Mostra els escoltats</string>
   <string name="auto_start_next">Auto-reprodueix el següent</string>
   <string name="drawer_playlist_filters">Filtres de reproducció</string>
@@ -132,7 +130,6 @@
   <string name="action_filter">Filtres</string>
   <string name="snackbar_change">Canviar</string>
   <string name="apply_filters">Aplicar filtres</string>
-  <string name="pref_gpodder_support_title">GPodder</string>
   <string name="gpodder_username">nom d\'usuari</string>
   <string name="gpodder_password">contrassenya</string>
   <string name="gpodder_device">Nom del dispositiu</string>
@@ -166,7 +163,6 @@
   <string name="pref_help_beta_description">Si t\'agradaria ajudar amb el testeig de noves funcionalitats ho pots fer desde aquesta web: https://play.google.com/apps/testing/org.bottiger.podcast</string>
   <string name="activity_download_name">Gestor de descàrregues</string>
   <string name="opml_import_toolbar_title">Contingut OPML</string>
-  <string name="opml_import_toolbar_description">Selecciona els podcasts als que et vols subscriure</string>
   <string name="download_manager_toolbar_title">Cua de descàrregues</string>
   <string name="download_manager_toolbar_description">Episodis que es descarregaràn</string>
   <string name="menu_clear_download">Netejar</string>
@@ -231,7 +227,8 @@
   <string name="intro_settings_done">Llest! Feliç podcasting!</string>
   <string name="app_intro_welcome_title">Benvingut a SoundWaves</string>
   <string name="app_intro_welcome_description">Per favor, dedica 10 segons a llegir aquestes pàgines introductòries</string>
-  <string name="appintro_settings_description">Aquesta aplicació és totalment gratuïta, no cobrem per opcions avançades com \"Descarregar nous episodis quan estiguin disponibles\" encara que has de tenir compte amb la teva tarifa de dades!</string>
+  <!--The text before the number in the string: "Top 20 episodes"-->
+  <!--The text after the number in the string: "Top 20 episodes"-->
   <plurals name="player_sleep">
     <item quantity="one">El reproductor s\'aturarà en %d minut</item>
     <item quantity="other">El reproductor s\'aturarà en %d minuts</item>
