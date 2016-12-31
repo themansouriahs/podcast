@@ -317,6 +317,11 @@
         <item quantity="other">%d new episodes</item>
     </plurals>
 
+    <plurals name="notification_new_episodes_summary">
+        <item quantity="one">+ %d more</item>
+        <item quantity="other">+ %d more</item>
+    </plurals>
+
     <plurals name="player_sleep">
         <item quantity="one">Player will sleep in %d minute</item>
         <item quantity="other">Player will sleep in %d minutes</item>

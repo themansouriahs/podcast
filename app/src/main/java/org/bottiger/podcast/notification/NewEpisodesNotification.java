@@ -71,15 +71,16 @@ public class NewEpisodesNotification {
         int episodeCount = mEpisodes.size();
 
         Resources resources = argContext.getResources();
-        String title = resources.getQuantityString(R.plurals.notification_new_episodes_title, argEpisodes.size(), argEpisodes.size());
+        String title = resources.getQuantityString(R.plurals.notification_new_episodes_title, episodeCount, episodeCount);
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         int displayedEpisodes = Math.min(episodeCount, MAX_DISPLAYED_EPISODES);
         int notDisplayedEpisodes = episodeCount-displayedEpisodes;
 
-        inboxStyle.setBigContentTitle(episodeCount + " new episodes");
+        inboxStyle.setBigContentTitle(title);
         if (notDisplayedEpisodes > 0) {
-            inboxStyle.setSummaryText("+" + notDisplayedEpisodes + " more");
+            String summary = resources.getQuantityString(R.plurals.notification_new_episodes_summary, notDisplayedEpisodes, notDisplayedEpisodes);
+            inboxStyle.setSummaryText(summary);
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
