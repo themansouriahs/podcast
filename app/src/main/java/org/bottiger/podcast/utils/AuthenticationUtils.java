@@ -6,6 +6,7 @@ import android.graphics.PorterDuff;
 import android.support.annotation.ColorRes;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.text.TextUtils;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+
+import java.net.SocketTimeoutException;
 
 /**
  * Created by aplb on 31-12-2015.
@@ -49,7 +52,8 @@ public class AuthenticationUtils {
     public static void setState(boolean argIsSuccesfull,
                                 Context argContext,
                                 ContentLoadingProgressBar argLoadingIndicator,
-                                TextView argTextView) {
+                                TextView argTextView,
+                                @Nullable Throwable argThrowabl) {
 
         @ColorRes int color = R.color.green;
 
@@ -58,9 +62,14 @@ public class AuthenticationUtils {
             argTextView.setVisibility(View.VISIBLE);
             argTextView.setText(argContext.getResources().getString(R.string.generic_test_credentials_succes));
         } else {
+            @StringRes int errorMsg = R.string.generic_test_credentials_failed;
+            if (argThrowabl instanceof SocketTimeoutException) {
+                errorMsg = R.string.test_credentials_failed_server_timeout;
+            }
+
             argLoadingIndicator.hide();
             argTextView.setVisibility(View.VISIBLE);
-            argTextView.setText(argContext.getResources().getString(R.string.generic_test_credentials_failed));
+            argTextView.setText(argContext.getResources().getString(errorMsg));
             color = R.color.red;
         }
 

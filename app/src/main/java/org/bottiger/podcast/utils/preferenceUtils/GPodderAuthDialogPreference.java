@@ -112,7 +112,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 String server = mServerView.getText().toString();
 
                 if (!StrUtils.isValidUrl(server)) {
-                    AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
+                    AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult, null);
                     return;
                 }
 
@@ -120,16 +120,16 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                     GPodderAPI api = new GPodderAPI(getContext(), server, username, password, new Callback() {
                         @Override
                         public void onResponse(retrofit2.Call call, retrofit2.Response response) {
-                            AuthenticationUtils.setState(response.isSuccessful(), getContext(), mTestLoading, mTestResult);
+                            AuthenticationUtils.setState(response.isSuccessful(), getContext(), mTestLoading, mTestResult, null);
                         }
 
                         @Override
                         public void onFailure(retrofit2.Call call, Throwable t) {
-                            AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
+                            AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult, t);
                         }
                     });
                 } catch (IllegalArgumentException iae) {
-                    AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult);
+                    AuthenticationUtils.setState(false, getContext(), mTestLoading, mTestResult, iae);
                     return;
                 }
             }
@@ -200,34 +200,12 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                             mDeviceNameView.setError("Invalid name");
                         }
 
-                        /*
-                        boolean emailValid = !isEmpty(newEmail) &&
-                                EMAIL_ADDRESS.matcher(newEmail).matches();
-                        if (!emailValid) {
-                            _email.setError("Invalid Email!");
-                        }
-
-                        boolean passValid = !isEmpty(newPassword) && newPassword.length() > 8;
-                        if (!passValid) {
-                            _password.setError("Invalid Password!");
-                        }
-
-                        boolean numValid = !isEmpty(newNumber);
-                        if (numValid) {
-                            int num = Integer.parseInt(newNumber.toString());
-                            numValid = num > 0 && num <= 100;
-                        }
-                        if (!numValid) {
-                            _number.setError("Invalid Number!");
-                        }
-                        */
-
                         boolean credentialsValid = AuthenticationUtils.validateCredentials(newEmail.toString(), newPassword.toString());
 
                         return serverValid && deviceNameValid && credentialsValid;
 
                     }
-                })//
+                })
                 .subscribe(new Observer<Boolean>() {
                     @Override
                     public void onCompleted() {
@@ -242,13 +220,6 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                     @Override
                     public void onNext(Boolean formValid) {
                         AuthenticationUtils.disableButton(mTestCredentials, formValid);
-                        /*
-                        if (formValid) {
-                            _btnValidIndicator.setBackgroundColor(getResources().getColor(R.color.blue));
-                        } else {
-                            _btnValidIndicator.setBackgroundColor(getResources().getColor(R.color.gray));
-                        }
-                        */
                     }
                 });
     }

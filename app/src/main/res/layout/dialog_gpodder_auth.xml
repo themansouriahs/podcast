@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="@dimen/material_component_dialogs_padding_around_content_area">
 
 
     <android.support.design.widget.TextInputLayout
@@ -79,36 +80,6 @@
 
     </android.support.design.widget.TextInputLayout>
 
-
     <include layout="@layout/include_test_credentials" />
-    <!--
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/generic_test_credentials"
-            android:id="@+id/test_credentials_button"
-            android:layout_marginRight="10dp"/>
-
-        <android.support.v4.widget.ContentLoadingProgressBar
-            android:layout_width="60dp"
-            android:layout_height="match_parent"
-            style="?android:attr/progressBarStyleSmall"
-            android:indeterminate="true"
-            android:id="@+id/test_credentials_loading"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:id="@+id/test_credentials_result" />
-
-    </LinearLayout>
-    -->
 
 </LinearLayout>

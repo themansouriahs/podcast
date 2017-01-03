@@ -119,7 +119,7 @@ public class DialogFeedAuthentication extends DialogFragment {
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
-                                AuthenticationUtils.setState(response.isSuccessful(), mActivity, contentLoadingProgressBar, textResult);
+                                AuthenticationUtils.setState(response.isSuccessful(), mActivity, contentLoadingProgressBar, textResult, null);
                             }
                         };
                         mainHandler.post(myRunnable);
@@ -134,7 +134,7 @@ public class DialogFeedAuthentication extends DialogFragment {
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
-                                AuthenticationUtils.setState(false, mActivity, contentLoadingProgressBar, textResult);
+                                AuthenticationUtils.setState(false, mActivity, contentLoadingProgressBar, textResult, null);
                             }
                         };
                         mainHandler.post(myRunnable);

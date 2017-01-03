@@ -312,6 +312,7 @@
     <string name="pref_new_episode_notification_title">New episodes</string>
     <string name="pref_new_episode_notification_summary">Notify when your subscriptions are updated with new episodes</string>
     <string name="playlist_up_arrow_description">Scroll up to acces playlist</string>
+    <string name="test_credentials_failed_server_timeout">Server not responding</string>
 
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>
