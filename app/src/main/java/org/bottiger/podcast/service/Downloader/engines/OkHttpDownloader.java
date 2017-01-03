@@ -144,8 +144,8 @@ public class OkHttpDownloader extends DownloadEngineBase {
                     long Bps = readTimeMs > 0 ? byteReadCounter * 1000 / readTimeMs : 0;
                     setSpeed(Bps);
                     byteReadCounter = 0;
+                    setProgress((float) progress);
                 }
-                setProgress((float) progress);
             }
 
             Log.d(TAG, "filetransfer done");
