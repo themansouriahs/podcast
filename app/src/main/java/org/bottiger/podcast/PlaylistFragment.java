@@ -68,6 +68,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,7 +100,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     private ViewStub mRecyclerStub;
 
     @Nullable private TopPlayer mTopPlayer;
-    @Nullable private ImageViewTinted mPhoto;
+    @Nullable private ImageView mPhoto;
 
     private GenericMediaPlayerInterface mPlayer;
 
@@ -412,7 +413,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             return;
 
         mTopPlayer = (TopPlayer) mTopPlayerStub.inflate();
-        mPhoto =            (ImageViewTinted) view.findViewById(R.id.session_photo);
+        mPhoto =            (ImageView) view.findViewById(R.id.session_photo);
 
         assert mTopPlayer != null;
         mTopPlayer.setOverlay(mOverlay);

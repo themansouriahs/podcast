@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -43,6 +44,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,7 +91,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 30-09-2014.
  */
-public class TopPlayer extends LinearLayout implements ScrollingView, NestedScrollingChild {
+public class TopPlayer extends RelativeLayout implements ScrollingView, NestedScrollingChild {
 
     private static final String TAG = TopPlayer.class.getSimpleName();
 
@@ -126,7 +128,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     @Nullable IEpisode mCurrentEpisode;
 
     private TopPlayer mMainLayout;
-    private LinearLayout mControls;
+    private ViewGroup mControls;
 
     @Nullable private TextView mEpisodeTitle;
     @Nullable private TextView mEpisodeInfo;
@@ -136,6 +138,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
     @Nullable private PlayerSeekbar mPlayerSeekbar;
     @Nullable private DownloadButtonView mPlayerDownloadButton;
     @Nullable private MaterialFavoriteButton mFavoriteButton;
+    @Nullable private ImageView mPlaylistUpArrow;
 
     @Nullable private ViewStub mMoreButtonsStub;
     @Nullable private LinearLayout mExpandedActionsBar;
@@ -146,7 +149,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     @NonNull private GenericMediaPlayerInterface mPlayer;
 
-    private PlayerButtonView mDownloadButton;
     private ImageView mFastForwardButton;
     private ImageView mRewindButton;
     private ImageButton mMoreButton;
@@ -161,7 +163,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
     private View mTriangle;
 
-    private ImageViewTinted mPhoto;
+    private ImageView mPhoto;
 
     private boolean mPlaylistEmpty = true;
 
@@ -238,13 +240,27 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         sizeSmall = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_minimum);
         sizeMedium = argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_medium);
-        sizeLarge = sScreenHeight- argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
+        //sizeLarge = sScreenHeight- 0;//argContext.getResources().getDimensionPixelSize(R.dimen.top_player_size_maximum_bottom);
 
         sizeStartShrink = sizeSmall+sizeShrinkBuffer;
         sizeActionbar = argContext.getResources().getDimensionPixelSize(R.dimen.action_bar_height);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setClipToOutline(true);
+            setClipToOutline(false);
+        }
+
+        setClipChildren(false);
+
+        ViewTreeObserver viewTreeObserver = getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    //viewWidth = view.getWidth();
+                    sizeLarge = TopPlayer.this.getHeight();
+                }
+            });
         }
     }
 
@@ -291,7 +307,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
 
         mMainLayout = this;
-        mControls = (LinearLayout) findViewById(R.id.top_player_controls);
+        mControls = (ViewGroup) findViewById(R.id.top_player_controls);
 
         getPlayerControlHeight(mControls);
 
@@ -307,15 +323,15 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mPlayerDownloadButton   =    (DownloadButtonView) findViewById(R.id.download);
 
         mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
-        mDownloadButton = (PlayerButtonView) findViewById(R.id.download);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
         mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
         mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
-        mPhoto = (ImageViewTinted) findViewById(R.id.session_photo);
+        mPhoto = (ImageView) findViewById(R.id.session_photo);
         mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
         mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
+        mPlaylistUpArrow = (ImageView) findViewById(R.id.playlist_up_arrow);
 
-        mMoreButtonsStub = (ViewStub) findViewById(R.id.stub_expanded_action_bar);
+        mMoreButtonsStub = (ViewStub) findViewById(R.id.expanded_action_bar);
 
         mTriangle = findViewById(R.id.visual_triangle);
 
@@ -420,10 +436,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         }
 
         if (argMinutes < 0) {
-            UIUtils.disPlayBottomSnackBar(this.getRootView(), toast_cancel, null, true);
+            UIUtils.disPlayBottomSnackBar(this, toast_cancel, null, true);
         } else {
             setCountDownText(millis);
-            UIUtils.disPlayBottomSnackBar(this.getRootView(), toast, new OnClickListener() {
+            UIUtils.disPlayBottomSnackBar(this, toast, new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     openTimePicker();
@@ -489,9 +505,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         setPlayerProgress(argEpisode);
 
         mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
-        mPlayerDownloadButton.setEpisode(argEpisode);
-        mPlayerDownloadButton.enabledProgressListener(true);
-
         mPlayPauseButton.setStatus(STATE_READY);
 
         ISubscription iSubscription = argEpisode.getSubscription(getContext());
@@ -506,7 +519,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         mPlayerSeekbar.setOverlay(mOverlay);
         mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
-        mPlayerDownloadButton.setEpisode(argEpisode);
+        if (mPlayerDownloadButton != null) {
+            mPlayerDownloadButton.setEpisode(argEpisode);
+            mPlayerDownloadButton.enabledProgressListener(true);
+        }
 
         String artworkURL = argEpisode.getArtwork(getContext());
 
@@ -580,7 +596,6 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
                         }
 
                         ColorUtils.tintButton(mFavoriteButton,    mTextColor);
-                        ColorUtils.tintButton(mDownloadButton,    mTextColor);
                         tintInflatedButtons();
 
                         postInvalidate();
@@ -697,13 +712,22 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
         Log.v("TopPlayer", "setPlayerHeight: " + argScreenHeight);
 
-
         screenHeight = argScreenHeight;
 
         setBackgroundVisibility(screenHeight);
 
+        if (mPlaylistUpArrow != null) {
+            setGenericVisibility(mPlaylistUpArrow, getMaximumSize(), 100, screenHeight);
+        }
+
         float minScreenHeight = screenHeight < sizeSmall ? sizeSmall : screenHeight;
         float minMaxScreenHeight = minScreenHeight > sizeLarge ? sizeLarge : minScreenHeight;
+
+        float controlTransY = minMaxScreenHeight - (mPlayPauseButton.getBottom() + 40); //525 minMaxScreenHeight-mControlHeight;
+
+        if (controlTransY >= 0) {
+            controlTransY = 0;
+        }
 
         screenHeight = minMaxScreenHeight;
 
@@ -711,15 +735,25 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         lp.height = (int)minMaxScreenHeight;
         setLayoutParams(lp);
 
-        float controlTransY = minMaxScreenHeight-mControlHeight;
-        Log.v("TopPlayer", "controlTransY: " +  controlTransY);
-        if (controlTransY >= 0)
-            controlTransY = 0;
-
-        mControls.setTranslationY(controlTransY);
+        translateControls(controlTransY);
 
         return minMaxScreenHeight;
 
+    }
+
+    private void translateControls(float argTranslationY) {
+        Log.v("TopPlayer", "controlTransY: " +  argTranslationY);
+        mEpisodeTitle.setTranslationY(argTranslationY);
+        mPlayerSeekbar.setTranslationY(argTranslationY);
+        mCurrentTime.setTranslationY(argTranslationY);
+        mTotalTime.setTranslationY(argTranslationY);
+        mPlayPauseButton.setTranslationY(argTranslationY);
+        mFastForwardButton.setTranslationY(argTranslationY);
+        mRewindButton.setTranslationY(argTranslationY);
+        mMoreButton.setTranslationY(argTranslationY);
+
+        mTotalTime.measure(MeasureSpec.EXACTLY, MeasureSpec.EXACTLY);
+        mTotalTime.requestLayout();
     }
 
     public float setBackgroundVisibility(float argTopPlayerHeight) {
@@ -784,15 +818,9 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         return sizeLarge;
     }
 
-    private void hideText() {
-        mTriangle.setVisibility(GONE);
-        mExpandedActionsBar.setVisibility(GONE);
-    }
-
-    private void showText() {
-
-        mTriangle.setVisibility(VISIBLE);
-        mExpandedActionsBar.setVisibility(VISIBLE);
+    private void setTextVIsibility(int argVisibility) {
+        mTriangle.setVisibility(argVisibility);
+        mExpandedActionsBar.setVisibility(argVisibility);
     }
 
     private void getPlayerControlHeight(@NonNull final View argView) {
@@ -883,6 +911,7 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
             mChapterButton = (ImageView) inflated.findViewById(R.id.chapter_button);
             mSpeedButton = (Button) inflated.findViewById(R.id.speed_button);
             mExpandedActionsBar = (LinearLayout) inflated.findViewById(R.id.expanded_action_bar);
+            mPlayerDownloadButton = (DownloadButtonView) findViewById(R.id.download);
 
             initExpandedButtons();
         }
@@ -893,10 +922,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
 
             if (mDoDisplayText) {
                 Log.d(TAG, "ShowText");
-                showText();
+                setTextVIsibility(VISIBLE);
             } else {
                 Log.d(TAG, "HideText");
-                hideText();
+                setTextVIsibility(GONE);
             }
         } finally {
             prefs.edit().putBoolean(mDoDisplayTextKey, mDoDisplayText).apply();
@@ -911,6 +940,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         if (mFullscreenButton != null) {
             ColorUtils.tintButton(mFullscreenButton, mTextColor);
         }
+
+        if (mPlayerDownloadButton != null) {
+            ColorUtils.tintButton(mPlayerDownloadButton, mTextColor);
+        }
     }
 
     private void initExpandedButtons() {
@@ -918,7 +951,10 @@ public class TopPlayer extends LinearLayout implements ScrollingView, NestedScro
         assert mChapterButton != null;
         assert mSpeedButton != null;
         assert mFullscreenButton != null;
-        //assert mSleepButtonTime != null;
+        assert mPlayerDownloadButton != null;
+
+        mPlayerDownloadButton.setEpisode(mCurrentEpisode);
+        mPlayerDownloadButton.enabledProgressListener(true);
 
         tintInflatedButtons();
 

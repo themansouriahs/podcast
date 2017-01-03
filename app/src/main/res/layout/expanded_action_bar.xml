@@ -13,8 +13,9 @@
     android:visibility="gone">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:background="@null"
         android:id="@+id/speed_button"
         android:text="1.0x"
@@ -26,8 +27,9 @@
 
     <Button
         android:id="@+id/sleep_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:drawableLeft="?attr/sleep_inv"
         android:background="@null"
         android:elevation="@dimen/player_elevation"
@@ -37,17 +39,33 @@
         android:hint=""/>
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:id="@+id/chapter_button"
-        android:paddingLeft="0dip"
-        android:paddingRight="10dp"
         android:padding="5dip"
         android:gravity="left|center_vertical"
+        android:layout_gravity="center_vertical"
         app:srcCompat="?attr/bookmark_inv"
         android:elevation="@dimen/player_elevation"
-        style="@style/TopPlayerButton" />
+        android:background="@null"
+         />
     <!--
+    style="@style/TopPlayerButton"
         app:srcCompat="?attr/bookmark_inv" -->
+
+    <org.bottiger.podcast.views.DownloadButtonView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/download"
+        android:background="@null"
+        android:padding="5dp"
+        android:gravity="left|center_vertical"
+        android:layout_gravity="center_vertical"
+        android:elevation="@dimen/player_elevation"
+        android:layout_margin="2dp"
+        />
 
 
     <org.bottiger.podcast.views.PlayerButtonView
