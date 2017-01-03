@@ -33,13 +33,13 @@ public abstract class DownloadEngineBase implements IDownloadEngine {
         return mContext;
     }
 
-    void setProgress(float argProgress) {
+    protected void setProgress(float argProgress) {
         mProgress = argProgress;
         mEpisode.setProgress(argProgress);
         updatedNotification();
     }
 
-    void setSpeed(long argSpeed) {
+    protected void setSpeed(long argSpeed) {
         mDownloadSpeedBps = argSpeed;
     }
 
@@ -53,7 +53,7 @@ public abstract class DownloadEngineBase implements IDownloadEngine {
         }
     }
 
-    void removeNotification() {
+    protected void removeNotification() {
         if (showNotification()) {
             ProgressNotification.removeNotification(mContext);
         }

@@ -15,7 +15,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
-import org.bottiger.podcast.service.Downloader.engines.OkHttpDownloader;
+import org.bottiger.podcast.service.Downloader.engines.okhttp.OkHttpDownloader;
 
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
