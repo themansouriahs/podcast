@@ -61,7 +61,7 @@ import static org.bottiger.podcast.utils.StorageUtils.VIDEO;
 public class SoundWavesDownloadManager extends Observable {
 
     public static final int HOURS = 48;
-    private static final String TAG = "SWDownloadManager";
+    private static final String TAG = SoundWavesDownloadManager.class.getSimpleName();
 
     public static class DownloadManagerChanged {
         public int queueSize;

@@ -24,8 +24,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	String showListenedKey = "showListened";
 	Boolean showListenedVal = true;
 
-	private Playlist mPlaylist = null;
-
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
@@ -38,10 +36,6 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 
-	public void playlistChanged(@NonNull Playlist argPlaylist) {
-		mPlaylist = argPlaylist;
-	}
-
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.episode_list, menu);
@@ -52,22 +46,21 @@ public abstract class AbstractEpisodeFragment extends PodcastBaseFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_clear_playlist: {
+			case R.id.menu_clear_playlist: {
 
-			if (mPlaylist == null) {
-				mPlaylist = SoundWaves.getAppContext(getContext()).getPlaylist();
-				Log.wtf(TAG, "Playlist should not be null"); // NoI18N
+				Playlist playlist = SoundWaves.getAppContext(getContext()).getPlaylist();
+				playlist.resetPlaylist(null);
+
+				int size = playlist.defaultSize();
+
+				if (!playlist.isEmpty()) {
+					playlist.populatePlaylist(size, true);
+					if (mAdapter != null) {
+						mAdapter.notifyDataSetChanged();
+					}
+				}
+				break;
 			}
-
-            mPlaylist.resetPlaylist(null);
-
-            int size = mPlaylist.defaultSize();
-            if (!mPlaylist.isEmpty()) {
-				mPlaylist.populatePlaylist(size, true);
-                mAdapter.notifyDataSetChanged();
-            }
-            break;
-		}
 		}
 		return super.onOptionsItemSelected(item);
 	}
