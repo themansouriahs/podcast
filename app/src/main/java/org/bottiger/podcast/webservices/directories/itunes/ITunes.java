@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -16,10 +17,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.ErrorUtils;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
+import org.bottiger.podcast.webservices.directories.audiosearch.types.Chart;
+import org.bottiger.podcast.webservices.directories.audiosearch.types.ChartItem;
+import org.bottiger.podcast.webservices.directories.audiosearch.types.Show;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchResult;
+import org.bottiger.podcast.webservices.directories.itunes.types.Entry;
+import org.bottiger.podcast.webservices.directories.itunes.types.Feed;
+import org.bottiger.podcast.webservices.directories.itunes.types.FeedLookup;
+import org.bottiger.podcast.webservices.directories.itunes.types.TopList;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -29,9 +38,22 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * Created by apl on 13-04-2015.
@@ -60,11 +82,16 @@ public class ITunes extends GenericDirectory {
             "{\"wrapperType\":\"track\", \"kind\":\"podcast\", \"collectionId\":914396881, \"trackId\":914396881, \"artistName\":\"Sadie Bean: Awesome Book Reviews | Harry Potter, Hobbit, Magic Half, Junie B Jones, and much more every week!\", \"collectionName\":\"Between Two Worlds with Sadie: Books for kids | Jokes | Fun Facts\", \"trackName\":\"Between Two Worlds with Sadie: Books for kids | Jokes | Fun Facts\", \"collectionCensoredName\":\"Between Two Worlds with Sadie: Books for kids | Jokes | Fun Facts\", \"trackCensoredName\":\"Between Two Worlds with Sadie: Books for kids | Jokes | Fun Facts\", \"collectionViewUrl\":\"https://itunes.apple.com/us/podcast/between-two-worlds-sadie-books/id914396881?mt=2&uo=4\", \"feedUrl\":\"http://feeds.feedburner.com/betweentwoworldspodcast\", \"trackViewUrl\":\"https://itunes.apple.com/us/podcast/between-two-worlds-sadie-books/id914396881?mt=2&uo=4\", \"artworkUrl30\":\"http://is1.mzstatic.com/image/pf/us/r30/Podcasts4/v4/ef/43/f2/ef43f2d8-2409-ae04-6428-e652f6544dfa/mza_2918338993485566970.30x30-50.jpg\", \"artworkUrl60\":\"http://is5.mzstatic.com/image/pf/us/r30/Podcasts4/v4/ef/43/f2/ef43f2d8-2409-ae04-6428-e652f6544dfa/mza_2918338993485566970.60x60-50.jpg\", \"artworkUrl100\":\"http://is4.mzstatic.com/image/pf/us/r30/Podcasts4/v4/ef/43/f2/ef43f2d8-2409-ae04-6428-e652f6544dfa/mza_2918338993485566970.100x100-75.jpg\", \"collectionPrice\":0.00, \"trackPrice\":0.00, \"trackRentalPrice\":0, \"collectionHdPrice\":0, \"trackHdPrice\":0, \"trackHdRentalPrice\":0, \"releaseDate\":\"2015-01-27T01:36:00Z\", \"collectionExplicitness\":\"cleaned\", \"trackExplicitness\":\"cleaned\", \"trackCount\":16, \"country\":\"USA\", \"currency\":\"USD\", \"primaryGenreName\":\"Kids & Family\", \"contentAdvisoryRating\":\"Clean\", \"radioStationUrl\":\"https://itunes.apple.com/station/idra.914396881\", \"artworkUrl600\":\"http://is5.mzstatic.com/image/pf/us/r30/Podcasts4/v4/ef/43/f2/ef43f2d8-2409-ae04-6428-e652f6544dfa/mza_2918338993485566970.600x600-75.jpg\", \"genreIds\":[\"1305\", \"26\", \"1304\", \"1415\", \"1301\", \"1401\"], \"genres\":[\"Kids & Family\", \"Podcasts\", \"Education\", \"K-12\", \"Arts\", \"Literature\"]}]\n" +
             "}";
 
+    private static final int[] SUPPORTED_MODES = { POPULAR };
+
     private static final boolean INCLUDE_EXPLICIT = true;
 
     private static final String BASE_URL = "https://itunes.apple.com/search?term=";
     private static final String PODCAST_FILTER = "&entity=podcast";
     private static final String EXPLICIT = "&explicit=Yes";
+
+    private static final String API_URL = "https://itunes.apple.com/";
+    private ITunesEndpoint mService;
 
     private static final String QUERY_SEPARATOR = " ";
 
@@ -77,6 +104,14 @@ public class ITunes extends GenericDirectory {
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // to allow coercion of JSON empty String ("") to null Object value:
         mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .client(getOkHttpClient())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        mService = retrofit.create(ITunesEndpoint.class);
     }
 
     public static @StringRes int getNameRes() {
@@ -114,13 +149,70 @@ public class ITunes extends GenericDirectory {
     }
 
     @Override
-    public void toplist(@NonNull Callback argCallback) {
-        // FIXME
+    public int[] supportedListModes() {
+        return SUPPORTED_MODES;
     }
 
     @Override
-    public void toplist(int amount, @Nullable String argTag, @NonNull Callback argCallback) {
-        // FIXME
+    public void toplist(int amount, @Nullable String argTag, @NonNull final Callback argCallback) {
+        String localLanguage = Locale.getDefault().getCountry().toLowerCase();
+
+        mService.chart(amount, localLanguage).enqueue(new retrofit2.Callback<TopList>() {
+            @Override
+            public void onResponse(Call<TopList> call, final retrofit2.Response<TopList> response) {
+                Flowable.just(response)
+                        .subscribeOn(Schedulers.io())
+                        .map(new Function<retrofit2.Response<TopList>, ISearchResult>() {
+                            @Override
+                            public ISearchResult apply(retrofit2.Response<TopList> chartResponse) throws Exception {
+                                GenericSearchResult resultReturn = new GenericSearchResult("");
+
+                                TopList topList = response.body();
+                                Feed feed = topList.getFeed();
+
+                                if (feed == null) {
+                                    return resultReturn;
+                                }
+
+                                List<Entry> shows = feed.getEntry();
+
+                                if (shows == null) {
+                                    return resultReturn;
+                                }
+
+                                for (int i = 0; i < shows.size(); i++)
+                                {
+                                    Entry entry = shows.get(i);
+                                    String id = entry.getId().getAttributes().getImId();
+                                    retrofit2.Response<FeedLookup> showResponse = mService.lookup(id).execute();
+
+                                    if (showResponse.isSuccessful()) {
+                                        FeedLookup show = showResponse.body();
+
+                                        SlimSubscription subscription = show.getResults().get(0).toSubscription();
+                                        if (subscription != null) {
+                                            resultReturn.addResult(subscription);
+                                        }
+                                    }
+                                }
+
+                                return resultReturn;
+                            }
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new RxBasicSubscriber<ISearchResult>() {
+                            @Override
+                            public void onNext(ISearchResult iSearchResult) {
+                                argCallback.result(iSearchResult);
+                            }
+                        });
+            }
+
+            @Override
+            public void onFailure(Call<TopList> call, Throwable t) {
+                ErrorUtils.handleException(t);
+            }
+        });
     }
 
     private String generateUrl(@NonNull String argTerm) {

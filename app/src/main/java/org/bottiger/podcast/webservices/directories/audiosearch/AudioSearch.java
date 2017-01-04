@@ -67,6 +67,8 @@ public class AudioSearch extends GenericDirectory {
     private static final String NAME = "Audiosear.ch";
     private static final String BASE_URL = "https://www.audiosear.ch/";
 
+    private static final int[] SUPPORTED_MODES = { POPULAR };
+
     private final String GRANT_TYPE = "client_credentials";
     private String AUTH_SIGNATURE;
     @Nullable private String AUTH_TOKEN = null;
@@ -107,6 +109,11 @@ public class AudioSearch extends GenericDirectory {
     @Override
     public boolean isEnabled() {
         return !(TextUtils.isEmpty(AUDIOSEARCH_APP_ID) || TextUtils.isEmpty(AUDIOSEARCH_SECRET));
+    }
+
+    @Override
+    public int[] supportedListModes() {
+        return SUPPORTED_MODES;
     }
 
     @Override

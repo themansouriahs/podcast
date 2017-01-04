@@ -39,6 +39,8 @@ public class GPodder extends GenericDirectory {
     private static final String NAME = "gPodder";
     private static final String QUERY_SEPARATOR = " ";
 
+    private static final int[] SUPPORTED_MODES = { POPULAR };
+
     private GPodderAPI mGPodderAPI;
     private Call mCall;
 
@@ -96,6 +98,11 @@ public class GPodder extends GenericDirectory {
             }
         }).start();
 
+    }
+
+    @Override
+    public int[] supportedListModes() {
+        return SUPPORTED_MODES;
     }
 
     public void toplist(@NonNull final Callback argCallback) {

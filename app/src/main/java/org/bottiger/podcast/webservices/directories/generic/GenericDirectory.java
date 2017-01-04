@@ -8,6 +8,7 @@ import android.support.annotation.StringRes;
 import org.bottiger.podcast.DiscoveryFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.HttpUtils;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 
@@ -20,7 +21,7 @@ import okhttp3.Request;
 /**
  * Created by apl on 13-04-2015.
  */
-public abstract class GenericDirectory implements IDirectoryProvider{
+public abstract class GenericDirectory implements IDirectoryProvider {
 
     private OkHttpClient mOkHttpClient;
 
@@ -36,6 +37,10 @@ public abstract class GenericDirectory implements IDirectoryProvider{
     @NonNull
     public String getName() {
         return mName;
+    }
+
+    @StringRes public static int defaultMode() {
+        return BY_AUTHOR;
     }
 
     public static @StringRes int getNameRes() {
