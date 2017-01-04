@@ -191,6 +191,7 @@ public class ITunes extends GenericDirectory {
 
                                         SlimSubscription subscription = show.getResults().get(0).toSubscription();
                                         if (subscription != null) {
+                                            subscription.setDescription(entry.getSummary().getLabel());
                                             resultReturn.addResult(subscription);
                                         }
                                     }
@@ -268,16 +269,16 @@ public class ITunes extends GenericDirectory {
                 result = new GenericSearchResult(mKeywords.replace("+", " "));
             }
 
-            for (ITunesSlimSubscription slimSubscription : list) {
+            for (ITunesSlimSubscription itunesSlimSubscription : list) {
 
                 URL url;
                 try {
-                    url = new URL(slimSubscription.getUrl());
+                    url = new URL(itunesSlimSubscription.getUrl());
                 } catch (MalformedURLException e) {
                     continue;
                 }
-                String imageUrl = slimSubscription.getImageurl();
-                String title = slimSubscription.getTitle();
+                String imageUrl = itunesSlimSubscription.getImageurl();
+                String title = itunesSlimSubscription.getTitle();
 
                 SlimSubscription subscription = new SlimSubscription(title, url, imageUrl);
 

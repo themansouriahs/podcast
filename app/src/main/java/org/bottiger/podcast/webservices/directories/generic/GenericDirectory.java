@@ -39,8 +39,9 @@ public abstract class GenericDirectory implements IDirectoryProvider {
         return mName;
     }
 
-    @StringRes public static int defaultMode() {
-        return BY_AUTHOR;
+    public static @ListMode int defaultMode(@NonNull Context argContext) {
+        boolean useData = !PreferenceHelper.getBooleanPreferenceValue(argContext, R.string.pref_refresh_only_wifi_key, R.bool.pref_refresh_only_wifi_default);
+        return useData ? POPULAR : BY_AUTHOR;
     }
 
     public static @StringRes int getNameRes() {

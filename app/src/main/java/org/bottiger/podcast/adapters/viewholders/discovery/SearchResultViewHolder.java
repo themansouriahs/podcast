@@ -18,6 +18,8 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
     public ImageViewTinted image;
     public android.support.v7.widget.SwitchCompat toggleSwitch;
 
+    private TextView mDescription;
+
     public Uri imageUrl = null;
 
     public SearchResultViewHolder(View itemView) {
@@ -27,6 +29,10 @@ public class SearchResultViewHolder extends RecyclerView.ViewHolder {
         title = (TextView) itemView.findViewById(R.id.result_title);
         image = (ImageViewTinted) itemView.findViewById(R.id.result_image);
         toggleSwitch = (android.support.v7.widget.SwitchCompat) itemView.findViewById(R.id.result_subscribe_switch);
+        mDescription = (TextView) itemView.findViewById(R.id.result_description);
+    }
 
+    public TextView getDescription() {
+        return mDescription;
     }
 }

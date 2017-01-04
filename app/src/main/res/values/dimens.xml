@@ -50,6 +50,10 @@
     <dimen name="playlist_margin">1px</dimen>
     <dimen name="playlist_image_size_small">50dp</dimen>
     <dimen name="playlist_image_radius_small">7dp</dimen>
+
+    <dimen name="playlist_image_size_medium">60dp</dimen>
+    <dimen name="playlist_image_radius_medium">8dp</dimen>
+
     <dimen name="playlist_image_size_large">90dp</dimen>
     <dimen name="playlist_image_radius_large">9dp</dimen>
 

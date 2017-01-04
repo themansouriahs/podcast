@@ -36,4 +36,8 @@ public class GSubscription {
     public void setUrl(String argUrl) {
         this.url = argUrl;
     }
+
+    public String getDescription() {
+        return description != null ? description : "";
+    }
 }

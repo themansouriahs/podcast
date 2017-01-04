@@ -64,6 +64,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         final ISubscription subscription = mDataset.get(position);
 
         holder.title.setText(subscription.getTitle());
+        holder.getDescription().setText(subscription.getDescription());
 
         try {
             ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), null, false, true, true, ImageLoaderUtils.NETWORK);

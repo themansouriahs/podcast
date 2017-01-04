@@ -35,12 +35,15 @@ public class LookupResult {
 
     @Nullable
     public SlimSubscription toSubscription() {
+        SlimSubscription subscription;
         try {
-            return new SlimSubscription(collectionName, new URL(feedUrl), artworkUrl);
+            subscription = new SlimSubscription(collectionName, new URL(feedUrl), artworkUrl);
         } catch (MalformedURLException e) {
             ErrorUtils.handleException(e);
             return null;
         }
+
+        return subscription;
     }
 
     public String Url() {

@@ -83,21 +83,6 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
     }
 
     @Override
-    public void setTitle(@Nullable String argTitle) {
-
-    }
-
-    @Override
-    public void setDescription(@Nullable String argDescription) {
-
-    }
-
-    @Override
-    public void setURL(@Nullable String argUrl) {
-
-    }
-
-    @Override
     public void setLink(@Nullable String argLink) {
 
     }

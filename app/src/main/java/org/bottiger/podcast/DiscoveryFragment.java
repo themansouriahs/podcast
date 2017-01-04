@@ -3,7 +3,6 @@ package org.bottiger.podcast;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,7 +16,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -83,7 +81,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private static final int ITUNES_INDEX  = 1;
     private static final int AUDIOSEARCH_INDEX  = 2;
 
-    public static final int[] ENGINE_IDS = {GPODDER_INDEX, ITUNES_INDEX, AUDIOSEARCH_INDEX};
+    public static final @SearchEngine int[] ENGINE_IDS = {GPODDER_INDEX, ITUNES_INDEX, AUDIOSEARCH_INDEX};
     public static final @StringRes int[] ENGINE_RES = {GPodder.getNameRes(), ITunes.getNameRes(), AudioSearch.getNameRes()};
 
     private static final int HANDLER_WHAT_SEARCH   = 27407; // whatever
@@ -94,7 +92,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private SearchHandler mSearchHandler = new SearchHandler(this);
 
     // Spinner values
-    private static final int SPINNER_BY_AUTHOR_POSITION = 0;
+    private static final int SPINNER_TOP_ITEM = 0;
 
     private android.support.v7.widget.SearchView mSearchView;
     private AppCompatSpinner mSpinner;
@@ -229,7 +227,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
         mProgress = (ProgressBar) view.findViewById(R.id.discovery_progress);
 
-        populateRecommendations();
+        populateResults(GenericDirectory.defaultMode(getContext()));
 
         mRxSubscription = SoundWaves
                 .getAppContext(getContext())
@@ -267,7 +265,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             return;
 
         updateSpinnerValues(SEARCH_RESULTS, argQuery);
-        //updateLabel(argQuery);
 
         ISearchParameters searchParameters = new GenericSearchParameters();
         searchParameters.addSearchTerm(argQuery);
@@ -293,14 +290,14 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
         Log.d(TAG, "searchviewQueryChanged: " + argQuery + " delay: " + argDelaySearch);
 
-        mSpinner.setSelection(SPINNER_BY_AUTHOR_POSITION);
+        mSpinner.setSelection(SPINNER_TOP_ITEM);
 
         mSearchHandler.removeMessages(HANDLER_WHAT_SEARCH);
 
         if (TextUtils.isEmpty(argQuery)) {
             mProgress.setVisibility(View.GONE);
             mSearchEngineButton.setVisibility(View.VISIBLE);
-            populateRecommendations();
+            populateResults(GenericDirectory.defaultMode(getContext()));
             return;
         }
 
@@ -341,7 +338,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             // FIXME: I do not fully understand why this is needed
             // bug: 5600e81488f8ad5351d0bdd7
             if (isAdded()) {
-                updateSpinnerValues(BY_AUTHOR, null);
+                updateSpinnerValues(GenericDirectory.defaultMode(getContext()), null);
                 setQueryHint();
             }
         }
@@ -383,13 +380,18 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
         if (value.equals(getListModeName(POPULAR))) {
             mProgress.setVisibility(View.VISIBLE);
-            fetchPopular();
+            populateResults(POPULAR);
             return;
         }
 
         if (value.equals(getListModeName(TRENDING))) {
             mProgress.setVisibility(View.VISIBLE);
-            fetchTrending();
+            populateResults(TRENDING);
+            return;
+        }
+
+        if (value.equals(getListModeName(BY_AUTHOR))) {
+            populateRecommendations();
             return;
         }
     }
@@ -433,7 +435,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             mSearchEngineButton.setImageResource(R.drawable.discovery_gpodder);
         }
 
-        updateSpinnerValues(GenericDirectory.defaultMode(), null);
+        updateSpinnerValues(GenericDirectory.defaultMode(getContext()), null);
     }
 
     private int getDefaultSearchEngine() {
@@ -447,21 +449,30 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     private void updateSpinnerValues(int argFirstItem, @Nullable String argQuery) {
         String[] array = supportedModeNames();
-        array[0] = getListModeName(argFirstItem);
+
+        List<String> items = new LinkedList<>(Arrays.asList(array));
+
+        String firstItem = getListModeName(argFirstItem);
+        if (items.contains(firstItem)) {
+            int index = items.indexOf(firstItem);
+            items.remove(index);
+            items.add(0, firstItem);
+        }
 
         if (!TextUtils.isEmpty(argQuery)) {
             String resultLabel = getResources().getString(R.string.discovery_search_results);
-            array[0] = StrUtils.fromHtmlCompat(String.format(resultLabel, argQuery));
+            String resultText = StrUtils.fromHtmlCompat(String.format(resultLabel, argQuery));
+            items.add(0, resultText);
         }
 
-        ArrayList<String> lst = new ArrayList<>(Arrays.asList(array));
+        ArrayList<String> lst = new ArrayList<>(items);
 
         if (mSpinnerAdapter == null) {
             mSpinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.discovery_spinner_item, lst);
         } else {
             mSpinnerAdapter.clear();
-            for (int i = 0; i < array.length; i++) {
-                mSpinnerAdapter.insert(array[i], i);
+            for (int i = 0; i < items.size(); i++) {
+                mSpinnerAdapter.insert(items.get(i), i);
             }
         }
     }
@@ -469,7 +480,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private String[] supportedModeNames() {
 
         if (mDirectoryProvider == null) {
-            return new String[]{ getListModeName(GenericDirectory.defaultMode()) };
+            return new String[]{ getListModeName(GenericDirectory.defaultMode(getContext())) };
         }
 
         int[] modes = mDirectoryProvider.supportedListModes();
@@ -520,6 +531,23 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         }
     }
 
+    private void populateResults(@IDirectoryProvider.ListMode int argMode) {
+        switch (argMode) {
+
+            case IDirectoryProvider.BY_AUTHOR:
+                populateRecommendations();
+                break;
+            case IDirectoryProvider.POPULAR:
+                fetchPopular();
+                break;
+            case IDirectoryProvider.SEARCH_RESULTS:
+                break;
+            case IDirectoryProvider.TRENDING:
+                fetchTrending();
+                break;
+        }
+    }
+
     private void populateRecommendations() {
 
         ArrayList<ISubscription> subscriptions = new ArrayList<>();
@@ -553,7 +581,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             return;
         }
 
-        updateSpinnerValues(GenericDirectory.defaultMode(), null);
+        updateSpinnerValues(GenericDirectory.defaultMode(getContext()), null);
         mResultsAdapter.setDataset(subscriptions);
     }
 

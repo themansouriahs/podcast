@@ -13,6 +13,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.webservices.datastore.IWebservice;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
@@ -34,9 +35,9 @@ import retrofit2.Response;
  */
 public class GPodder extends GenericDirectory {
 
-    private static final String TAG = "GPodder";
+    private static final String TAG = GPodder.class.getSimpleName();
 
-    private static final String NAME = "gPodder";
+    private static final String NAME = "gpodder.net";
     private static final String QUERY_SEPARATOR = " ";
 
     private static final int[] SUPPORTED_MODES = { POPULAR };
@@ -151,12 +152,13 @@ public class GPodder extends GenericDirectory {
             String title = podcast.getTitle();
             String urlString = podcast.getUrl();
             String imageUrl = podcast.getLogoUrl();
+            String description = podcast.getDescription();
 
             if (TextUtils.isEmpty(title)) {
                 continue;
             }
 
-            if (!Patterns.WEB_URL.matcher(urlString).matches()) {
+            if (!StrUtils.isValidUrl(urlString)) {
                 continue;
             }
 
@@ -169,6 +171,7 @@ public class GPodder extends GenericDirectory {
             }
 
             ISubscription subscription = new SlimSubscription(title, url, imageUrl);
+            subscription.setDescription(description);
             result.addResult(subscription);
         }
 
