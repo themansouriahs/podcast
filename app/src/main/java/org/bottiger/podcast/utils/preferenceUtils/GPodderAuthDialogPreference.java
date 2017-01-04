@@ -64,6 +64,7 @@ public class GPodderAuthDialogPreference extends DialogPreference {
         mCloudSupportKey = getContext().getResources().getString(R.string.pref_cloud_support_key);
         mGPodderSupportKey = getContext().getResources().getString(R.string.pref_gpodder_support_key);
 
+        setPositiveButtonText(R.string.gpodder_dialog_positive_button);
     }
 
 
@@ -163,14 +164,6 @@ public class GPodderAuthDialogPreference extends DialogPreference {
 
             editor.commit();
         }
-        /*else {
-            String username = mUsernameView.getText().toString();
-            String password = mPasswordView.getText().toString();
-
-            GPodderAPI api = new GPodderAPI(username, password);
-            //api.uploadSubscriptions(SubscriptionLoader.asList(getContext().getContentResolver()));
-        }
-        */
 
         if (_subscription != null && !_subscription.isUnsubscribed()) {
             _subscription.unsubscribe();

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.WorkerThread;
 import android.support.v4.util.LongSparseArray;
 import android.support.v7.util.SortedList;
 import android.util.Log;
@@ -17,6 +18,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 
@@ -28,7 +30,7 @@ import java.net.SocketTimeoutException;
  */
 public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    private static final String TAG = "CloudSyncAdapter";
+    private static final String TAG = CloudSyncAdapter.class.getSimpleName();
 
     private Context mContext;
 
@@ -49,11 +51,13 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         String cloudSyncKey = getContext().getResources().getString(R.string.pref_cloud_support_key);
         boolean supportCloudSync = sharedPreferences.getBoolean(cloudSyncKey, !BuildConfig.PRIVATE_MODE);
+
         if (supportCloudSync) {
             performGPodderSync();
         }
     }
 
+    @WorkerThread
     private void performGPodderSync() {
         Log.d(TAG, "Performing gPodder synchronization");
 

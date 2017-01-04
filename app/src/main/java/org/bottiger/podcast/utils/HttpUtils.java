@@ -23,11 +23,19 @@ public class HttpUtils {
     }
 
     public static OkHttpClient.Builder getNewDefaultOkHttpClientBuilder(@NonNull Context argContext) {
+        return getNewDefaultOkHttpClientBuilder(argContext, 30);
+    }
+
+    public static OkHttpClient.Builder getBackgroundOkHttpClientBuilder(@NonNull Context argContext) {
+        return getNewDefaultOkHttpClientBuilder(argContext, 120);
+    }
+
+    private static OkHttpClient.Builder getNewDefaultOkHttpClientBuilder(@NonNull Context argContext, int argTimeOut) {
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
         okHttpBuilder.interceptors().add(new UserAgentInterceptor(argContext));
-        okHttpBuilder.connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS);
+        okHttpBuilder.connectTimeout(argTimeOut, TimeUnit.SECONDS)
+                .writeTimeout(argTimeOut, TimeUnit.SECONDS)
+                .readTimeout(argTimeOut, TimeUnit.SECONDS);
 
         return okHttpBuilder;
     }

@@ -398,6 +398,7 @@ public class Subscription extends BasePodcastSubscription {
 	}
 
     public void subscribe(@NonNull String argTag) {
+		super.subscribe();
         setStatus(STATUS_SUBSCRIBED, argTag);
     }
 

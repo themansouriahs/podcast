@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
  */
 public class SubscriptionLoader {
 
-    public static Subscription fetchFromCursor(@NonNull  Subscription sub, @NonNull Cursor cursor) {
+    public static Subscription fetchFromCursor(@NonNull Subscription sub, @NonNull Cursor cursor) {
         sub.id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
         int lastUpdatedIndex = cursor
@@ -52,6 +52,8 @@ public class SubscriptionLoader {
 
         sub.setClicks(cursor.getInt(cursor
                 .getColumnIndex(SubscriptionColumns.RATING)));
+        sub.setSubscribedAt(cursor.getLong(cursor
+                .getColumnIndex(SubscriptionColumns.SUBSCRIBED_AT)));
 
         int newEpisodesIndex = cursor
                 .getColumnIndex(SubscriptionColumns.NEW_EPISODES);

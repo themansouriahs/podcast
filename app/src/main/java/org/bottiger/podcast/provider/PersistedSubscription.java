@@ -10,6 +10,19 @@ public abstract class PersistedSubscription extends BaseSubscription implements 
 
     public long id;
     private int mClicks = 0;
+    private long mSubscribedAt;
+
+    public long getSubscribedAt() {
+        return mSubscribedAt;
+    }
+
+    protected void setSubscribedAt(long argSubscribedAt) {
+        mSubscribedAt = argSubscribedAt;
+    }
+
+    public void subscribe() {
+        mSubscribedAt = System.currentTimeMillis();
+    }
 
     public long getId() {
         return id;

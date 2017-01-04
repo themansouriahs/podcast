@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.ArrayMap;
@@ -57,6 +58,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static org.bottiger.podcast.utils.HttpUtils.getBackgroundOkHttpClientBuilder;
+
 /**
  * Created by Arvid on 8/23/2015.
  */
@@ -72,9 +75,7 @@ public class GPodderAPI implements IWebservice {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({SYNCHRONIZATION_OK, AUTHENTICATION_ERROR, SERVER_ERROR})
-    public @interface SynchronizationResult {
-    }
-
+    public @interface SynchronizationResult {}
     public static final int SYNCHRONIZATION_OK = 1;
     public static final int AUTHENTICATION_ERROR = 2;
     public static final int SERVER_ERROR = 3;
@@ -105,7 +106,7 @@ public class GPodderAPI implements IWebservice {
 
         mUsername = argUsername;
 
-        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        OkHttpClient.Builder client = getBackgroundOkHttpClientBuilder(argContext);
         client.interceptors().add(new UserAgentInterceptor(SoundWaves.getAppContext(argContext)));
         client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
 
@@ -130,9 +131,8 @@ public class GPodderAPI implements IWebservice {
      * @return
      * @throws IOException
      */
-    public
-    @SynchronizationResult
-    int synchronize(@NonNull Context argContext,
+    @WorkerThread
+    public @SynchronizationResult int synchronize(@NonNull Context argContext,
                     @NonNull LongSparseArray<Subscription> argLocalSubscriptions) throws IOException {
 
         Response response = api.login(mUsername).execute();
@@ -145,7 +145,6 @@ public class GPodderAPI implements IWebservice {
         device.type = GPodderUtils.getDeviceCaption(argContext);
 
         int keyRes = R.string.gpodder_last_sync_key;
-        String key = argContext.getResources().getString(keyRes);
         long lastSync = PreferenceHelper.getLongPreferenceValue(argContext, keyRes, R.integer.gpodder_last_sync_default);
 
         long timestamp;
@@ -246,6 +245,7 @@ public class GPodderAPI implements IWebservice {
 
         if (timestamp > 0) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+            String key = argContext.getResources().getString(keyRes);
             prefs.edit().putLong(key, timestamp).commit();
         }
 
@@ -253,8 +253,6 @@ public class GPodderAPI implements IWebservice {
         /**
          * Sync Episode actions
          */
-        //String where = String.format("%s>%d", ItemColumns.LAST_UPDATE, lastSync * 1000);
-        //FeedItem[] items = FeedCursorLoader.asCursor(argContext.getContentResolver(), where);
         ArrayList<IEpisode> allItems = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisodes();
         List<FeedItem> recentlySyncedItems = new LinkedList<>();
         IEpisode episode;
@@ -355,14 +353,12 @@ public class GPodderAPI implements IWebservice {
         if (remoteActions != null) {
             GEpisodeAction action;
             IEpisode item;
-            ContentResolver resolver = argContext.getContentResolver();
             for (int i = 0; i < remoteActions.length; i++) {
                 action = remoteActions[i];
-                if (action != null && action.action == GEpisodeAction.PLAY) {
-                    //item = FeedItem.getByURL(resolver, action.episode);
+                if (action != null && action.action.equals(GEpisodeAction.PLAY)) {
                     item = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisode(action.episode);
                     if (item != null) {
-                        item.setOffset(resolver, action.position*1000);
+                        item.setOffset(action.position*1000);
                     }
                 }
             }

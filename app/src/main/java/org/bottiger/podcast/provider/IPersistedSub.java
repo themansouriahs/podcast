@@ -6,6 +6,8 @@ package org.bottiger.podcast.provider;
 
 public interface IPersistedSub extends ISubscription {
 
+    long getSubscribedAt();
+
     long getId();
     void setId(long argId);
 

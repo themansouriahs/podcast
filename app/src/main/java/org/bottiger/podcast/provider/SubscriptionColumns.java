@@ -34,8 +34,8 @@ public class SubscriptionColumns implements BaseColumns {
 	public static final String RATING = "rating";
 	public static final String USERNAME = "user";
 	public static final String PASSWORD = "pwd";
-	public static final String SERVER_ID = "server_id";
-	public static final String REMOTE_ID = "sync";	
+	public static final String SUBSCRIBED_AT = "server_id";
+	public static final String REMOTE_ID = "sync";
 	public static final String AUTO_DOWNLOAD = "auto_download";	
 	public static final String PLAYLIST_POSITION = "playlist_id";		
 
@@ -64,8 +64,8 @@ public class SubscriptionColumns implements BaseColumns {
 		+ RATING + " INTEGER DEFAULT 0, "
 		+ USERNAME	+ " VARCHAR(32) , " 
 		+ PASSWORD + " VARCHAR(32) , " 
-		+ SERVER_ID + " INTEGER , " 
-		+ REMOTE_ID + " VARCHAR(128), " 		
+		+ SUBSCRIBED_AT + " INTEGER , "
+		+ REMOTE_ID + " VARCHAR(128), "
 		+ AUTO_DOWNLOAD + " INTEGER , "
 		+ PLAYLIST_POSITION + " INTEGER , " 	
 		+ IMAGE_URL + " VARCHAR(1024), "

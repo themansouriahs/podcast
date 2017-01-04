@@ -195,6 +195,7 @@ public class LibraryPersistency {
             cv.put(SubscriptionColumns.LAST_UPDATED, lastUpdated);
         }
 
+        cv.put(SubscriptionColumns.SUBSCRIBED_AT, argSubscription.getSubscribedAt());
         cv.put(SubscriptionColumns.LAST_ITEM_UPDATED, argSubscription.getLastItemUpdated());
         cv.put(SubscriptionColumns.STATUS, argSubscription.getStatus());
         cv.put(SubscriptionColumns.SETTINGS, argSubscription.getSettings());
