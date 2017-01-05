@@ -129,8 +129,8 @@ public class FeaturedPodcastsUtil {
                 new URL("http://feeds.twit.tv/twil.xml"),
                 "http://elroy.twit.tv/sites/default/files/styles/twit_album_art_144x144/public/images/shows/this_week_in_law/album_art/audio/twil1400audio.jpg");
         featuredPodcast1.slimSubscription.setDescription("Join legal blogger (and trained attorney) Denise Howell along with J. Michael Keyes and Emory Roane as they discuss breaking issues in technology law, including patents, copyrights, and more. Records live every Friday at 2:00pm Eastern / 11:00am Pacific / 19:00 UTC.");
-        featuredPodcast1.startDate.set(2017, 0, 4);
-        featuredPodcast1.endDate.set(2017, 0, 10);
+        featuredPodcast1.startDate.set(2016, 0, 4);
+        featuredPodcast1.endDate.set(2016, 0, 10);
 
         FEATURED_PODCASTS.add(featuredPodcast1);
     }
