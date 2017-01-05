@@ -145,8 +145,6 @@ public class OkHttpDownloader extends DownloadEngineBase {
                 Log.d(TAG, "filetransfer done");
             }
 
-            BufferedSource source = body.source();
-
             sink = Okio.buffer(Okio.sink(tmpFile));
             sink.writeAll(response.body().source());
             sink.close();
@@ -274,12 +272,18 @@ public class OkHttpDownloader extends DownloadEngineBase {
             return new ForwardingSource(source) {
                 long totalBytesRead = 0L;
 
-                @Override public long read(Buffer sink, long byteCount) throws IOException {
+                @Override
+                public long read(Buffer sink, long byteCount) throws IOException {
                     long bytesRead = super.read(sink, byteCount);
                     // read() returns the number of bytes read, or -1 if this source is exhausted.
                     totalBytesRead += bytesRead != -1 ? bytesRead : 0;
                     progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1, startTime);
                     return bytesRead;
+                }
+
+                @Override
+                public void close() throws IOException {
+                    progressListener.update(responseBody.contentLength(), responseBody.contentLength(), true, startTime);
                 }
             };
         }

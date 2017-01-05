@@ -96,8 +96,6 @@ public class FeaturedPodcastsUtil {
 
                 String prefKey = "hasDownloadedTest5";
 
-                long value = Long.parseLong(Settings.Secure.ANDROID_ID, 16);
-
                 if (episode != null) {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
                     String lastDownload = prefs.getString(prefKey, "");
