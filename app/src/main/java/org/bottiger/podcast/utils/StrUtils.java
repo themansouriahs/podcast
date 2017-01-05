@@ -7,10 +7,12 @@ import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.style.StyleSpan;
 import android.util.Base64;
 import android.util.Patterns;
 
@@ -317,6 +319,20 @@ From here: http://stackoverflow.com/questions/9027317/how-to-convert-millisecond
 			}
 		}
 		return a.substring(0, minLength);
+	}
+
+	public static Spanned getTextWithBoldPrefix(@NonNull SpannableStringBuilder argSpannableStringBuilder,
+												@NonNull String argBoldPrefix,
+												@NonNull String normalSuffix) {
+		argSpannableStringBuilder.clear();
+
+		int start = argSpannableStringBuilder.length();
+		argSpannableStringBuilder.append(argBoldPrefix);
+		argSpannableStringBuilder.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), start, argSpannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+		argSpannableStringBuilder.append(normalSuffix);
+
+		return argSpannableStringBuilder;
 	}
 
 }

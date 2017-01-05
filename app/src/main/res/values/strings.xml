@@ -315,6 +315,9 @@
     <string name="test_credentials_failed_server_timeout">Server not responding</string>
     <string name="gpodder_dialog_positive_button">Connect</string>
 
+    <!-- Used in the context: "Featured: <Podcats Title>"-->
+    <string name="featured_prefix">Featured:</string>
+
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>
         <item quantity="other">%d new episodes</item>

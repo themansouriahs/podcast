@@ -34,6 +34,7 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.utils.IntUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
 import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
@@ -120,9 +121,18 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 // Log the subscription
                 SoundWaves.getAppContext(getActivity()).getAnalystics().logFeed(subscription.getURLString(), false);
             }
+
+            String searchQuery = argResult.getSearchQuery();
+
+            if (FeaturedPodcastsUtil.showFeaturedPodcast(searchQuery)) {
+                List<ISubscription> subscriptionList = new LinkedList<>(subscriptions);
+                subscriptionList.add(0, FeaturedPodcastsUtil.getFeaturedPodcats());
+                subscriptions = new ArrayList<>(subscriptionList);
+            }
+
             mResultsAdapter.setDataset(subscriptions);
 
-            if (argResult.getSearchQuery().equals(mSearchView.getQuery().toString()) )
+            if (searchQuery.equals(mSearchView.getQuery().toString()) )
                 mProgress.setVisibility(View.GONE);
         }
 

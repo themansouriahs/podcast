@@ -22,6 +22,7 @@ import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StorageUtils;
+import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
 import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -166,6 +167,11 @@ public class SubscriptionRefreshManager {
         for (int i = 0; i < subscriptions.size(); i++) {
            addSubscriptionToQueue(argContext, subscriptions.get(i), argCallback);
            subscriptionsAdded++;
+        }
+
+        if (FeaturedPodcastsUtil.hasFeaturedPodcast()) {
+            IDownloadCompleteCallback callback = FeaturedPodcastsUtil.getRefreshCallback(argContext);
+            addSubscriptionToQueue(argContext, FeaturedPodcastsUtil.getFeaturedPodcats(), callback);
         }
 
         Log.d(TAG, "addAllSubscriptionsToQueue added: " + subscriptionsAdded);

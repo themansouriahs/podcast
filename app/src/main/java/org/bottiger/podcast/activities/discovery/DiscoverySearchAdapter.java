@@ -23,7 +23,9 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,7 +65,12 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     public void onBindViewHolder(final SearchResultViewHolder holder, final int position) {
         final ISubscription subscription = mDataset.get(position);
 
-        holder.title.setText(subscription.getTitle());
+        if (FeaturedPodcastsUtil.isFeatured(subscription)) {
+            holder.title.setText(FeaturedPodcastsUtil.getFeaturedHeadline(subscription, mActivity.getResources()));
+        } else {
+            holder.title.setText(subscription.getTitle());
+        }
+
         holder.getDescription().setText(subscription.getDescription());
 
         try {

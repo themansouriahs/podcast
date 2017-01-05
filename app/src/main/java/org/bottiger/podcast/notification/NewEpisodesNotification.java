@@ -26,6 +26,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.PreferenceHelper;
+import org.bottiger.podcast.utils.StrUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -150,19 +151,9 @@ public class NewEpisodesNotification {
     }
 
     private static Spanned getLine(@NonNull SpannableStringBuilder argSpannableStringBuilder, @NonNull IEpisode argEpisode, @NonNull Context argContext) {
-
         String subscription = argEpisode.getSubscription(argContext).getTitle() + ":";
-
-        argSpannableStringBuilder.clear();
-
-        int start = argSpannableStringBuilder.length();
-        argSpannableStringBuilder.append(subscription);
-        argSpannableStringBuilder.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), start, argSpannableStringBuilder.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        argSpannableStringBuilder.append(" ");
-        argSpannableStringBuilder.append(argEpisode.getTitle());
-
-        return argSpannableStringBuilder;
+        String episode = " " + argEpisode.getTitle();
+        return StrUtils.getTextWithBoldPrefix(argSpannableStringBuilder, subscription, episode);
     }
 
 }

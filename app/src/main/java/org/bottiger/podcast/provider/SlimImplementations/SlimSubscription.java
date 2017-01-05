@@ -37,6 +37,7 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
     public SlimSubscription(@NonNull URL argURL) {
         mTitle = "";
         mURL = argURL;
+        mUrlString = argURL.toString();
         mImageURL = "";
         initEpisodes();
     }
@@ -44,6 +45,7 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
     public SlimSubscription(@NonNull String argTitle, @NonNull URL argURL, @Nullable String argImageURL) {
         mTitle = argTitle;
         mURL = argURL;
+        mUrlString = argURL.toString();
         mImageURL = argImageURL;
         initEpisodes();
     }
