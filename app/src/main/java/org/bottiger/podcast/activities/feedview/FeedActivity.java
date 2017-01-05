@@ -131,35 +131,6 @@ public class FeedActivity extends TopActivity {
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener = getMultiShrinkScrollerListener();
     SearchView.OnQueryTextListener mOnQueryTextListener = getOnQueryTextListener();
 
-    public static Intent getIntent(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
-        Class activityClass;
-        boolean isSlim = false;
-        Bundle bundle = new Bundle();
-
-        if (argSubscription instanceof SlimSubscription) {
-            isSlim = true;
-            activityClass = DiscoveryFeedActivity.class;
-            bundle.putParcelable(SUBSCRIPTION_SLIM_KEY, (SlimSubscription)argSubscription); // Not required, but nice to have if we already got it
-        } else {
-            SoundWaves.getAppContext(argContext).getLibraryInstance().loadEpisodes((Subscription) argSubscription);
-            activityClass = FeedActivity.class;
-        }
-
-        bundle.putBoolean(FEED_ACTIVITY_IS_SLIM, isSlim);
-        bundle.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
-
-        Intent intent = new Intent(argContext, activityClass);
-        intent.putExtras(bundle);
-
-        return intent;
-    }
-
-    public static void start(@NonNull Activity argActivity, @NonNull ISubscription argSubscription) {
-        Intent intent = getIntent(argActivity, argSubscription);
-        argActivity.startActivityForResult(intent, FEED_ACTIVITY_CANCELED);
-        argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -674,6 +645,7 @@ public class FeedActivity extends TopActivity {
 
 
                 if (mSettingsRevealed) {
+                    mMultiShrinkScroller.resetHeader();
                     mRevealAnimator =
                             ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, revealRadius, 0);
                     mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -700,7 +672,6 @@ public class FeedActivity extends TopActivity {
                     });
                     mRevealAnimator.start();
                 } else {
-
                     // Open Settings
                     mMultiShrinkScroller.expandHeader();
                     mRevealAnimator =
@@ -716,5 +687,34 @@ public class FeedActivity extends TopActivity {
                 mSettingsRevealed = !mSettingsRevealed;
             }
         };
+    }
+
+    public static Intent getIntent(@NonNull Context argContext, @NonNull ISubscription argSubscription) {
+        Class activityClass;
+        boolean isSlim = false;
+        Bundle bundle = new Bundle();
+
+        if (argSubscription instanceof SlimSubscription) {
+            isSlim = true;
+            activityClass = DiscoveryFeedActivity.class;
+            bundle.putParcelable(SUBSCRIPTION_SLIM_KEY, (SlimSubscription)argSubscription); // Not required, but nice to have if we already got it
+        } else {
+            SoundWaves.getAppContext(argContext).getLibraryInstance().loadEpisodes((Subscription) argSubscription);
+            activityClass = FeedActivity.class;
+        }
+
+        bundle.putBoolean(FEED_ACTIVITY_IS_SLIM, isSlim);
+        bundle.putString(FeedActivity.SUBSCRIPTION_URL_KEY, argSubscription.getURLString());
+
+        Intent intent = new Intent(argContext, activityClass);
+        intent.putExtras(bundle);
+
+        return intent;
+    }
+
+    public static void start(@NonNull Activity argActivity, @NonNull ISubscription argSubscription) {
+        Intent intent = getIntent(argActivity, argSubscription);
+        argActivity.startActivityForResult(intent, FEED_ACTIVITY_CANCELED);
+        argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
     }
 }

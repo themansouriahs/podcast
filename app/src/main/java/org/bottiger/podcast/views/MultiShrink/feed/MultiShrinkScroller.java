@@ -110,6 +110,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     private TextView mLargeTextView;
     private View mPhotoTouchInterceptOverlay;
     private FloatingActionButton mFloatingActionButton;
+    private FrameLayout mRevealLayout;
     /** Contains desired location/size of the title, once the header is fully compressed */
     private TextView mInvisiblePlaceholderTextView;
     private View mTitleGradientView;
@@ -147,7 +148,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     private final int mTransparentStartHeight;
     private final int mMaximumTitleMargin;
     private final float mToolbarElevation;
-    private final boolean mIsTwoPanel;
     private final int mActionBarSize;
 
     // Objects used to perform color filtering on the header. These are stored as fields for
@@ -253,8 +253,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 R.dimen.quickcontact_starting_empty_height);
         mToolbarElevation = getResources().getDimension(
                 R.dimen.quick_contact_toolbar_elevation);
-        //mIsTwoPanel = getResources().getBoolean(R.bool.quickcontact_two_panel);
-        mIsTwoPanel = false; // FIXME
         mMaximumTitleMargin = (int) getResources().getDimension(
                 R.dimen.quickcontact_title_initial_margin);
 
@@ -286,6 +284,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         mInvisiblePlaceholderTextView = (TextView) mLargeTextView;
         mStartColumn = findViewById(R.id.empty_start_column);
         mFloatingActionButton = (FloatingActionButton)findViewById(R.id.feedview_fap_button);
+        mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
         // Touching the empty space should close the card
         if (mStartColumn != null) {
             mStartColumn.setOnClickListener(new OnClickListener() {
@@ -309,75 +308,45 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         mTitleGradientView = findViewById(R.id.title_gradient);
         mActionBarGradientView = findViewById(R.id.action_bar_gradient);
 
-        if (Build.VERSION.SDK_INT >= 16) {
-            mTitleGradientView.setBackground(mTitleGradientDrawable);
-            mActionBarGradientView.setBackground(mActionBarGradientDrawable);
-        }
+        mTitleGradientView.setBackground(mTitleGradientDrawable);
+        mActionBarGradientView.setBackground(mActionBarGradientDrawable);
 
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
                 overallYScrol = overallYScrol + dy;
-
                 Log.i("check", "overall->" + overallYScrol);
 
             }
         });
 
         mPhotoTouchInterceptOverlay = findViewById(R.id.photo_touch_intercept_overlay);
-        if (!mIsTwoPanel) {
-            mPhotoTouchInterceptOverlay.setOnClickListener(new OnClickListener() {
+        mPhotoTouchInterceptOverlay.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     expandHeader();
                 }
-            });
-        }
+            }
+        );
 
         SchedulingUtils.doOnPreDraw(this, /* drawNextFrame = */ false, new Runnable() {
             @Override
             public void run() {
-                if (!mIsTwoPanel) {
-                    // We never want the height of the photo view to exceed its width.
-                    mMaximumHeaderHeight = mPhotoViewContainer.getWidth();
-                    mIntermediateHeaderHeight = (int) (mMaximumHeaderHeight
-                            * INTERMEDIATE_HEADER_HEIGHT_RATIO);
-                }
+                // We never want the height of the photo view to exceed its width.
+                mMaximumHeaderHeight = mPhotoViewContainer.getWidth();
+                mIntermediateHeaderHeight = (int) (mMaximumHeaderHeight * INTERMEDIATE_HEADER_HEIGHT_RATIO);
+
                 final boolean isLandscape = getResources().getConfiguration().orientation
                         == Configuration.ORIENTATION_LANDSCAPE;
                 mMaximumPortraitHeaderHeight = isLandscape ? getHeight()
                         : mPhotoViewContainer.getWidth();
                 setHeaderHeight(getMaximumScrollableHeaderHeight());
                 mMaximumHeaderTextSize = mLargeTextView.getHeight();
-                if (mIsTwoPanel) {
-                    mMaximumHeaderHeight = getHeight();
-                    mMinimumHeaderHeight = mMaximumHeaderHeight;
-                    mIntermediateHeaderHeight = mMaximumHeaderHeight;
 
-                    // Permanently set photo width and height.
-                    final TypedValue photoRatio = new TypedValue();
-
-                    final ViewGroup.LayoutParams photoLayoutParams
-                            = mPhotoViewContainer.getLayoutParams();
-                    photoLayoutParams.height = mMaximumHeaderHeight;
-                    photoLayoutParams.width = (int) (mMaximumHeaderHeight * photoRatio.getFloat());
-                    mPhotoViewContainer.setLayoutParams(photoLayoutParams);
-
-                    // Permanently set title width and margin.
-                    final FrameLayout.LayoutParams largeTextLayoutParams
-                            = (FrameLayout.LayoutParams) mLargeTextView.getLayoutParams();
-                    largeTextLayoutParams.width = photoLayoutParams.width -
-                            largeTextLayoutParams.leftMargin - largeTextLayoutParams.rightMargin;
-                    largeTextLayoutParams.gravity = Gravity.BOTTOM | Gravity.START;
-                    mLargeTextView.setLayoutParams(largeTextLayoutParams);
-                } else {
-                    // Set the width of mLargeTextView as if it was nested inside
-                    // mPhotoViewContainer.
-                    mLargeTextView.setWidth(mPhotoViewContainer.getWidth()
-                            - 2 * mMaximumTitleMargin);
-                }
+                // Set the width of mLargeTextView as if it was nested inside
+                // mPhotoViewContainer.
+                mLargeTextView.setWidth(mPhotoViewContainer.getWidth() - 2 * mMaximumTitleMargin);
 
                 calculateCollapsedLargeTitlePadding();
                 updateHeaderTextSizeAndMargin();
@@ -527,11 +496,33 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         }
     }
 
+    public int settingsLayoutHeight() {
+        mRevealLayout.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.AT_MOST));
+        final int targetHeight = mRevealLayout.getMeasuredHeight();
+        return Math.max(mMaximumHeaderHeight, targetHeight);
+    }
+
     /**
      * Expand to maximum size.
      */
     public void expandHeader() {
-        if (getHeaderHeight() != mMaximumHeaderHeight) {
+        if (getHeaderHeight() < settingsLayoutHeight()) {
+            final ObjectAnimator animator = ObjectAnimator.ofInt(this, "headerHeight",
+                    settingsLayoutHeight());
+            animator.setDuration(ExpandingEntryCardView.DURATION_EXPAND_ANIMATION_CHANGE_BOUNDS);
+            animator.start();
+            // Scroll nested scroll view to its top
+            if (mRecyclerView.getScrollY() != 0) {
+                ObjectAnimator.ofInt(mRecyclerView, "scrollY", -mRecyclerView.getScrollY()).start();
+            }
+        }
+    }
+
+    /**
+     * Reset the header to it's maximum size.
+     */
+    public void resetHeader() {
+        if (getHeaderHeight() > mMaximumHeaderHeight) {
             final ObjectAnimator animator = ObjectAnimator.ofInt(this, "headerHeight",
                     mMaximumHeaderHeight);
             animator.setDuration(ExpandingEntryCardView.DURATION_EXPAND_ANIMATION_CHANGE_BOUNDS);
@@ -872,15 +863,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
             canvas.translate(transx, transy);
 
             canvas.rotate(180, width, 0);
-            if (mIsTwoPanel) {
-                // Only show the EdgeEffect on the bottom of the ScrollView.
-                mEdgeGlowBottom.setSize(mRecyclerView.getWidth(), height);
-                if (isLayoutRtl()) {
-                    canvas.translate(mPhotoViewContainer.getWidth(), 0);
-                }
-            } else {
-                mEdgeGlowBottom.setSize(width, height);
-            }
+            mEdgeGlowBottom.setSize(width, height);
             if (Build.VERSION.SDK_INT >= 16) {
                 if (mEdgeGlowBottom.draw(canvas)) {
                     postInvalidateOnAnimation();
@@ -910,18 +893,9 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
     }
 
     private int getMaximumScrollUpwards() {
-        if (!mIsTwoPanel) {
-            return mTransparentStartHeight
-                    // How much the Header view can compress
-                    + getMaximumScrollableHeaderHeight() - getFullyCompressedHeaderHeight()
-                    // How much the ScrollView can scroll. 0, if child is smaller than ScrollView.
-                    + Math.max(0, mScrollViewChild.getHeight() - getHeight()
-                    + getFullyCompressedHeaderHeight());
-        } else {
-            return mTransparentStartHeight
+        return mTransparentStartHeight
                     // How much the ScrollView can scroll. 0, if child is smaller than ScrollView.
                     + Math.max(0, mScrollViewChild.getHeight() - getHeight());
-        }
     }
 
     private int getTransparentViewHeight() {
@@ -1040,11 +1014,6 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
      * Set the header size and padding, based on the current scroll position.
      */
     private void updateHeaderTextSizeAndMargin() {
-        if (mIsTwoPanel) {
-            // The text size stays at a constant size & location in two panel layouts.
-            return;
-        }
-
         // The pivot point for scaling should be middle of the starting side.
         if (isLayoutRtl()) {
             mLargeTextView.setPivotX(mLargeTextView.getWidth());
@@ -1170,20 +1139,12 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
             Trace.beginSection("updatePhotoTintAndDropShadow");
         }
 
-        if (mIsTwoPanel && !isBasedOffLetterTile(mPhotoView)) {
-            // When in two panel mode, UX considers photo tinting unnecessary for non letter
-            // tile photos.
-            mTitleGradientDrawable.setAlpha(0xFF);
-            mActionBarGradientDrawable.setAlpha(0xFF);
-            return;
-        }
-
         // We need to use toolbarLayoutParams to determine the height, since the layout
         // params can be updated before the height change is reflected inside the View#getHeight().
         final int toolbarHeight = getToolbarHeight();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (toolbarHeight <= mMinimumHeaderHeight && !mIsTwoPanel) {
+            if (toolbarHeight <= mMinimumHeaderHeight) {
                 mPhotoViewContainer.setElevation(mToolbarElevation);
             } else {
                 mPhotoViewContainer.setElevation(0);
@@ -1198,13 +1159,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         // The value that "ratio" will have when the header is at its starting/intermediate size.
         final float intermediateRatio = calculateHeightRatio((int)
                 (mMaximumPortraitHeaderHeight * INTERMEDIATE_HEADER_HEIGHT_RATIO));
-        if (!mIsTwoPanel) {
-            ratio = calculateHeightRatio(toolbarHeight);
-        } else {
-            // We want the ratio and intermediateRatio to have the *approximate* values
-            // they would have in portrait mode when at the intermediate position.
-            ratio = intermediateRatio;
-        }
+        ratio = calculateHeightRatio(toolbarHeight);
 
         final float linearBeforeMiddle = Math.max(1 - (1 - ratio) / intermediateRatio, 0);
 
@@ -1386,7 +1341,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
         //mRecyclerView.suppressLayout(false); // FIXME
 
         final int newEmptyScrollViewSpace = -getOverflowingChildViewSize() + heightDelta;
-        if (newEmptyScrollViewSpace > 0 && !mIsTwoPanel) {
+        if (newEmptyScrollViewSpace > 0) {
             final int newDesiredToolbarHeight = Math.min(getToolbarHeight()
                     + newEmptyScrollViewSpace, getMaximumScrollableHeaderHeight());
             ObjectAnimator.ofInt(this, "toolbarHeight", newDesiredToolbarHeight).setDuration(

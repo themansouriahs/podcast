@@ -119,7 +119,7 @@ public class SubscriptionSettingsUtils {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSubscription.setDoSkipIntro(isChecked);
-                OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
+                OnSwitchChangedHandler(isChecked, contentResolver, mSkipIntroListener);
             }
         });
 
@@ -127,7 +127,7 @@ public class SubscriptionSettingsUtils {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSubscription.setDoNotifyOnNew(isChecked);
-                OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
+                OnSwitchChangedHandler(isChecked, contentResolver, mNotifyOnNewListener);
             }
         });
     }

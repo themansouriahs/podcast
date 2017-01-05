@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
 <FrameLayout
     android:id="@+id/feed_activity_settings_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:paddingTop="40dp"
     android:visibility="invisible">
