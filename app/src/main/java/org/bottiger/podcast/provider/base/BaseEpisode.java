@@ -1,6 +1,9 @@
 package org.bottiger.podcast.provider.base;
 
+import android.Manifest;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.events.EpisodeChanged;
@@ -8,8 +11,10 @@ import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.chapter.Chapter;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -90,6 +95,16 @@ public abstract class BaseEpisode implements IEpisode {
     public boolean hasBeenDownloadedOnce() {
         return false;
     }
+
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    public String getAbsolutePath(@NonNull Context argContext) throws IOException, SecurityException {
+        return SDCardManager.pathFromFilename(this, argContext);
+    }
+
+    public String getAbsoluteTmpPath(@NonNull Context argContext) throws IOException {
+        return SDCardManager.pathTmpFromFilename(argContext, this);
+    }
+
 
     public class SeekEvent {
 

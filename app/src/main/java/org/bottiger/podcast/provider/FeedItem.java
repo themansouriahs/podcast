@@ -459,15 +459,6 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}
 
-	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public String getAbsolutePath(@NonNull Context argContext) throws IOException, SecurityException {
-		return SDCardManager.pathFromFilename(this, argContext);
-	}
-
-	public String getAbsoluteTmpPath(@NonNull Context argContext) throws IOException {
-		return SDCardManager.pathTmpFromFilename(argContext, this);
-	}
-
 	@Nullable
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 	public Uri getFileLocation(@Location int argLocation, @NonNull Context argContext) throws SecurityException {

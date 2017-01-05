@@ -1,14 +1,18 @@
 package org.bottiger.podcast.provider;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 
+import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.chapter.Chapter;
 
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
@@ -62,6 +66,10 @@ public interface IEpisode extends IDbItem {
     void setProgress(double argProgress);
 
     boolean newerThan(IEpisode item);
+
+    @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    String getAbsolutePath(@NonNull Context argContext) throws IOException, SecurityException;
+    String getAbsoluteTmpPath(@NonNull Context argContext) throws IOException;
 
     @NonNull
     String getURL();

@@ -14,12 +14,15 @@ import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.NetworkUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -149,14 +152,17 @@ public class DownloadService extends IntentService {
             return;
         }
 
-        FeedItem feedItem = (FeedItem) episode.getEpisode();
+        IEpisode feedItem = episode.getEpisode();
 
         IDownloadEngine mEngine = NetworkUtils.newEngine(this, feedItem);
         mEngine.addCallback(mSoundWavesDownloadManager.getIDownloadEngineCallback());
 
         Log.d(TAG, "Start downloading: " + feedItem);
         mEngine.startDownload(sQueue.size() > 0);
-        mProgressPublisher.addEpisode(feedItem);
+
+        if (feedItem instanceof FeedItem) {
+            mProgressPublisher.addEpisode((FeedItem) feedItem);
+        }
     }
 
     @Nullable
@@ -169,12 +175,14 @@ public class DownloadService extends IntentService {
         boolean startedManually = argIntent.getBooleanExtra(PARAM_IN_MANUAL_START, false);
 
         IEpisode episode = null;
-        if (!TextUtils.isEmpty(url)) {
-            episode = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(url);
+        if (id > 0) {
+            episode = SoundWaves.getAppContext(this).getLibraryInstance().getEpisode(id);
         } else {
-            Log.wtf(TAG, "wtf");
-            VendorCrashReporter.report(TAG, "episode null");
-            return null;
+            try {
+                episode = new SlimEpisode("", new URL(url), "", null);
+            } catch (MalformedURLException e) {
+                return null;
+            }
         }
 
         if (episode == null) {

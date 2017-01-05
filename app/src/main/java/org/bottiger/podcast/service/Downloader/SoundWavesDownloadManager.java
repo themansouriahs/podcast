@@ -192,10 +192,6 @@ public class SoundWavesDownloadManager extends Observable {
 	private void addItemToQueue(IEpisode argEpisode, boolean startedManually, @QueuePosition int argPosition) {
         Log.d(TAG, "Adding item to queue: " + argEpisode);
 
-        if (!(argEpisode instanceof FeedItem)) {
-            return;
-        }
-
         if (argEpisode.isDownloaded(mContext))
             return;
 

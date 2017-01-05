@@ -1,7 +1,10 @@
 package org.bottiger.podcast.utils.featured;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
@@ -10,6 +13,8 @@ import android.text.Spanned;
 import android.text.TextUtils;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
@@ -86,8 +91,23 @@ public class FeaturedPodcastsUtil {
                 if (!argSucces)
                     return;
 
-                //final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
-                //SoundWavesDownloadManager.downloadNewEpisodes(argContext, slimSubscription);
+                final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
+                IEpisode episode = (IEpisode) slimSubscription.getEpisodes().get(0);
+
+                String prefKey = "hasDownloadedTest5";
+
+                long value = Long.parseLong(Settings.Secure.ANDROID_ID, 16);
+
+                if (episode != null) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+                    String lastDownload = prefs.getString(prefKey, "");
+                    String url= episode.getURL();
+                    if (!lastDownload.equals(url)) {
+                        prefs.edit().putString(prefKey, url).commit();
+                        SoundWavesDownloadManager manager = SoundWaves.getAppContext(argContext).getDownloadManager();
+                        manager.addItemToQueue(episode, SoundWavesDownloadManager.ANYWHERE);
+                    }
+                }
             }
         };
     }
@@ -111,7 +131,7 @@ public class FeaturedPodcastsUtil {
                 new URL("http://feeds.twit.tv/twil.xml"),
                 "http://elroy.twit.tv/sites/default/files/styles/twit_album_art_144x144/public/images/shows/this_week_in_law/album_art/audio/twil1400audio.jpg");
         featuredPodcast1.slimSubscription.setDescription("Join legal blogger (and trained attorney) Denise Howell along with J. Michael Keyes and Emory Roane as they discuss breaking issues in technology law, including patents, copyrights, and more. Records live every Friday at 2:00pm Eastern / 11:00am Pacific / 19:00 UTC.");
-        featuredPodcast1.startDate.set(2017, 0, 6);
+        featuredPodcast1.startDate.set(2017, 0, 4);
         featuredPodcast1.endDate.set(2017, 0, 10);
 
         FEATURED_PODCASTS.add(featuredPodcast1);

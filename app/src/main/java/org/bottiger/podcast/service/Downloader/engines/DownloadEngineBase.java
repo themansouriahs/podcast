@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.notification.ProgressNotification;
+import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.PreferenceHelper;
 
@@ -34,6 +35,11 @@ public abstract class DownloadEngineBase implements IDownloadEngine {
     }
 
     protected void setProgress(float argProgress) {
+
+        if (!(mEpisode instanceof FeedItem)) {
+            return;
+        }
+
         mProgress = argProgress;
         mEpisode.setProgress(argProgress);
         updatedNotification();

@@ -17,6 +17,8 @@ import android.support.v4.content.ContextCompat;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.SlimImplementations.SlimEpisode;
 
 import java.io.File;
 import java.io.IOException;
@@ -208,19 +210,33 @@ public class SDCardManager {
     }
 
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public static String pathFromFilename(FeedItem item, @NonNull Context argContext) throws IOException, SecurityException {
-		if (item.getFilename() == null || item.getFilename().equals("")) {
+	public static String pathFromFilename(IEpisode item, @NonNull Context argContext) throws IOException, SecurityException {
+
+        if (item instanceof SlimEpisode) {
+            return pathTmpFromFilename(argContext, "test");
+        }
+
+        FeedItem feedItem = (FeedItem) item;
+
+		if (feedItem.getFilename() == null || feedItem.getFilename().equals("")) {
 			return "";
 		} else {
-			return pathFromFilename(item.getFilename(), argContext);
+			return pathFromFilename(feedItem.getFilename(), argContext);
 		}
 	}
 	
-	public static String pathTmpFromFilename(@NonNull Context argContext, FeedItem item) throws IOException, SecurityException {
-		if (item.getFilename() == null || item.getFilename().equals("")) {
+	public static String pathTmpFromFilename(@NonNull Context argContext, IEpisode item) throws IOException, SecurityException {
+
+        if (item instanceof SlimEpisode) {
+            return pathTmpFromFilename(argContext, "test");
+        }
+
+        FeedItem feedItem = (FeedItem) item;
+
+        if (feedItem.getFilename() == null || feedItem.getFilename().equals("")) {
 			return "";
 		} else {
-			return pathTmpFromFilename(argContext, item.getFilename());
+			return pathTmpFromFilename(argContext, feedItem.getFilename());
 		}
 	}
 

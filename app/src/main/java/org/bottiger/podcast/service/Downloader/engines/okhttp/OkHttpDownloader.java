@@ -100,31 +100,27 @@ public class OkHttpDownloader extends DownloadEngineBase {
             return;
         }
 
-        if (!(mEpisode instanceof FeedItem)) {
-            Log.d(TAG, "Trying to download slim episode - abort");
-            onFailure(new IllegalArgumentException("Argument must be of type FeedItem"));
-            return;
-        }
+        boolean isFeedItem = mEpisode instanceof FeedItem;
 
-        FeedItem episode = (FeedItem) mEpisode;
+        FeedItem feedItem = isFeedItem ? (FeedItem)mEpisode : null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(mURL.toString());
         Log.d(TAG, "File extension: " + extension);
 
-        String filename = Integer.toString(episode.getEpisodeNumber()) + episode.getTitle().replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
-        episode.setFilename(filename + "." + extension);
+        String filename;
+        if (isFeedItem) {
+            filename = Integer.toString(feedItem.getEpisodeNumber()) + feedItem.getTitle().replace(' ', '_'); //Integer.toString(item.getEpisodeNumber()) + "_"
+            feedItem.setFilename(filename + "." + extension);
+        }
 
         File tmpFile;
         File finalFile;
         try {
-            tmpFile = new File(episode.getAbsoluteTmpPath(getContext()));
-            finalFile = new File(episode.getAbsolutePath(getContext()));
+            tmpFile = new File(mEpisode.getAbsoluteTmpPath(getContext()));
+            finalFile = new File(mEpisode.getAbsolutePath(getContext()));
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
-
-        //BufferedSource source = null;
-        //BufferedSink sink = null;
 
         try {
             Log.d(TAG, "startDownload");

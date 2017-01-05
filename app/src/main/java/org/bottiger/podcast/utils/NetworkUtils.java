@@ -12,6 +12,7 @@ import android.util.Log;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.engines.IDownloadEngine;
@@ -91,11 +92,16 @@ public class NetworkUtils {
 
         @SoundWavesDownloadManager.NetworkState int networkState = getNetworkStatus(argContext, true);
 
-        FeedItem downloadingItem;
+        IEpisode downloadingItem;
         try {
             argLock.lock();
 
-            downloadingItem = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisode(nextInQueue.getId());
+            if (nextInQueue.getId() > 0) {
+                downloadingItem = SoundWaves.getAppContext(argContext).getLibraryInstance().getEpisode(nextInQueue.getId());
+            } else {
+                // slim episode
+                downloadingItem = nextInQueue.getEpisode();
+            }
 
             if (downloadingItem == null)
                 return false;
@@ -118,7 +124,7 @@ public class NetworkUtils {
     }
 
     @WorkerThread
-    public static IDownloadEngine newEngine(@NonNull Context argContext, @NonNull FeedItem argEpisode) {
+    public static IDownloadEngine newEngine(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
         return new OkHttpDownloader(argContext, argEpisode);
     }
 }
