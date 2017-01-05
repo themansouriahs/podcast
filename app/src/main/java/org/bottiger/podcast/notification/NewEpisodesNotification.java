@@ -78,15 +78,15 @@ public class NewEpisodesNotification {
         int displayedEpisodes = Math.min(episodeCount, MAX_DISPLAYED_EPISODES);
         int notDisplayedEpisodes = episodeCount-displayedEpisodes;
 
+        for (int i = 0; i < displayedEpisodes; i++) {
+            Spanned spanned = getLine(mEpisodes.get(i), argContext);
+            inboxStyle.addLine(spanned);
+        }
+
         inboxStyle.setBigContentTitle(title);
         if (notDisplayedEpisodes > 0) {
             String summary = resources.getQuantityString(R.plurals.notification_new_episodes_summary, notDisplayedEpisodes, notDisplayedEpisodes);
             inboxStyle.setSummaryText(summary);
-        }
-
-        SpannableStringBuilder builder = new SpannableStringBuilder();
-        for (int i = 0; i < displayedEpisodes; i++) {
-            inboxStyle.addLine(getLine(builder, mEpisodes.get(i), argContext));
         }
 
         Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_sw);
@@ -150,10 +150,11 @@ public class NewEpisodesNotification {
                 R.bool.pref_new_episode_notification_default);
     }
 
-    private static Spanned getLine(@NonNull SpannableStringBuilder argSpannableStringBuilder, @NonNull IEpisode argEpisode, @NonNull Context argContext) {
+    private static Spanned getLine(@NonNull IEpisode argEpisode, @NonNull Context argContext) {
+        SpannableStringBuilder builder = new SpannableStringBuilder();
         String subscription = argEpisode.getSubscription(argContext).getTitle() + ":";
         String episode = " " + argEpisode.getTitle();
-        return StrUtils.getTextWithBoldPrefix(argSpannableStringBuilder, subscription, episode);
+        return StrUtils.getTextWithBoldPrefix(builder, subscription, episode);
     }
 
 }
