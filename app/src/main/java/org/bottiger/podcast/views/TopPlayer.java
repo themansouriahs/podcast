@@ -818,6 +818,10 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         return sizeLarge;
     }
 
+    public int getMinimumSize() {
+        return sizeSmall;
+    }
+
     private void setTextVIsibility(int argVisibility) {
         mTriangle.setVisibility(argVisibility);
         mExpandedActionsBar.setVisibility(argVisibility);

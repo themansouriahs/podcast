@@ -15,6 +15,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.PlayerHelper;
@@ -55,6 +56,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.NestedScrollingChildHelper;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -68,6 +70,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -355,11 +358,12 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                  if (mTopPlayer != null) {
                      shouldBeFullscreen = !mTopPlayer.isFullscreen();
                      mTopPlayer.setFullscreen(shouldBeFullscreen, true);
+
+                     if (!shouldBeFullscreen) {
+                         inflatePlaylist(mPlaylistFragmentContainer, mTopPlayer);
+                     }
                  }
 
-                 if (!shouldBeFullscreen) {
-                     inflatePlaylist(mPlaylistFragmentContainer);
-                 }
                  getActivity().invalidateOptionsMenu();
                  return true;
              }
@@ -374,19 +378,26 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         setPlaylistViewState(mPlaylist);
 
         if (showTopPlayer(mPlaylist)) {
+            View container = getView();
+
+            if (container == null) {
+                VendorCrashReporter.report("Container", "is null");
+                return;
+            }
+
             if (mTopPlayerStub != null) {
-                inflateTopPlayer(getView());
+                inflateTopPlayer(container);
             }
 
             bindHeaderWrapper(mPlaylist);
-        }
 
-        if (showPlaylist(mPlaylist)) {
-            if (mRecyclerStub != null) {
-                inflatePlaylist(getView());
+            if (showPlaylist(mPlaylist)) {
+                if (mRecyclerStub != null) {
+                    inflatePlaylist(container, mTopPlayer);
+                }
+
+                mAdapter.notifyDataSetChanged();
             }
-
-            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -412,10 +423,11 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         if (mTopPlayerStub == null)
             return;
 
-        mTopPlayer = (TopPlayer) mTopPlayerStub.inflate();
-        mPhoto =            (ImageView) view.findViewById(R.id.session_photo);
+        mTopPlayer  = (TopPlayer) mTopPlayerStub.inflate();
+        mPhoto      = (ImageView) view.findViewById(R.id.session_photo);
 
         assert mTopPlayer != null;
+
         mTopPlayer.setOverlay(mOverlay);
 
         bindHeaderWrapper(mPlaylist);
@@ -427,7 +439,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         }
     }
 
-    private synchronized void inflatePlaylist(@NonNull View view) {
+    private synchronized void inflatePlaylist(@NonNull View argView, @NonNull TopPlayer argTopPlayer) {
 
         if (mRecyclerStub == null)
             return;
@@ -436,9 +448,10 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
         // use a linear layout manager
         mLayoutManager = new CustomLinearLayoutManager(mContext);
+        mLayoutManager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.setPadding(0, 0, 0, UIUtils.NavigationBarHeight(getContext()));
+        mRecyclerView.setPadding(0,0,0,mTopPlayer.getMinimumSize());
 
         // specify an adapter (see also next example)
         mAdapter = new PlaylistAdapter(getActivity(), mOverlay);
@@ -447,7 +460,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         mRecyclerView.setAdapter(mAdapter);
 
         // init swipe to dismiss logic
-        ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(view);
+        ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(argView);
         swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
 
         mRecyclerStub = null;
