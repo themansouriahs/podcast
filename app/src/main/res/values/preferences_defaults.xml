@@ -10,6 +10,7 @@
     <bool name="pref_show_listened_default">false</bool>
     <bool name="pref_download_only_when_charging_default">false</bool>
     <bool name="pref_download_notification_default">false</bool>
+    <bool name="pref_driving_mode_default">false</bool>
     <bool name="pref_new_episode_notification_default">false</bool>
     <string name="pref_theme_default">1</string>
     <integer name="gpodder_last_sync_default">0</integer>

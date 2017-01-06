@@ -1,0 +1,127 @@
+<android.support.percent.PercentRelativeLayout
+    android:id="@+id/scene_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/player_title"
+        android:hint="Episode Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="42sp"
+        android:textColor="?attr/themeTextColorPrimary"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        />
+
+    <org.bottiger.podcast.views.PlayerSeekbar
+        android:id="@+id/top_player_seekbar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_below="@id/player_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:paddingLeft="@dimen/top_player_margin"
+        android:paddingRight="@dimen/top_player_margin"
+        android:paddingTop="18dp"
+        android:maxHeight="2dp"
+        android:progress="30" />
+
+
+    <org.bottiger.podcast.views.PlayPauseImageView
+        android:id="@+id/playpause"
+        app:layout_widthPercent="25%"
+        android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clipToPadding="false"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/top_player_seekbar"
+        android:elevation="2dp"
+        />
+
+    <net.steamcrafted.materialiconlib.MaterialIconView
+        android:id="@+id/top_player_rewind"
+        app:layout_widthPercent="50%"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_weight="0.7"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="center"
+        app:materialIcon="undo"
+        app:materialIconColor="?attr/icon_fill_color"
+        app:materialIconSize="50dp"
+        android:layout_alignTop="@id/playpause"
+        android:layout_alignBottom="@id/playpause"
+        android:layout_toLeftOf="@id/playpause" />
+
+    <net.steamcrafted.materialiconlib.MaterialIconView
+        android:id="@+id/top_player_fastforward"
+        app:layout_widthPercent="50%"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_weight="0.7"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="center"
+        app:materialIcon="redo"
+        app:materialIconColor="?attr/icon_fill_color"
+        app:materialIconSize="50dp"
+        android:layout_alignTop="@id/playpause"
+        android:layout_alignBottom="@id/playpause"
+        android:layout_toRightOf="@id/playpause" />
+
+    <org.bottiger.podcast.views.TextViewObserver
+        android:id="@+id/current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/themeTextColorPrimary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_below="@id/top_player_seekbar"
+        android:layout_alignLeft="@id/top_player_seekbar"
+        android:layout_alignBottom="@id/top_player_fastforward"
+        android:paddingLeft="35dp"/>
+
+    <TextView
+        android:id="@+id/total_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/themeTextColorPrimary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_below="@id/top_player_seekbar"
+        android:layout_alignRight="@id/top_player_seekbar"
+        android:layout_alignBottom="@id/top_player_fastforward"
+        android:paddingRight="35dp"
+        android:layout_alignParentRight="true"/>
+
+    <org.bottiger.podcast.views.SquareImageView
+        android:id="@+id/session_photo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:scaleType="fitCenter"
+        android:layout_below="@id/playpause"
+        android:layout_above="@id/playlist_up_arrow"
+        />
+
+    <ImageView
+        android:id="@+id/playlist_up_arrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_playlist_up_arrow"
+        android:paddingLeft="100dp"
+        android:paddingRight="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/playlist_up_arrow_description" />
+
+</android.support.percent.PercentRelativeLayout>

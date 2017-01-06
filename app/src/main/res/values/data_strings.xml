@@ -48,6 +48,7 @@
     <string name="pref_store_on_sdcard_key" translatable="false">pref_store_on_sdcard</string>
     <string name="pref_download_notification_key" translatable="false">pref_download_notification</string>
     <string name="pref_new_episode_notification_key" translatable="false">pref_new_episode_notification</string>
+    <string name="pref_driving_mode_key" translatable="false">pref_driving_mode</string>
 
 
 </resources>

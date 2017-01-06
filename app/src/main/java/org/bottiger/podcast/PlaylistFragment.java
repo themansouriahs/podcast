@@ -1,66 +1,36 @@
 package org.bottiger.podcast;
 
 import org.bottiger.podcast.adapters.PlaylistAdapter;
+import org.bottiger.podcast.flavors.Activities.Constants;
+import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.listeners.NewPlayerEvent;
-import org.bottiger.podcast.listeners.PaletteListener;
-import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.player.SoundWavesPlayer;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.base.BaseSubscription;
-import org.bottiger.podcast.utils.ColorExtractor;
-import org.bottiger.podcast.utils.ErrorUtils;
-import org.bottiger.podcast.utils.ImageLoaderUtils;
-import org.bottiger.podcast.utils.PaletteHelper;
-import org.bottiger.podcast.utils.PlayerHelper;
-import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.utils.chapter.Chapter;
-import org.bottiger.podcast.utils.chapter.ChapterReader;
-import org.bottiger.podcast.utils.id3reader.ID3ReaderException;
 import org.bottiger.podcast.views.CustomLinearLayoutManager;
-import org.bottiger.podcast.views.DownloadButtonView;
-import org.bottiger.podcast.views.ImageViewTinted;
 import org.bottiger.podcast.views.Overlay;
-import org.bottiger.podcast.views.PlayPauseImageView;
-import org.bottiger.podcast.views.PlayerSeekbar;
 import org.bottiger.podcast.views.PlaylistViewHolder;
-import org.bottiger.podcast.views.TextViewObserver;
 import org.bottiger.podcast.views.TopPlayer;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.NestedScrollingChildHelper;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -70,20 +40,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.github.ivbaranov.mfb.MaterialFavoriteButton;
-
+import io.reactivex.functions.Consumer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
-
-import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
 public class PlaylistFragment extends AbstractEpisodeFragment {
 
@@ -127,6 +90,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     private Subscription mRxPlaylistSubscription;
 
     private NestedScrollingChildHelper scrollingChildHelper;
+
+    private VendorActivityTracker mActivityTracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -216,6 +181,19 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     public void onAttach(Context context) {
         mContext = context;
         super.onAttach(context);
+
+        mActivityTracker = new VendorActivityTracker(context);
+        mActivityTracker.getActivityes().subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                @Constants.Activities int activity = integer;
+                Log.i(TAG, "activity: " + integer);
+
+                if (mTopPlayer != null) {
+                    mTopPlayer.setPlayerType(activity);
+                }
+            }
+        });
     }
 
     @Override
@@ -233,16 +211,19 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         super.onStart();
 
         Log.d(TAG, "mRxPlaylistSubscription isUnsubscribed: " + mRxPlaylistSubscription.isUnsubscribed());
+        mActivityTracker.start();
     }
 
     @Override
     public void onStop() {
         Log.d(TAG, "onStop");
+        mActivityTracker.stop();
         super.onStop();
     }
 
     @Override
     public void onPause() {
+        mActivityTracker.pause();
         Log.d(TAG, "onPause");
         super.onPause();
     }
@@ -261,6 +242,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         }
 
         super.onResume();
+        mActivityTracker.resume();
     }
 
 
@@ -353,6 +335,14 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
                  dialogPlaylistFilters.show(getFragmentManager(), getTag());
                  return true;
              }
+             /*
+             case R.id.action_driving: {
+                 if (mTopPlayer != null) {
+                    mTopPlayer.togglePlayerType();
+                 }
+                 return true;
+             }
+             */
              case R.id.action_fullscreen_player: {
                  boolean shouldBeFullscreen = false;
                  if (mTopPlayer != null) {

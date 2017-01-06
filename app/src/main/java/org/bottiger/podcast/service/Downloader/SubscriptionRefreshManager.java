@@ -159,6 +159,7 @@ public class SubscriptionRefreshManager {
     }
 
     private int addAllSubscriptionsToQueue(@NonNull Context argContext, @Nullable IDownloadCompleteCallback argCallback) {
+
         Log.d(TAG, "addAllSubscriptionsToQueue");
 
         int subscriptionsAdded = 0;

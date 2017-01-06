@@ -34,6 +34,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -45,6 +46,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +56,8 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import org.bottiger.podcast.PlaylistFragment;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlayerChapterAdapter;
+import org.bottiger.podcast.flavors.Activities.Constants;
+import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.model.events.EpisodeChanged;
@@ -80,12 +84,14 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
 
+import io.reactivex.functions.Consumer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import static org.bottiger.podcast.flavors.Activities.Constants.OTHER;
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 
 /**
@@ -115,6 +121,10 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
     private int mControlHeight = -1;
 
+    private Scene mPrimaryScene;
+    private Scene mDrivingScene;
+    private @Constants.Activities int mCurrentActivity = OTHER;
+
     private float screenHeight;
 
     private String mDoFullscreentKey;
@@ -129,6 +139,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
     private TopPlayer mMainLayout;
     private ViewGroup mControls;
+    @Nullable private View mDrivingLayout = null;
 
     @Nullable private TextView mEpisodeTitle;
     @Nullable private TextView mEpisodeInfo;
@@ -139,6 +150,8 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     @Nullable private DownloadButtonView mPlayerDownloadButton;
     @Nullable private MaterialFavoriteButton mFavoriteButton;
     @Nullable private ImageView mPlaylistUpArrow;
+    @Nullable private View mTriangle;
+    @Nullable private ImageView mPhoto;
 
     @Nullable private ViewStub mMoreButtonsStub;
     @Nullable private LinearLayout mExpandedActionsBar;
@@ -147,11 +160,20 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     @Nullable private ImageView mChapterButton;
     @Nullable private Button mSpeedButton;
 
+    @Nullable private TextView mDrivingTitle;
+    @Nullable private PlayerSeekbar mDrivingSeekbar;
+    @Nullable private TextViewObserver mDrivingCurrentTime;
+    @Nullable private TextView mDrivingTotalTime;
+    @Nullable private PlayPauseImageView mDrivingPlayPause;
+    @Nullable private ImageView mDrivingFastForward;
+    @Nullable private ImageView mDrivingReverse;
+    @Nullable private ImageView mDrivingPhoto;
+
     @NonNull private GenericMediaPlayerInterface mPlayer;
 
-    private ImageView mFastForwardButton;
-    private ImageView mRewindButton;
-    private ImageButton mMoreButton;
+    @Nullable private ImageView mFastForwardButton;
+    @Nullable private ImageView mRewindButton;
+    @Nullable private ImageButton mMoreButton;
 
     @Nullable private Overlay mOverlay;
 
@@ -160,10 +182,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
     @Nullable private CountDownTimer mCountDownTimer;
     private long mCountDownTimeLeft = TIMER_NOT_SET;
-
-    private View mTriangle;
-
-    private ImageView mPhoto;
 
     private boolean mPlaylistEmpty = true;
 
@@ -215,9 +233,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         scrollingChildHelper.setNestedScrollingEnabled(true);
 
         mRxPlayerChanged = getPlayerSubscription();
-
         mGestureDetector = new GestureDetectorCompat(argContext,mTopPLayerScrollGestureListener);
-
         mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
 
         mViewConfiguration = ViewConfiguration.get(argContext);
@@ -309,11 +325,17 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         mMainLayout = this;
         mControls = (ViewGroup) findViewById(R.id.top_player_controls);
 
+        ViewGroup sceneRoot = mControls;
+        ViewGroup sceneLayout = (ViewGroup) findViewById(R.id.scene_layout);
+
+        mPrimaryScene = new Scene(sceneRoot, sceneLayout);
+        //mDrivingScene = Scene.getSceneForLayout(sceneRoot, R.layout.playlist_top_player_driving, getContext());
+
         getPlayerControlHeight(mControls);
 
         mEpisodeTitle           =    (TextView) findViewById(R.id.player_title);
         mEpisodeInfo            =    (TextView) findViewById(R.id.player_podcast);
-        mFavoriteButton         = (MaterialFavoriteButton) findViewById(R.id.favorite);
+        mFavoriteButton         =    (MaterialFavoriteButton) findViewById(R.id.favorite);
 
         mCurrentTime            =    (TextViewObserver) findViewById(R.id.current_time);
         mTotalTime              =    (TextView) findViewById(R.id.total_time);
@@ -462,8 +484,8 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     public void bind(@Nullable final IEpisode argEpisode) {
 
         // FIXME remove
-        if (mCurrentEpisode == argEpisode)
-            return;
+        //if (mCurrentEpisode == argEpisode)
+        //    return;
 
         mCurrentEpisode = argEpisode;
 
@@ -479,33 +501,21 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         final String title = StrUtils.formatTitle(argEpisode.getTitle());
         final String description = argEpisode.getDescription();
-
-        mEpisodeTitle.setText(title);
-        mEpisodeInfo.setText(description.trim());
-
+        final int colorText = UIUtils.attrColor(R.attr.themeTextColorPrimary, mContext);
         View.OnClickListener onClickListener = getToast(title, description);
-        mEpisodeTitle.setOnClickListener(onClickListener);
-        mEpisodeInfo.setOnClickListener(onClickListener);
+        SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
+
+        bindTitle(mEpisodeTitle, title, onClickListener, colorText);
+        bindTitle(mEpisodeInfo, description.trim(), onClickListener, colorText);
+        bindDuration(mTotalTime, argEpisode);
+        setPlayerProgress(mCurrentTime, argEpisode);
+        bindPlayPauseButton(mPlayPauseButton, argEpisode);
+        bindSeekButton(mRewindButton, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.BACKWARDS);
+        bindSeekButton(mFastForwardButton, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.FORWARD);
 
         if (argEpisode instanceof FeedItem) {
             mFavoriteButton.setFavorite(((FeedItem) argEpisode).isFavorite());
         }
-
-        final int colorText = UIUtils.attrColor(R.attr.themeTextColorPrimary, mContext);
-        mEpisodeTitle.setTextColor(colorText);
-        mEpisodeInfo.setTextColor(colorText);
-
-        long duration = argEpisode.getDuration();
-        if (duration > 0) {
-            mTotalTime.setText(StrUtils.formatTime(duration));
-        } else {
-            PlayerHelper.setDuration(argEpisode, mTotalTime);
-        }
-
-        setPlayerProgress(argEpisode);
-
-        mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
-        mPlayPauseButton.setStatus(STATE_READY);
 
         ISubscription iSubscription = argEpisode.getSubscription(getContext());
         if (mPlayer.isPlaying()) {
@@ -515,9 +525,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             setPlaybackSpeedView(subscription.getPlaybackSpeed());
         }
 
-        mPlayerSeekbar.setEpisode(argEpisode);
-        mPlayerSeekbar.setOverlay(mOverlay);
-        mPlayerSeekbar.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        bindSeekbar(mPlayerSeekbar, argEpisode, mOverlay);
 
         if (mPlayerDownloadButton != null) {
             mPlayerDownloadButton.setEpisode(argEpisode);
@@ -562,17 +570,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         Log.v("MissingImage", "Setting image");
         ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
 
-        SoundWaves soundwaves = SoundWaves.getAppContext(getContext());
-
-        mRewindButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
-                argEpisode,
-                OnTouchSeekListener.BACKWARDS,
-                mOverlay));
-        mFastForwardButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(soundwaves,
-                argEpisode,
-                OnTouchSeekListener.FORWARD,
-                mOverlay));
-
         float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
         setPlaybackSpeedView(speed);
 
@@ -601,6 +598,64 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
                         postInvalidate();
                     }
                 });
+
+
+        // Bind the car view
+        if (mDrivingLayout != null) {
+            assert mDrivingTitle != null;
+            assert mDrivingSeekbar != null;
+            assert mDrivingCurrentTime != null;
+            assert mDrivingTotalTime != null;
+            assert mDrivingPlayPause != null;
+            assert mDrivingFastForward != null;
+            assert mDrivingReverse != null;
+            assert mDrivingPhoto != null;
+
+            bindTitle(mDrivingTitle, title, onClickListener, colorText);
+            bindSeekbar(mDrivingSeekbar, argEpisode, mOverlay);
+            setPlayerProgress(mDrivingCurrentTime, argEpisode);
+            bindDuration(mDrivingTotalTime, argEpisode);
+            bindPlayPauseButton(mDrivingPlayPause, argEpisode);
+            bindSeekButton(mDrivingReverse, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.BACKWARDS);
+            bindSeekButton(mDrivingFastForward, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.FORWARD);
+            ImageLoaderUtils.loadImageInto(mDrivingPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
+        }
+    }
+
+    public void togglePlayerType() {
+        setPlayerType(mCurrentActivity == Constants.IN_VEHICLE ? OTHER : Constants.IN_VEHICLE);
+    }
+
+    public void setPlayerType(@Constants.Activities int argActivity) {
+        if (mCurrentActivity == argActivity) {
+            return;
+        }
+
+        mCurrentActivity = argActivity;
+
+
+        if (mDrivingScene == null) {
+            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
+                    (Context.LAYOUT_INFLATER_SERVICE);
+            mDrivingLayout = inflater.inflate(R.layout.playlist_top_player_driving,
+                    mControls, false);
+
+            mDrivingTitle = (TextView) mDrivingLayout.findViewById(R.id.player_title);
+            mDrivingSeekbar = (PlayerSeekbar) mDrivingLayout.findViewById(R.id.top_player_seekbar);
+            mDrivingCurrentTime = (TextViewObserver) mDrivingLayout.findViewById(R.id.current_time);
+            mDrivingTotalTime = (TextView) mDrivingLayout.findViewById(R.id.total_time);
+            mDrivingPlayPause = (PlayPauseImageView) mDrivingLayout.findViewById(R.id.playpause);
+            mDrivingFastForward = (ImageView) mDrivingLayout.findViewById(R.id.top_player_fastforward);
+            mDrivingReverse = (ImageView) mDrivingLayout.findViewById(R.id.top_player_rewind);
+            mDrivingPhoto = (ImageView) mDrivingLayout.findViewById(R.id.session_photo);
+
+            bind(mCurrentEpisode);
+
+            mDrivingScene = new Scene(mControls, mDrivingLayout);
+        }
+
+        Scene newScene = mCurrentActivity == Constants.IN_VEHICLE ? mDrivingScene : mPrimaryScene;
+        TransitionManager.go(newScene);
     }
 
     private void openTimePicker() {
@@ -1076,14 +1131,14 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
     }
 
-    private void setPlayerProgress(@NonNull IEpisode argEpisode) {
+    private static void setPlayerProgress(@NonNull TextViewObserver argCurrentTime, @NonNull IEpisode argEpisode) {
         long offset = argEpisode.getOffset();
         if (offset > 0) {
-            mCurrentTime.setText(StrUtils.formatTime(offset));
+            argCurrentTime.setText(StrUtils.formatTime(offset));
         } else {
-            mCurrentTime.setText("00:00");
+            argCurrentTime.setText("00:00");
         }
-        mCurrentTime.setEpisode(argEpisode);
+        argCurrentTime.setEpisode(argEpisode);
     }
 
     private void setPlayer() {
@@ -1102,6 +1157,53 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             mPlayer.removeListener(mCurrentTime);
             mPlayer.removeListener(mPlayPauseButton);
         }
+    }
+
+    private static void bindSeekButton(@NonNull ImageView argSeekButton,
+                                       @NonNull IEpisode argEpisode,
+                                       @NonNull SoundWaves argApp,
+                                       @NonNull Overlay argOverlay,
+                                       @OnTouchSeekListener.Direction int argDirection) {
+        argSeekButton.setOnTouchListener(OnTouchSeekListener.getSeekListener(argApp,
+                argEpisode,
+                argDirection,
+                argOverlay));
+    }
+
+    private static void bindPlayPauseButton(@Nullable PlayPauseImageView argPlayPauseImageView, @NonNull IEpisode argEpisode) {
+        argPlayPauseImageView.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
+        argPlayPauseImageView.setStatus(STATE_READY);
+    }
+
+    private static void bindDuration(@Nullable TextView argDurationView, @NonNull IEpisode argEpisode) {
+        if (argDurationView == null) {
+            return;
+        }
+
+        long duration = argEpisode.getDuration();
+        if (duration > 0) {
+            argDurationView.setText(StrUtils.formatTime(duration));
+        } else {
+            PlayerHelper.setDuration(argEpisode, argDurationView);
+        }
+    }
+
+    private static void bindTitle(@Nullable TextView argTitleView,
+                                  @NonNull String argTitle,
+                                  @NonNull View.OnClickListener argOnClickListener,
+                                  @NonNull @ColorInt int argColor) {
+        if (argTitleView == null)
+            return;
+
+        argTitleView.setText(argTitle);
+        argTitleView.setOnClickListener(argOnClickListener);
+        argTitleView.setTextColor(argColor);
+    }
+
+    private static void bindSeekbar(@NonNull PlayerSeekbar argSeekbar, @NonNull IEpisode argEpisode, @NonNull Overlay argOverlay) {
+        argSeekbar.setEpisode(argEpisode);
+        argSeekbar.setOverlay(argOverlay);
+        argSeekbar.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
     }
 
     private Subscription getPlayerSubscription() {

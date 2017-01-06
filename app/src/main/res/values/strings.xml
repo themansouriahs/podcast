@@ -317,6 +317,8 @@
 
     <!-- Used in the context: "Featured: <Podcats Title>"-->
     <string name="featured_prefix">Featured:</string>
+    <string name="pref_driving_mode_title">Driving mode</string>
+    <string name="pref_driving_mode_description">Enlarge the player UI when driving</string>
 
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>

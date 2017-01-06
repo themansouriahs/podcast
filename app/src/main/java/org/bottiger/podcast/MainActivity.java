@@ -19,11 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 import org.bottiger.podcast.activities.intro.Intro;
 import org.bottiger.podcast.debug.SqliteCopy;
+import org.bottiger.podcast.flavors.Activities.Constants;
+import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
@@ -34,9 +34,14 @@ import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
 import org.bottiger.podcast.webservices.datastore.webplayer.WebPlayerAuthenticator;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+
+import io.reactivex.functions.Consumer;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity {
@@ -101,7 +106,16 @@ public class MainActivity extends FragmentContainerActivity {
 		//if (Build.VERSION.SDK_INT >= 23) {
 		//	CloudSyncUtils.startCloudSync(this);
 		//}
+	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
 	}
 
 	@Override

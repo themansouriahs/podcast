@@ -326,6 +326,13 @@
             android:title="@string/pref_advanced_category_experimental"
             android:key="@string/pref_advanced_category_experimental_key">
 
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_driving_mode_default"
+                android:key="@string/pref_driving_mode_key"
+                android:title="@string/pref_driving_mode_title"
+                android:summary="@string/pref_driving_mode_description"
+                />
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_screen_rotation_key"
