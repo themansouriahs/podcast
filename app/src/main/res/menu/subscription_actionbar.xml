@@ -32,6 +32,8 @@
             android:title="@string/menu_subscriptions_order_updated" />
         <item android:id="@+id/menu_order_new_count"
             android:title="@string/menu_subscriptions_order_new_count" />
+        <item android:id="@+id/menu_order_score"
+            android:title="@string/menu_subscriptions_order_rating" />
 
         </group>
     </menu>

@@ -30,6 +30,7 @@ import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.ItemColumns;
+import org.bottiger.podcast.provider.PersistedSubscription;
 import org.bottiger.podcast.provider.PodcastOpenHelper;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
@@ -72,7 +73,8 @@ public class Library {
     private static final int BACKPREASURE_BUFFER_SIZE = 10000;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({DATE_NEW_FIRST, DATE_OLD_FIRST, NOT_SET, ALPHABETICALLY, ALPHABETICALLY_REVERSE, LAST_UPDATE, NEW_EPISODES})
+    @IntDef({DATE_NEW_FIRST, DATE_OLD_FIRST, NOT_SET, ALPHABETICALLY,
+            ALPHABETICALLY_REVERSE, LAST_UPDATE, NEW_EPISODES, SCORE})
     public @interface SortOrder {}
     public static final int DATE_NEW_FIRST         = 0;
     public static final int DATE_OLD_FIRST         = 1;
@@ -81,6 +83,7 @@ public class Library {
     public static final int ALPHABETICALLY_REVERSE = 4;
     public static final int LAST_UPDATE            = 5;
     public static final int NEW_EPISODES           = 6;
+    public static final int SCORE                  = 7;
 
     @NonNull private Context mContext;
     @NonNull private LibraryPersistency mLibraryPersistency;
@@ -991,6 +994,14 @@ public class Library {
 
                 return order;
             }
+            case SCORE: {
+                int order = compareNewScore(s2, s1); // largest first
+                if (order == 0) {
+                    return compareTitle(s1, s2);
+                }
+
+                return order;
+            }
             case ALPHABETICALLY:
             case NOT_SET:
             case DATE_OLD_FIRST:
@@ -1006,6 +1017,13 @@ public class Library {
     private static int compareDates(@Nullable ISubscription s1, @Nullable ISubscription s2) {
         Long episode1 = s1 != null ? s1.getLastUpdate() : 0;
         Long episode2 = s2 != null ? s2.getLastUpdate() : 0;
+
+        return episode1.compareTo(episode2);
+    }
+
+    private static int compareNewScore(@Nullable ISubscription s1, @Nullable ISubscription s2) {
+        Integer episode1 = s1 instanceof PersistedSubscription ? ((PersistedSubscription)s1).getScore() : 0;
+        Integer episode2 = s2 instanceof PersistedSubscription ? ((PersistedSubscription)s2).getScore() : 0;
 
         return episode1.compareTo(episode2);
     }

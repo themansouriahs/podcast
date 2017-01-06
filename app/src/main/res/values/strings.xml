@@ -319,6 +319,7 @@
     <string name="featured_prefix">Featured:</string>
     <string name="pref_driving_mode_title">Driving mode</string>
     <string name="pref_driving_mode_description">Enlarge the player UI when driving</string>
+    <string name="menu_subscriptions_order_rating">Popularity</string>
 
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>

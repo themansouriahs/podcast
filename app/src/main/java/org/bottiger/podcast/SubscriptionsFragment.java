@@ -276,6 +276,10 @@ public class SubscriptionsFragment extends Fragment {
                 idres = R.id.menu_order_new_count;
                 break;
             }
+            case Library.SCORE: {
+                idres = R.id.menu_order_score;
+                break;
+            }
             default: {
                 idres = R.id.menu_order_alphabetically;
             }
@@ -313,6 +317,10 @@ public class SubscriptionsFragment extends Fragment {
             }
             case R.id.menu_order_new_count: {
                 setSortOrder(item, Library.NEW_EPISODES);
+                break;
+            }
+            case R.id.menu_order_score: {
+                setSortOrder(item, Library.SCORE);
                 break;
             }
 
