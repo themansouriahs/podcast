@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
@@ -26,11 +25,9 @@ import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchResult;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.Flowable;
@@ -41,7 +38,6 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

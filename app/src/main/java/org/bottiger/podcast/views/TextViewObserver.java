@@ -16,7 +16,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.StrUtils;
 

@@ -2,32 +2,21 @@ package org.bottiger.podcast.utils;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Path;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
-import android.support.v4.util.LongSparseArray;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.util.SortedList;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.parser.opml.OpmlElement;
 import org.bottiger.podcast.parser.opml.OpmlReader;
 import org.bottiger.podcast.parser.opml.OpmlWriter;
 import org.bottiger.podcast.provider.DatabaseHelper;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.xmlpull.v1.XmlPullParserException;
@@ -35,19 +24,14 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import static android.location.Location.convert;
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 public class OPMLImportExport {
 

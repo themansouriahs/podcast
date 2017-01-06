@@ -30,7 +30,6 @@ import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.PlayerHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
-import org.bottiger.podcast.utils.UIUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

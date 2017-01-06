@@ -1,6 +1,5 @@
 package org.bottiger.podcast.views;
 
-import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +28,6 @@ import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -46,25 +44,20 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
-import org.bottiger.podcast.PlaylistFragment;
+import org.bottiger.podcast.MainActivity;
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.adapters.PlayerChapterAdapter;
 import org.bottiger.podcast.flavors.Activities.Constants;
-import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-
-import org.bottiger.podcast.MainActivity;
-import org.bottiger.podcast.R;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -84,7 +77,6 @@ import org.bottiger.podcast.views.dialogs.DialogPlaybackSpeed;
 
 import java.util.Calendar;
 
-import io.reactivex.functions.Consumer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;

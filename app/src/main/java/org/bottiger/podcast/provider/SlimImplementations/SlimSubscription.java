@@ -3,7 +3,6 @@ package org.bottiger.podcast.provider.SlimImplementations;
 import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
@@ -12,7 +11,6 @@ import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.base.BasePodcastSubscription;
-import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.provider.converter.EpisodeConverter;
 
 import java.net.MalformedURLException;

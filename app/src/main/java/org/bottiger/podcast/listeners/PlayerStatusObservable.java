@@ -1,7 +1,6 @@
 package org.bottiger.podcast.listeners;
 
 
-import android.content.ContentResolver;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.IntDef;
@@ -15,8 +14,6 @@ import org.bottiger.podcast.service.PlayerService;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
-
-import io.reactivex.processors.PublishProcessor;
 
 public class PlayerStatusObservable {
 

@@ -12,7 +12,6 @@ import android.util.Log;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.notification.NewEpisodesNotification;
 import org.bottiger.podcast.parser.FeedParser;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -23,13 +22,11 @@ import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
-import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;

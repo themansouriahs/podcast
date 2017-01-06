@@ -7,8 +7,6 @@ import android.support.annotation.RequiresPermission;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.events.EpisodeChanged;
-import org.bottiger.podcast.player.SoundWavesPlayerBase;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.SDCardManager;

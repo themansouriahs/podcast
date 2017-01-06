@@ -2,8 +2,6 @@ package org.bottiger.podcast.listeners;
 
 import android.support.v7.graphics.Palette;
 
-import org.bottiger.podcast.provider.IDbItem;
-
 /**
  * Created by apl on 05-08-2014.
  */

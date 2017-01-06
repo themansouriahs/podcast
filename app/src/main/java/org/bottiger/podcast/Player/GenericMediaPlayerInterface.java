@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import com.google.android.exoplayer2.ExoPlayer;
 
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 

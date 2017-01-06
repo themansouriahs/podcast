@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.PreloadTarget;
 
 import org.bottiger.podcast.provider.PersistedSubscription;

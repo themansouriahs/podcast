@@ -1,7 +1,6 @@
 package org.bottiger.podcast.cloud;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;

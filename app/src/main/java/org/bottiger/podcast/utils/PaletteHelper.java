@@ -8,27 +8,21 @@ import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.util.LruCache;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
-import org.reactivestreams.Subscription;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.processors.PublishProcessor;
-import io.reactivex.processors.ReplayProcessor;
 import io.reactivex.schedulers.Schedulers;
 
 /**

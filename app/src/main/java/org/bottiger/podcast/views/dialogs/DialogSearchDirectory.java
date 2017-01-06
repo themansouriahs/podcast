@@ -1,6 +1,5 @@
 package org.bottiger.podcast.views.dialogs;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -14,8 +13,6 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
 
 /**
  * Created by apl on 26-04-2015.

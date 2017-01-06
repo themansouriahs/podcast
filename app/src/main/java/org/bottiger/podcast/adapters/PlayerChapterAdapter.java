@@ -14,7 +14,6 @@ import org.bottiger.podcast.adapters.viewholders.PlayerChapterViewHolder;
 import org.bottiger.podcast.utils.chapter.Chapter;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by aplb on 24-11-2016.

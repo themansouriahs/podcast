@@ -5,7 +5,6 @@ import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.view.Menu;
 
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 
 /**

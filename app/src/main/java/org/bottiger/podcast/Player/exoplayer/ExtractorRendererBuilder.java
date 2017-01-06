@@ -17,27 +17,18 @@ package org.bottiger.podcast.player.exoplayer;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.Extractor;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.text.TextRenderer;
-import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DataSpec;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
-import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Predicate;
-import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 
 import org.bottiger.podcast.utils.HttpUtils;
 

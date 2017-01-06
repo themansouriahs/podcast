@@ -10,13 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.SpannedString;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.StyleSpan;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.FragmentContainerActivity;

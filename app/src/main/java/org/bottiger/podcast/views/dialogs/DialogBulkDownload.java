@@ -5,9 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -23,7 +20,6 @@ import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.StorageUtils;
 
 import java.util.Date;

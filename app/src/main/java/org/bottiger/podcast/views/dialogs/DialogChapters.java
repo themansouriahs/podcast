@@ -7,42 +7,25 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.adapters.PlayerChapterAdapter;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.chapter.Chapter;
 import org.bottiger.podcast.utils.chapter.ChapterUtil;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
-import org.bottiger.podcast.utils.rxbus.RxBusSimpleEvents;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import io.reactivex.functions.Predicate;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 import static android.view.View.GONE;
 

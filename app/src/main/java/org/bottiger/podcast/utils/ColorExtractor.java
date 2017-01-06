@@ -3,20 +3,12 @@ package org.bottiger.podcast.utils;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.provider.ISubscription;
-
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Single;
 
 /**
  * Created by apl on 15-03-2015.

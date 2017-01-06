@@ -18,7 +18,6 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 

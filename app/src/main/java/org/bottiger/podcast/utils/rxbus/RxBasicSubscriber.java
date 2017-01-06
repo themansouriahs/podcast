@@ -2,7 +2,6 @@ package org.bottiger.podcast.utils.rxbus;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.reactivestreams.Subscriber;

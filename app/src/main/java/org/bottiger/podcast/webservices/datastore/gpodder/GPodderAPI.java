@@ -1,6 +1,5 @@
 package org.bottiger.podcast.webservices.datastore.gpodder;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;

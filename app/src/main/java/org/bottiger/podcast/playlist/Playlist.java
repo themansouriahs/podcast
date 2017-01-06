@@ -28,7 +28,6 @@ import org.bottiger.podcast.provider.PersistedSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.utils.ColorExtractor;
 
 import java.util.ArrayList;
 import java.util.Date;

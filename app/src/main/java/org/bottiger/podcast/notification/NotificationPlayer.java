@@ -25,7 +25,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 

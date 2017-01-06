@@ -3,7 +3,6 @@ package org.bottiger.podcast.player.exoplayer;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -14,7 +13,6 @@ import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
-import com.google.android.exoplayer2.util.Util;
 
 import org.bottiger.podcast.utils.PlaybackSpeed;
 

@@ -1,10 +1,7 @@
 package org.bottiger.podcast.adapters.viewholders;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.graphics.Color;
 import android.support.transition.TransitionManager;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -12,9 +9,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorUtils;
-import org.bottiger.podcast.utils.PaletteHelper;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 

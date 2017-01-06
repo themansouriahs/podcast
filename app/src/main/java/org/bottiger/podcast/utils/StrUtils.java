@@ -17,9 +17,6 @@ import android.util.Base64;
 import android.util.Patterns;
 
 import org.bottiger.podcast.provider.IEpisode;
-import org.unbescape.html.HtmlEscape;
-import org.unbescape.html.HtmlEscapeLevel;
-import org.unbescape.html.HtmlEscapeType;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;

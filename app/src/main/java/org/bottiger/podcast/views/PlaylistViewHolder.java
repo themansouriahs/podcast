@@ -5,14 +5,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.adapters.PlaylistAdapter;

@@ -5,18 +5,13 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
-import org.bottiger.podcast.DiscoveryFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
 
-import java.io.IOException;
-
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 
 /**
  * Created by apl on 13-04-2015.

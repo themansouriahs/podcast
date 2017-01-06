@@ -1,9 +1,7 @@
 package org.bottiger.podcast;
 
-import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -17,16 +15,15 @@ import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import org.bottiger.podcast.cloud.EventLogger;
+import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
+import org.bottiger.podcast.flavors.Analytics.IAnalytics;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCodeFactory;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.player.SoundWavesPlayer;
-
-import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
-import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCodeFactory;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.service.Downloader.SubscriptionRefreshManager;

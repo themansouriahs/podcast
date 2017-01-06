@@ -11,7 +11,6 @@ import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;

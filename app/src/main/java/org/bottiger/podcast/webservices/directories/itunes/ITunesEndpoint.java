@@ -1,6 +1,5 @@
 package org.bottiger.podcast.webservices.directories.itunes;
 
-import org.bottiger.podcast.webservices.directories.itunes.types.Feed;
 import org.bottiger.podcast.webservices.directories.itunes.types.FeedLookup;
 import org.bottiger.podcast.webservices.directories.itunes.types.TopList;
 

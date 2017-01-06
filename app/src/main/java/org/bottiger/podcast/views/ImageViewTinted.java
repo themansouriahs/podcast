@@ -1,12 +1,10 @@
 package org.bottiger.podcast.views;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorExtractor;
 
 /**

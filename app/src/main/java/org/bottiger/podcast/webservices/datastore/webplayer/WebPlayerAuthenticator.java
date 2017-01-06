@@ -11,7 +11,6 @@ import org.bottiger.podcast.provider.IEpisode;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;

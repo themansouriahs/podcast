@@ -1,11 +1,5 @@
 package org.bottiger.podcast.player.exoplayer;
 
-import android.annotation.TargetApi;
-import android.media.MediaCodec;
-import android.media.MediaFormat;
-import android.os.Build;
-import android.util.Log;
-
 import com.google.android.exoplayer2.source.MediaSource;
 
 import org.bottiger.podcast.utils.PlaybackSpeed;

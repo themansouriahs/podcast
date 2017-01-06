@@ -1,31 +1,14 @@
 package org.bottiger.podcast.activities.intro;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.BoolRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RawRes;
-import android.support.annotation.StringRes;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
-import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.heinrichreimersoftware.materialintro.app.SlideFragment;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.databinding.IntroSettingsFragmentBinding;
-import org.bottiger.podcast.utils.PreferenceHelper;
 
 /**
  * Created by aplb on 04-12-2016.

@@ -1,6 +1,5 @@
 package org.bottiger.podcast;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
@@ -15,9 +14,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.ViewGroup;
-
-import org.bottiger.podcast.utils.UIUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

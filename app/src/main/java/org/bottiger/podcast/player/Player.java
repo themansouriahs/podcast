@@ -3,7 +3,6 @@ package org.bottiger.podcast.player;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.provider.IEpisode;
 

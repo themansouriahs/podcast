@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.AppWidgetTarget;
 
 import org.bottiger.podcast.R;
@@ -32,7 +31,6 @@ import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.AndroidUtil;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.UIUtils;
 
 import static org.bottiger.podcast.notification.NotificationPlayer.REQUEST_CODE;
 

@@ -1,7 +1,5 @@
 package org.bottiger.podcast.flavors.Activities;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.IntDef;
 
 import java.lang.annotation.Retention;

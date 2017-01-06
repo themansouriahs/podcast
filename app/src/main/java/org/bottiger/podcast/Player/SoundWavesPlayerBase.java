@@ -1,16 +1,9 @@
 package org.bottiger.podcast.player;
 
-import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.media.MediaCodec;
-import android.media.PlaybackParams;
-import android.net.Uri;
-import android.os.Build;
 import android.os.RemoteException;
-import android.os.SystemClock;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,26 +12,19 @@ import android.util.Log;
 
 import com.google.android.exoplayer2.ExoPlayer;
 
-import org.bottiger.podcast.BuildConfig;
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.flavors.MediaCast.IMediaCast;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.cloud.EventLogger;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
-import org.bottiger.podcast.player.exoplayer.ExtractorRendererBuilder;
-import org.bottiger.podcast.player.exoplayer.PodcastAudioRendererV21;
-import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.service.PlayerService;
-
-import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.views.OnTouchSeekListener;

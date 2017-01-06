@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,9 +19,6 @@ import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
-import org.bottiger.podcast.webservices.directories.audiosearch.types.Chart;
-import org.bottiger.podcast.webservices.directories.audiosearch.types.ChartItem;
-import org.bottiger.podcast.webservices.directories.audiosearch.types.Show;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchResult;
 import org.bottiger.podcast.webservices.directories.itunes.types.Entry;
@@ -39,21 +35,16 @@ import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * Created by apl on 13-04-2015.

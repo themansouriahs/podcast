@@ -44,7 +44,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 import android.text.style.StyleSpan;
-import android.transition.AutoTransition;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -52,12 +51,9 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.DrawerActivity;
 import org.bottiger.podcast.R;
-import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.provider.ISubscription;
 /**
  * An assortment of UI helpers.

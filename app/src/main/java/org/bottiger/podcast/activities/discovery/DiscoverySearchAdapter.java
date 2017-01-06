@@ -19,11 +19,8 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
-import org.bottiger.podcast.utils.SharedAdapterUtils;
-import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
 

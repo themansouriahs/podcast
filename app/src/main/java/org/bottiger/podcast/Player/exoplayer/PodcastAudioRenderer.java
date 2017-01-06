@@ -3,7 +3,6 @@ package org.bottiger.podcast.player.exoplayer;
 import android.media.audiofx.AutomaticGainControl;
 import android.support.annotation.Nullable;
 
-import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.audio.MediaCodecAudioRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.source.MediaSource;

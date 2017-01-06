@@ -1,9 +1,7 @@
 package org.bottiger.podcast.activities.intro;
 
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
@@ -15,8 +13,6 @@ import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
-import org.bottiger.podcast.flavors.Analytics.VendorAnalytics;
-import org.bottiger.podcast.utils.ColorUtils;
 
 /**
  * Created by aplb on 03-12-2016.

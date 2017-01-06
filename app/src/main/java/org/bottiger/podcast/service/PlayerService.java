@@ -1,25 +1,5 @@
 package org.bottiger.podcast.service;
 
-import org.bottiger.podcast.R;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.player.PlayerPhoneListener;
-import org.bottiger.podcast.player.PlayerStateManager;
-import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.listeners.PlayerStatusObservable;
-import org.bottiger.podcast.notification.NotificationPlayer;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.Subscription;
-import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.utils.PlaybackSpeed;
-import org.bottiger.podcast.utils.chapter.Chapter;
-import org.bottiger.podcast.utils.chapter.ChapterUtil;
-import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
-
-
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.ComponentName;
@@ -32,7 +12,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
@@ -45,6 +24,24 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
 
+import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
+import org.bottiger.podcast.player.PlayerPhoneListener;
+import org.bottiger.podcast.player.PlayerStateManager;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.chapter.ChapterUtil;
+import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
@@ -53,12 +50,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.processors.BehaviorProcessor;
 import io.reactivex.processors.FlowableProcessor;
-import io.reactivex.processors.PublishProcessor;
-import io.reactivex.schedulers.Schedulers;
 
 import static org.bottiger.podcast.player.PlayerStateManager.ACTION_TOGGLE;
 

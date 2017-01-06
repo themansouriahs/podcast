@@ -1,7 +1,5 @@
 package org.bottiger.podcast.utils.id3reader.model;
 
-import org.bottiger.podcast.utils.id3reader.model.Header;
-
 public class FrameHeader extends Header {
 
 	protected char flags;

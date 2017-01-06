@@ -16,7 +16,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
 
 import io.reactivex.Single;
-import io.reactivex.SingleObserver;
 
 /**
  * Created by apl on 15-04-2015.

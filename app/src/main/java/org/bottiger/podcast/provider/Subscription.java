@@ -17,7 +17,6 @@ import org.bottiger.podcast.provider.base.BasePodcastSubscription;
 import org.bottiger.podcast.utils.BitMaskUtils;
 import org.bottiger.podcast.utils.PlaybackSpeed;
 import org.bottiger.podcast.utils.PreferenceHelper;
-import org.bottiger.podcast.utils.StrUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

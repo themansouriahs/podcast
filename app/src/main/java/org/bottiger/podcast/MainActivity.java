@@ -1,47 +1,28 @@
 package org.bottiger.podcast;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
-
 
 import org.bottiger.podcast.activities.intro.Intro;
 import org.bottiger.podcast.debug.SqliteCopy;
-import org.bottiger.podcast.flavors.Activities.Constants;
-import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
-import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.service.syncadapter.CloudSyncUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.TransitionUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.dialogs.DialogAddPodcast;
-import org.bottiger.podcast.webservices.datastore.webplayer.WebPlayerAuthenticator;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-
-import io.reactivex.functions.Consumer;
 
 // Sliding
 public class MainActivity extends FragmentContainerActivity {

@@ -1,14 +1,11 @@
 package org.bottiger.podcast.adapters.viewholders.subscription;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.bignerdranch.android.multiselector.MultiSelector;
-import com.bignerdranch.android.multiselector.MultiSelectorBindingHolder;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.views.ImageViewTinted;

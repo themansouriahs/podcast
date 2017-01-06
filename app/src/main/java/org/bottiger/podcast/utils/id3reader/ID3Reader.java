@@ -1,6 +1,5 @@
 package org.bottiger.podcast.utils.id3reader;
 
-import org.bottiger.podcast.utils.id3reader.ID3ReaderException;
 import org.bottiger.podcast.utils.id3reader.model.FrameHeader;
 import org.bottiger.podcast.utils.id3reader.model.TagHeader;
 

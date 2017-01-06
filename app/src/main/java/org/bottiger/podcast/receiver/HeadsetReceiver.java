@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.service.PlayerService;
 
 public class HeadsetReceiver extends BroadcastReceiver {

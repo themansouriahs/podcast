@@ -9,7 +9,6 @@ import android.widget.RelativeLayout;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
-import org.bottiger.podcast.player.exoplayer.ExoPlayerWrapper;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.views.PlayPauseImageView;

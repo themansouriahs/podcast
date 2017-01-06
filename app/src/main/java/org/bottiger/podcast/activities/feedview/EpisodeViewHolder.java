@@ -2,7 +2,6 @@ package org.bottiger.podcast.activities.feedview;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.transition.AutoTransition;

@@ -1,22 +1,5 @@
 package org.bottiger.podcast;
 
-import org.bottiger.podcast.adapters.PlaylistAdapter;
-import org.bottiger.podcast.flavors.Activities.Constants;
-import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.player.GenericMediaPlayerInterface;
-import org.bottiger.podcast.playlist.Playlist;
-import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
-import org.bottiger.podcast.provider.FeedItem;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.utils.UIUtils;
-import org.bottiger.podcast.views.CustomLinearLayoutManager;
-import org.bottiger.podcast.views.Overlay;
-import org.bottiger.podcast.views.PlaylistViewHolder;
-import org.bottiger.podcast.views.TopPlayer;
-import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
-import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -42,6 +25,23 @@ import android.view.ViewStub;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+
+import org.bottiger.podcast.adapters.PlaylistAdapter;
+import org.bottiger.podcast.flavors.Activities.Constants;
+import org.bottiger.podcast.flavors.Activities.VendorActivityTracker;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.player.GenericMediaPlayerInterface;
+import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.playlist.filters.SubscriptionFilter;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.utils.UIUtils;
+import org.bottiger.podcast.views.CustomLinearLayoutManager;
+import org.bottiger.podcast.views.Overlay;
+import org.bottiger.podcast.views.PlaylistViewHolder;
+import org.bottiger.podcast.views.TopPlayer;
+import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
 import io.reactivex.functions.Consumer;
 import rx.Subscription;

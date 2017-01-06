@@ -4,7 +4,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.processors.PublishProcessor;
-import io.reactivex.processors.ReplayProcessor;
 import io.reactivex.schedulers.Schedulers;
 
 /**

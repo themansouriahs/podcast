@@ -2,11 +2,8 @@ package org.bottiger.podcast.views;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.support.v7.graphics.Palette;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 

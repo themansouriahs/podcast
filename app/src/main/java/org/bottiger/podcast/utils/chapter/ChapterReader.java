@@ -1,36 +1,19 @@
 package org.bottiger.podcast.utils.chapter;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 import android.util.Log;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.utils.id3reader.ID3Chapter;
 import org.bottiger.podcast.utils.id3reader.ID3Reader;
 import org.bottiger.podcast.utils.id3reader.ID3ReaderException;
 import org.bottiger.podcast.utils.id3reader.model.FrameHeader;
 import org.bottiger.podcast.utils.id3reader.model.TagHeader;
-import org.reactivestreams.Subscriber;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.Single;
-import io.reactivex.SingleObserver;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 
 public class ChapterReader extends ID3Reader {
     private static final String TAG = "ID3ChapterReader";

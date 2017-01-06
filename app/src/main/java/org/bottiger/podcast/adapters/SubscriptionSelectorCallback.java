@@ -16,7 +16,6 @@ import com.bignerdranch.android.multiselector.MultiSelector;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorUtils;
 

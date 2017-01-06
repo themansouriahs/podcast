@@ -3,20 +3,15 @@ package org.bottiger.podcast.views;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -25,9 +20,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import org.bottiger.podcast.BuildConfig;
-import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
-import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.provider.IEpisode;
@@ -37,7 +30,6 @@ import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Predicate;
 
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;

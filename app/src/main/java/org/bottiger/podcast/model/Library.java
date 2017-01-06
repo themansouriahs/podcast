@@ -3,7 +3,6 @@ package org.bottiger.podcast.model;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
@@ -14,8 +13,6 @@ import android.support.v4.util.ArrayMap;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.bumptech.glide.request.target.Target;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -36,7 +33,6 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
-import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.StrUtils;
 
@@ -49,7 +45,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.ObservableEmitter;
@@ -57,7 +52,6 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;

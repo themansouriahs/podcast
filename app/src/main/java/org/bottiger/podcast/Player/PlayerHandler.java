@@ -1,20 +1,15 @@
 package org.bottiger.podcast.player;
 
 import android.content.Context;
-
-import android.icu.util.TimeUnit;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.util.TimeUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Created by apl on 20-01-2015.

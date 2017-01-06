@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 
-import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.chapter.Chapter;
 
 import java.io.IOException;
