@@ -377,9 +377,9 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
             if (mTopPlayerStub != null) {
                 inflateTopPlayer(container);
+            } else {
+                bindHeaderWrapper(mPlaylist);
             }
-
-            bindHeaderWrapper(mPlaylist);
 
             if (showPlaylist(mPlaylist)) {
                 if (mRecyclerStub != null) {

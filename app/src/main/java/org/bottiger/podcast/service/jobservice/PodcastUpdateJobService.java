@@ -20,7 +20,7 @@ import org.bottiger.podcast.utils.PreferenceHelper;
 @TargetApi(21)
 public class PodcastUpdateJobService extends JobService {
 
-    private static final String TAG = "PodcastUpdateJobService";
+    private static final String TAG = PodcastUpdateJobService.class.getSimpleName();
 
     @Override
     public boolean onStartJob(final JobParameters params) {
