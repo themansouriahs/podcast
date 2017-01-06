@@ -48,7 +48,8 @@ public class PodcastUpdateJobService extends JobService {
                 SoundWavesDownloadManager.downloadNewEpisodes(getApplicationContext(), argSubscription);
 
 
-                jobFinished(params, true);
+                // http://stackoverflow.com/questions/36945166/android-jobscheduler-running-way-too-often-when-using-setperiodic
+                jobFinished(params, false);
 
             }
         });
