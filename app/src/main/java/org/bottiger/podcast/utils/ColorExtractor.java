@@ -135,6 +135,9 @@ public class ColorExtractor {
 
     private void loadPrimaryColor(@Nullable Palette argPalette) {
         Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null; // was dark
+        if (swatch == null && argPalette != null) {
+            swatch = argPalette.getLightVibrantSwatch();
+        }
         mPrimary = getColor(swatch, R.color.colorPrimary);
     }
 
@@ -171,28 +174,6 @@ public class ColorExtractor {
         } else {
             color = argSwatch.getRgb();
         }
-
-        /*
-            int currentNightMode = SoundWaves.getAppContext().getResources().getConfiguration().uiMode
-                    & Configuration.UI_MODE_NIGHT_MASK;
-
-            switch (currentNightMode) {
-                case Configuration.UI_MODE_NIGHT_UNDEFINED:
-                    // We don't know what mode we're in, assume notnight
-                case Configuration.UI_MODE_NIGHT_NO:
-                    // Night mode is not active, we're in day time
-                    return color;
-                case Configuration.UI_MODE_NIGHT_YES: {
-                    // Night mode is active, we're at night!
-                    //color = (int) (color * 0.2);
-
-                    float[] hsv = new float[3];
-                    Color.colorToHSV(color, hsv);
-                    hsv[2] *= 0.2f; // value component
-                    color = Color.HSVToColor(hsv);
-                }
-            }
-            */
 
         return color;
     }

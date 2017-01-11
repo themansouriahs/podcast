@@ -258,18 +258,6 @@ public class Subscription extends BasePodcastSubscription {
 		notifyPropertyChanged(null);
     }
 
-    public int getPrimaryColor() {
-        return mPrimaryColor;
-    }
-
-    public int getPrimaryTintColor() {
-        return mPrimaryTintColor;
-    }
-
-    public int getSecondaryColor() {
-        return mSecondaryColor;
-    }
-
 	@Override
 	public String toString() {
 		return "Subscription: " + this.mTitle + " (" + this.mUrlString + ")";

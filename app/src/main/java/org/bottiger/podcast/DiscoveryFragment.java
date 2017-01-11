@@ -112,11 +112,18 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private IDirectoryProvider.Callback mSearchResultCallback = new IDirectoryProvider.Callback() {
         @Override
         public void result(@NonNull ISearchResult argResult) {
+
+            Context context = getContext();
+
+            if (context == null) {
+                return; // This does happen
+            }
+
             Log.d(TAG, "Search results for: " + argResult.getSearchQuery());
             ArrayList<ISubscription> subscriptions = new ArrayList<>();
             for (ISubscription subscription : argResult.getResults()) {
                 subscriptions.add(subscription);
-                subscription.fetchImage(getContext());
+                subscription.fetchImage(context);
 
                 // Log the subscription
                 SoundWaves.getAppContext(getActivity()).getAnalystics().logFeed(subscription.getURLString(), false);

@@ -22,6 +22,7 @@ import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -50,9 +51,9 @@ public abstract class BaseSubscription implements ISubscription {
     protected boolean mIsLoaded = false;
     protected boolean mIsRefreshing = false;
 
-    protected int mPrimaryColor;
-    protected int mPrimaryTintColor;
-    protected int mSecondaryColor;
+    protected int mPrimaryColor = -1;
+    protected int mPrimaryTintColor = -1;
+    protected int mSecondaryColor = -1;
 
     /**
      * See SubscriptionColumns for documentation
@@ -209,15 +210,16 @@ public abstract class BaseSubscription implements ISubscription {
         Bitmap bitmap;
         Palette palette = null;
 
+        String url = getImageURL();
         try {
-            bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, getImageURL())
+            bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, url)
                     .into(200, 200) // Width and height
                     .get();
             palette = Palette.from(bitmap).generate();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Glide execution error. URL probably not valid");
         }
 
         ColorExtractor colorExtractor = new ColorExtractor(palette);
@@ -269,7 +271,8 @@ public abstract class BaseSubscription implements ISubscription {
                     @Override
                     public Boolean apply(Context context) throws Exception {
                         try {
-                            Glide.with(context).load(getImageURL()).diskCacheStrategy(ImageLoaderUtils.SW_DiskCacheStrategy).into(200, 200).get();
+                            String url = getImageURL();
+                            Glide.with(context).load(url).diskCacheStrategy(ImageLoaderUtils.SW_DiskCacheStrategy).into(200, 200).get();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             return false;
@@ -339,6 +342,18 @@ public abstract class BaseSubscription implements ISubscription {
         mPrimaryTintColor = newPrimaryTintColor;
         mSecondaryColor   = newSecondaryColor;
         notifyPropertyChanged(null);
+    }
+
+    public int getPrimaryColor() {
+        return mPrimaryColor;
+    }
+
+    public int getPrimaryTintColor() {
+        return mPrimaryTintColor;
+    }
+
+    public int getSecondaryColor() {
+        return mSecondaryColor;
     }
 
     protected void notifyPropertyChanged(@android.support.annotation.Nullable String argTag) {

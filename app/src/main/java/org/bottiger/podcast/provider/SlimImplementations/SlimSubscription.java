@@ -175,21 +175,6 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
         return ISubscription.SLIM;
     }
 
-    @Override
-    public int getPrimaryColor() {
-        return -1;
-    }
-
-    @Override
-    public int getPrimaryTintColor() {
-        return -1;
-    }
-
-    @Override
-    public int getSecondaryColor() {
-        return -1;
-    }
-
     public int describeContents() {
         return 0;
     }
