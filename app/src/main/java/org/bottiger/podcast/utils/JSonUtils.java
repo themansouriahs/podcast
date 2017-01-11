@@ -25,7 +25,7 @@ public class JSonUtils {
         Type typeOfHashMap = new TypeToken<HashMap<String, List<String>>>() { }.getType();
 
         if (sobj.equals(""))
-            return null;
+            return new HashMap<>();
         else
             return new Gson().fromJson(sobj, typeOfHashMap);
     }

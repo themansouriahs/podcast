@@ -42,6 +42,8 @@ import rx.Observable;
 import rx.Observer;
 import rx.functions.Func2;
 
+import static org.bottiger.podcast.utils.okhttp.AuthenticationInterceptor.AUTHENTICATION_HEADER;
+
 /**
  * Created by aplb on 31-12-2015.
  */
@@ -225,7 +227,7 @@ public class DialogFeedAuthentication extends DialogFragment {
             @Override
             public Request authenticate(Route route, Response response) throws IOException {
                 String credential = Credentials.basic(argUsername, argPassword);
-                return response.request().newBuilder().header("Authorization", credential).build();
+                return response.request().newBuilder().header(AUTHENTICATION_HEADER, credential).build();
             }
         });
 

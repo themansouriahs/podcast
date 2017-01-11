@@ -1,7 +1,9 @@
 package org.bottiger.podcast.service.Downloader;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
@@ -10,6 +12,7 @@ import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.FeedParser;
@@ -20,18 +23,23 @@ import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.service.IDownloadCompleteCallback;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.HttpUtils;
+import org.bottiger.podcast.utils.JSonUtils;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
+import org.bottiger.podcast.utils.okhttp.AuthenticationInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -50,15 +58,29 @@ public class SubscriptionRefreshManager {
     private final OkHttpClient mOkClient;
 
     @NonNull
+    private static final AuthenticationInterceptor sAuthenticationInterceptor = new AuthenticationInterceptor();
+
+    @NonNull
     private final Handler mainHandler;
     
     @NonNull
     private Context mContext;
 
+    @Nullable
+    private HashMap<String, List<String>> prefCredentials;
+    @NonNull private final SharedPreferences prefs;
+    @NonNull private final String prefKey;
+
     public SubscriptionRefreshManager(@NonNull Context argContext) {
         mContext = argContext;
         mainHandler = new Handler(argContext.getMainLooper());
-        mOkClient = HttpUtils.getNewDefaultOkHttpClientBuilder(argContext).build();
+        mOkClient = HttpUtils
+                .getNewDefaultOkHttpClientBuilder(argContext)
+                .addInterceptor(sAuthenticationInterceptor)
+                .build();
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        prefKey = argContext.getResources().getString(R.string.feed_authentication_data_key);
     }
 
     public void refreshAll() {
@@ -69,7 +91,8 @@ public class SubscriptionRefreshManager {
     @WorkerThread
     public Subscription refreshSync(@NonNull Subscription argSubscription) throws IOException {
         final Request request = getRequest(argSubscription);
-        Response response = mOkClient.newCall(request).execute();
+        final String credentials = getCredentials(argSubscription);
+        Response response = executeRequest(request, credentials);
         handleHttpResponse(mContext, argSubscription, response, null);
         return argSubscription;
     }
@@ -127,6 +150,7 @@ public class SubscriptionRefreshManager {
         argSubscription.setIsRefreshing(true);
 
         final Request request = getRequest(argSubscription);
+        final String credentials = getCredentials(argSubscription);
 
         Single.just(request)
                 .subscribeOn(Schedulers.io())
@@ -140,7 +164,7 @@ public class SubscriptionRefreshManager {
             @Override
             public void onSuccess(Request value) {
                 try {
-                    Response response = mOkClient.newCall(value).execute();
+                    Response response = executeRequest(value, credentials);
                     handleHttpResponse(argContext, argSubscription, response, argCallback);
                 } catch (IOException e) {
                     ErrorUtils.handleException(e);
@@ -303,6 +327,30 @@ public class SubscriptionRefreshManager {
         keys[0] = "url";
         values[0] = TextUtils.isEmpty(argSubscription.getURLString()) ? "No url" : argSubscription.getURLString(); // NoI18N
         VendorCrashReporter.handleException(argExceiption, keys, values);
+    }
+
+    private synchronized Response executeRequest(@NonNull Request argRequest, @Nullable String argCredentials) throws IOException {
+        sAuthenticationInterceptor.setCredenticals(argCredentials);
+        return mOkClient.newCall(argRequest).execute();
+    }
+
+    private String getCredentials(@NonNull ISubscription argSubscription) {
+        prefCredentials = JSonUtils.getComplexObject(prefKey, prefs);
+
+        if (prefCredentials == null) {
+            return null;
+        }
+
+        String credentials = null;
+        List<String> details = prefCredentials.get(argSubscription.getURLString());
+
+        if (details != null && details.size() > 1) {
+            String username = details.get(0);
+            String password = details.get(1);
+            credentials = Credentials.basic(username, password);
+        }
+
+        return credentials;
     }
 
     @RestrictTo(TESTS)
