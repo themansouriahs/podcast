@@ -46,16 +46,20 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
     }
 
     @Override
-    public void onAttach (Context argContext) {
-        mContext = argContext;
-        super.onAttach(argContext);
-
+    public void onStart() {
+        super.onStart();
         String saveOnSdCardKey = getResources().getString(R.string.pref_store_on_sdcard_key);
         Preference saveOnSdCardPreference = this.findPreference(saveOnSdCardKey);
         if (saveOnSdCardPreference != null && !SDCardManager.hasSdCard(mContext)) {
             PreferenceCategory category = (PreferenceCategory) findPreference("pref_network_category_storage");
             category.removePreference(saveOnSdCardPreference);
         }
+    }
+
+    @Override
+    public void onAttach (Context argContext) {
+        mContext = argContext;
+        super.onAttach(argContext);
     }
 
     @Override
