@@ -320,6 +320,10 @@
     <string name="pref_driving_mode_title">Driving mode</string>
     <string name="pref_driving_mode_description">Enlarge the player UI when driving</string>
     <string name="menu_subscriptions_order_rating">Popularity</string>
+    <string name="error_mising_storage_permission">Requires storage permission</string>
+    <string name="about_tmp_dir_title">Cache dir</string>
+    <string name="about_podcast_dir_title">Podcast location</string>
+    <string name="about_app_settings_into">Device setup</string>
 
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>

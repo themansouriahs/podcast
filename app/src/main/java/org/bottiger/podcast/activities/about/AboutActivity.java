@@ -1,5 +1,6 @@
 package org.bottiger.podcast.activities.about;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -14,6 +15,10 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutTitleItem;
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWavesPreferenceFragment;
+import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.utils.StorageUtils;
+
+import java.io.IOException;
 
 import static org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator.FEEDBACK;
 
@@ -24,11 +29,14 @@ import static org.bottiger.podcast.utils.navdrawer.NavigationDrawerMenuGenerator
 public class AboutActivity extends MaterialAboutActivity {
 
     @Override
-    protected MaterialAboutList getMaterialAboutList() {
+    protected MaterialAboutList getMaterialAboutList(final Context context) {
 
         MaterialAboutList.Builder builder = new MaterialAboutList.Builder();
 
         MaterialAboutCard.Builder aboutCardBuilder = new MaterialAboutCard.Builder();
+
+        MaterialAboutCard.Builder appCardBuilder = new MaterialAboutCard.Builder();
+        appCardBuilder.title(R.string.about_app_settings_into);
 
         MaterialAboutCard.Builder authorCardBuilder = new MaterialAboutCard.Builder();
         authorCardBuilder.title(R.string.about_author);
@@ -96,8 +104,54 @@ public class AboutActivity extends MaterialAboutActivity {
                 })
                 .build());
 
+        String tmpDir;
+        String podcastDir;
+        boolean hasPermission = false;
+
+        try {
+            tmpDir = SDCardManager.getTmpDir(context);
+            podcastDir = SDCardManager.getDownloadDir(context).toString();
+            hasPermission = true;
+        } catch (IOException e) {
+            tmpDir = getResources().getString(R.string.error_mising_storage_permission);
+            podcastDir = getResources().getString(R.string.error_mising_storage_permission);
+        }
+
+        final String tmpDirFinal = tmpDir;
+        final String podcastDirFinal = podcastDir;
+
+        MaterialAboutActionItem.Builder fileTmpLocationBuilder = new MaterialAboutActionItem.Builder()
+                .text(R.string.about_tmp_dir_title)
+                .icon(R.drawable.ic_folder_open_black_24dp)
+                .subText(tmpDir);
+
+        MaterialAboutActionItem.Builder filePodcastLocationBuilder = new MaterialAboutActionItem.Builder()
+                .text(R.string.about_podcast_dir_title)
+                .icon(R.drawable.ic_folder_open_black_24dp)
+                .subText(podcastDir);
+
+        if (hasPermission) {
+            fileTmpLocationBuilder.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                @Override
+                public void onClick() {
+                    StorageUtils.openFolderIntent(context, tmpDirFinal);
+                }
+            });
+
+            filePodcastLocationBuilder.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                @Override
+                public void onClick() {
+                    StorageUtils.openFolderIntent(context, podcastDirFinal);
+                }
+            });
+        }
+
+        appCardBuilder.addItem(fileTmpLocationBuilder.build());
+        appCardBuilder.addItem(filePodcastLocationBuilder.build());
+
         builder.addCard(aboutCardBuilder.build());
         builder.addCard(authorCardBuilder.build());
+        builder.addCard(appCardBuilder.build());
 
         return builder.build();
     }

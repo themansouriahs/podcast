@@ -2,7 +2,10 @@ package org.bottiger.podcast.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
@@ -264,5 +267,14 @@ public class StorageUtils {
                 R.string.pref_download_collection_size_default);
 
         return (int) (Long.valueOf(collectionSize) / 1000);
+    }
+
+    public static void openFolderIntent(@NonNull Context argContext, @NonNull String argLocation)
+    {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Uri uri = Uri.parse(argLocation);
+        //intent.setDataAndType(uri, "text/csv");
+        intent.setDataAndType(uri, "text/csv");
+        argContext.startActivity(Intent.createChooser(intent, "Open folder"));
     }
 }
