@@ -111,8 +111,17 @@ public class DialogPlaybackSpeed extends DialogFragment {
         final IEpisode episode = playlist.first();
 
         if (episode != null) {
+            ISubscription isubscription = episode.getSubscription(getActivity());
+
+            scope = GLOBAL;
+
+            if (isubscription instanceof Subscription) {
+                if (((Subscription)isubscription).hasCustomPlaybackSpeed()) {
+                    scope = SUBSCRIPTION;
+                }
+            }
+
             mInitialPlaybackSpeed = episode.getPlaybackSpeed(getActivity());
-            scope = SUBSCRIPTION;
         }
 
         if (mInitialPlaybackSpeed == PlaybackSpeed.UNDEFINED) {

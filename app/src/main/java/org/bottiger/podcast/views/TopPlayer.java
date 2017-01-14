@@ -510,12 +510,14 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         }
 
         ISubscription iSubscription = argEpisode.getSubscription(getContext());
+
+        /*
         if (mPlayer.isPlaying()) {
             setPlaybackSpeedView(mPlayer.getCurrentSpeedMultiplier());
         } else if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
             org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
             setPlaybackSpeedView(subscription.getPlaybackSpeed());
-        }
+        }*/
 
         bindSeekbar(mPlayerSeekbar, argEpisode, mOverlay);
 
@@ -567,7 +569,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         // Set colors
         mTextColor = ColorUtils.getTextColor(getContext());
-        int color = ColorUtils.getBackgroundColor(getContext());
 
         argEpisode.getSubscription(mContext).getColors(mContext)
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
@@ -1021,6 +1022,11 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             }
         });
 
+        if (mCurrentEpisode != null) {
+            float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
+            setPlaybackSpeedView(speed);
+        }
+
         GenericMediaPlayerInterface player = SoundWaves.getAppContext(mContext).getPlayer();
         final long countDownMs = player.timeUntilFadeout();
         setCountDownText(countDownMs);
@@ -1042,9 +1048,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         int visibility = SoundWaves.getAppContext(getContext()).getPlayer().canSetSpeed() ? View.VISIBLE : View.GONE;
         mSpeedButton.setVisibility(visibility);
-
-        float speedMultiplier = player.getCurrentSpeedMultiplier();
-        setPlaybackSpeedView(speedMultiplier);
 
         mSpeedButton.setOnClickListener(new OnClickListener() {
             @Override

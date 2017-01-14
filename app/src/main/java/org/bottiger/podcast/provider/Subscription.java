@@ -606,6 +606,10 @@ public class Subscription extends BasePodcastSubscription {
 		notifyPropertyChanged(null);
 	}
 
+	public boolean hasCustomPlaybackSpeed() {
+		return IsSettingEnabled(PLAYBACK_SPEED_SET);
+	}
+
 	public float getPlaybackSpeed() {
 		float parsedSpeed = parsePlaybackSpeed();
 
