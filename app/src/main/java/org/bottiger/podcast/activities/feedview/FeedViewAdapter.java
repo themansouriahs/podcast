@@ -5,6 +5,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
@@ -110,28 +111,35 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     @Override
     public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
+
         final int dataPosition = viewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
-        final EpisodeViewHolder episodeViewHolder = viewHolder;
-
-        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, dataPosition == getItemCount()-1);
 
         if (item == null) {
             VendorCrashReporter.report("FeedViewAdapter", "item is null for: " + mSubscription);
             return;
         }
 
+        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, dataPosition == getItemCount()-1);
+
+        final EpisodeViewHolder episodeViewHolder = viewHolder;
+        final boolean canDownload = item.canDownload();
+        @SoundWavesPlayerBase.PlayerState int playerStatus = STATE_IDLE;
+
+        String title = item.getTitle();
+        String description = item.getDescription();
+
+        if (!TextUtils.isEmpty(title)) {
+            episodeViewHolder.mTitle.setText(item.getTitle());
+        }
+
         episodeViewHolder.mPrimaryColor = ColorUtils.getTextColor(mActivity);
         episodeViewHolder.mFadedColor = ColorUtils.getFadedTextColor(mActivity);
+        episodeViewHolder.mTextSecondary.setText(getSecondaryText(item));
 
-        if (item.getTitle() != null)
-            episodeViewHolder.mTitle.setText(item.getTitle());
-
-        episodeViewHolder.mDescription.setText(item.getDescription());
+        episodeViewHolder.mDescription.setText(description);
         episodeViewHolder.IsMarkedAsListened = item.isMarkedAsListened();
         episodeViewHolder.DisplayDescription = mIsExpanded;
-
-        episodeViewHolder.mTextSecondary.setText(getSecondaryText(item));
 
         @EpisodeViewHolder.DisplayState int state = EpisodeViewHolder.COLLAPSED;
         if (mExpanededItems.contains(dataPosition)) {
@@ -142,7 +150,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             state = EpisodeViewHolder.COLLAPSED_WITH_DESCRIPTION;
         }
 
-        final boolean canDownload = item.canDownload();
         episodeViewHolder.setState(state, canDownload);
 
         episodeViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -152,15 +159,12 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             }
         });
 
-        @SoundWavesPlayerBase.PlayerState int playerStatus = STATE_IDLE;
-
         if (mActivity.getPlayerHelper().isPlaying(item)) {
             playerStatus = STATE_READY;
         }
 
         episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
         episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
-
         episodeViewHolder.mDownloadButton.setEpisode(item);
 
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);

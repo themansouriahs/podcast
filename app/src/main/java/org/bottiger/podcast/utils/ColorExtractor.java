@@ -136,6 +136,9 @@ public class ColorExtractor {
     private void loadPrimaryColor(@Nullable Palette argPalette) {
         Palette.Swatch swatch = argPalette != null ? argPalette.getDarkVibrantSwatch() : null; // was dark
         if (swatch == null && argPalette != null) {
+            swatch = argPalette.getDarkMutedSwatch();
+        }
+        if (swatch == null && argPalette != null) {
             swatch = argPalette.getLightVibrantSwatch();
         }
         mPrimary = getColor(swatch, R.color.colorPrimary);
