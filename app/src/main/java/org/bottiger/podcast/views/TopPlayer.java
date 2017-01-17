@@ -511,14 +511,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         ISubscription iSubscription = argEpisode.getSubscription(getContext());
 
-        /*
-        if (mPlayer.isPlaying()) {
-            setPlaybackSpeedView(mPlayer.getCurrentSpeedMultiplier());
-        } else if (iSubscription instanceof org.bottiger.podcast.provider.Subscription) {
-            org.bottiger.podcast.provider.Subscription subscription = (org.bottiger.podcast.provider.Subscription)iSubscription;
-            setPlaybackSpeedView(subscription.getPlaybackSpeed());
-        }*/
-
         bindSeekbar(mPlayerSeekbar, argEpisode, mOverlay);
 
         if (mPlayerDownloadButton != null) {
@@ -532,34 +524,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             artworkURL = iSubscription.getImageURL();
         }
 
-        iSubscription.getColors(mContext)
-                    .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                    .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                    .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
-
-                        @Override
-                        public void onSuccess(ColorExtractor value) {
-                            mPlayPauseButton.setColor(value);
-
-                            int transparentgradientColor;
-                            int gradientColor = value.getPrimary();
-
-                            int alpha = 0;
-                            int red = Color.red(gradientColor);
-                            int green = Color.green(gradientColor);
-                            int blue = Color.blue(gradientColor);
-                            transparentgradientColor = Color.argb(alpha, red, green, blue);
-
-                            GradientDrawable gd = new GradientDrawable(
-                                    GradientDrawable.Orientation.TOP_BOTTOM,
-                                    new int[]{transparentgradientColor, gradientColor});
-                            Drawable wrapDrawable = DrawableCompat.wrap(gd);
-                            DrawableCompat.setTint(wrapDrawable, value.getPrimary());
-
-                            mPlayerSeekbar.getProgressDrawable().setColorFilter(value.getPrimary(), PorterDuff.Mode.SRC_IN);
-                        }
-                    });
-
+        setDynamicColors(iSubscription, argEpisode);
 
         Log.v("MissingImage", "Setting image");
         ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
@@ -569,29 +534,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         // Set colors
         mTextColor = ColorUtils.getTextColor(getContext());
-
-        argEpisode.getSubscription(mContext).getColors(mContext)
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
-                    @Override
-                    public void onSuccess(ColorExtractor value) {
-                        mPlayPauseButton.setColor(value);
-                        mBackgroundColor = value.getPrimaryTint() != -1 ? value.getPrimaryTint() : ContextCompat.getColor(mContext, R.color.colorBgSecondary);
-
-                        mBackgroundColor = ColorUtils.adjustToTheme(getResources(), mBackgroundColor);
-
-                        if (mBackgroundColor != -1 && !UIUtils.isInNightMode(getResources())) {
-                            setBackgroundColor(mBackgroundColor);
-                        }
-
-                        ColorUtils.tintButton(mFavoriteButton,    mTextColor);
-                        tintInflatedButtons();
-
-                        postInvalidate();
-                    }
-                });
-
 
         // Bind the car view
         if (mDrivingLayout != null) {
@@ -641,6 +583,13 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             mDrivingFastForward = (ImageView) mDrivingLayout.findViewById(R.id.top_player_fastforward);
             mDrivingReverse = (ImageView) mDrivingLayout.findViewById(R.id.top_player_rewind);
             mDrivingPhoto = (ImageView) mDrivingLayout.findViewById(R.id.session_photo);
+
+            setPlayer();
+
+            if (mCurrentEpisode != null) {
+                ISubscription iSubscription = mCurrentEpisode.getSubscription(getContext());
+                setDynamicColors(iSubscription, mCurrentEpisode);
+            }
 
             bind(mCurrentEpisode);
 
@@ -725,6 +674,70 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             return;
 
         mPlaylistEmpty = argDoFill;
+    }
+
+    private void setDynamicColors(@NonNull ISubscription argSubscription, @NonNull IEpisode argEpisode) {
+        argSubscription.getColors(mContext)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        mPlayPauseButton.setColor(value);
+
+                        if (mDrivingPlayPause != null) {
+                            mDrivingPlayPause.setColor(value);
+                        }
+
+                        int transparentgradientColor;
+                        int gradientColor = value.getPrimary();
+
+                        int alpha = 0;
+                        int red = Color.red(gradientColor);
+                        int green = Color.green(gradientColor);
+                        int blue = Color.blue(gradientColor);
+                        transparentgradientColor = Color.argb(alpha, red, green, blue);
+
+                        GradientDrawable gd = new GradientDrawable(
+                                GradientDrawable.Orientation.TOP_BOTTOM,
+                                new int[]{transparentgradientColor, gradientColor});
+                        Drawable wrapDrawable = DrawableCompat.wrap(gd);
+                        DrawableCompat.setTint(wrapDrawable, value.getPrimary());
+
+                        mPlayerSeekbar.getProgressDrawable().setColorFilter(value.getPrimary(), PorterDuff.Mode.SRC_IN);
+
+                        if (mDrivingSeekbar != null) {
+                            mDrivingSeekbar.getProgressDrawable().setColorFilter(value.getPrimary(), PorterDuff.Mode.SRC_IN);
+                        }
+                    }
+                });
+
+        argEpisode.getSubscription(mContext).getColors(mContext)
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscription.BasicColorExtractorObserver<ColorExtractor>() {
+                    @Override
+                    public void onSuccess(ColorExtractor value) {
+                        mPlayPauseButton.setColor(value);
+
+                        if (mDrivingPlayPause != null) {
+                            mDrivingPlayPause.setColor(value);
+                        }
+
+                        mBackgroundColor = value.getPrimaryTint() != -1 ? value.getPrimaryTint() : ContextCompat.getColor(mContext, R.color.colorBgSecondary);
+                        mBackgroundColor = ColorUtils.adjustToTheme(getResources(), mBackgroundColor);
+
+                        if (mBackgroundColor != -1 && !UIUtils.isInNightMode(getResources())) {
+                            setBackgroundColor(mBackgroundColor);
+                        }
+
+                        ColorUtils.tintButton(mFavoriteButton,    mTextColor);
+                        tintInflatedButtons();
+
+                        postInvalidate();
+                    }
+                });
     }
 
     private float canConsume(float argDiff) {
@@ -1144,6 +1157,16 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         mPlayer.addListener(mPlayerSeekbar);
         mPlayer.addListener(mCurrentTime);
         mPlayer.addListener(mPlayPauseButton);
+
+        if (mDrivingSeekbar != null) {
+            mPlayer.addListener(mDrivingSeekbar);
+        }
+        if (mDrivingCurrentTime != null) {
+            mPlayer.addListener(mDrivingCurrentTime);
+        }
+        if (mDrivingPlayPause != null) {
+            mPlayer.addListener(mDrivingPlayPause);
+        }
     }
 
     private void unsetPlayer() {
@@ -1151,6 +1174,10 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             mPlayer.removeListener(mPlayerSeekbar);
             mPlayer.removeListener(mCurrentTime);
             mPlayer.removeListener(mPlayPauseButton);
+
+            mPlayer.removeListener(mDrivingSeekbar);
+            mPlayer.removeListener(mDrivingCurrentTime);
+            mPlayer.removeListener(mDrivingPlayPause);
         }
     }
 
