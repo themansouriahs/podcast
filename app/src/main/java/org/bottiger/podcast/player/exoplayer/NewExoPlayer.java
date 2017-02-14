@@ -45,6 +45,7 @@ import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector;
 import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.MetadataDecoderFactory;
 import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.metadata.id3.Id3Decoder;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -187,7 +188,7 @@ public final class NewExoPlayer implements ExoPlayer {
         this.audioRendererCount = audioRendererCount;
 
         // Set initial values.
-        audioSessionId = AudioTrack.SESSION_ID_NOT_SET;
+        audioSessionId = C.AUDIO_SESSION_ID_UNSET;
         volume = 1;
 
         // Build the player and associated objects.
@@ -567,6 +568,16 @@ public final class NewExoPlayer implements ExoPlayer {
     }
 
     @Override
+    public boolean isCurrentWindowDynamic() {
+        return player.isCurrentWindowDynamic();
+    }
+
+    @Override
+    public boolean isCurrentWindowSeekable() {
+        return player.isCurrentWindowSeekable();
+    }
+
+    @Override
     public Timeline getCurrentTimeline() {
         return player.getCurrentTimeline();
     }
@@ -595,8 +606,9 @@ public final class NewExoPlayer implements ExoPlayer {
         Renderer textRenderer = new TextRenderer(componentListener, mainHandler.getLooper());
         renderersList.add(textRenderer);
 
+        MetadataDecoderFactory decoderFactory = MetadataDecoderFactory.DEFAULT;
         MetadataRenderer id3Renderer = new MetadataRenderer(componentListener,
-                mainHandler.getLooper(), new Id3Decoder());
+                mainHandler.getLooper(), decoderFactory);
         renderersList.add(id3Renderer);
     }
 
@@ -809,7 +821,7 @@ public final class NewExoPlayer implements ExoPlayer {
             }
             audioFormat = null;
             audioDecoderCounters = null;
-            audioSessionId = AudioTrack.SESSION_ID_NOT_SET;
+            audioSessionId = C.AUDIO_SESSION_ID_UNSET;
         }
 
         // TextRenderer.Output implementation
@@ -889,7 +901,7 @@ public final class NewExoPlayer implements ExoPlayer {
     @TargetApi(Build.VERSION_CODES.M)
     public void setPlaybackSpeed(float argNewSpeed) {
         if (renderers[audioRendererIndex] != null) {
-            ((PodcastMediaCodecAudioRenderer) renderers[audioRendererIndex]).setSpeed(argNewSpeed);
+            ((org.bottiger.podcast.player.exoplayer.PodcastMediaCodecAudioRenderer) renderers[audioRendererIndex]).setSpeed(argNewSpeed);
         }
         /*
         if (renderers[ExoPlayerWrapper.TYPE_AUDIO] != null) {

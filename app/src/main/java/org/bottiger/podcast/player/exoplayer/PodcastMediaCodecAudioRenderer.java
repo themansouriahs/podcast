@@ -30,7 +30,7 @@ public class PodcastMediaCodecAudioRenderer extends MediaCodecAudioRenderer {
 
     private static final int SAMPLES_PER_CODEC_FRAME = 1_024;
 
-    private Sonic mSonic;
+    private org.bottiger.podcast.player.exoplayer.Sonic mSonic;
     private byte[] mSonicInputBuffer;
     private byte[] mSonicOutputBuffer;
 
