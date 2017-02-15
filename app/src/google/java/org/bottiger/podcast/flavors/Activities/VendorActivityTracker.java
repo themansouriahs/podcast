@@ -44,6 +44,8 @@ import static org.bottiger.podcast.flavors.Activities.Constants.STILL;
 
 public class VendorActivityTracker implements IActivityDetector, ResultCallback<Status>, SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String TAG = VendorActivityTracker.class.getSimpleName();
+
     private final GoogleApiClient mGoogleApiClient;
     private final Context mContext;
 
@@ -88,6 +90,8 @@ public class VendorActivityTracker implements IActivityDetector, ResultCallback<
                 if (detectedActivities == null) {
                     return STILL;
                 }
+
+                Log.d(TAG, "activity: " + detectedActivities.getType());
 
                 switch (detectedActivities.getType()) {
                     case DetectedActivity.IN_VEHICLE:

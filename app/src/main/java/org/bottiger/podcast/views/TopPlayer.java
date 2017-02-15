@@ -584,8 +584,6 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             mDrivingReverse = (ImageView) mDrivingLayout.findViewById(R.id.top_player_rewind);
             mDrivingPhoto = (ImageView) mDrivingLayout.findViewById(R.id.session_photo);
 
-            setPlayer();
-
             if (mCurrentEpisode != null) {
                 ISubscription iSubscription = mCurrentEpisode.getSubscription(getContext());
                 setDynamicColors(iSubscription, mCurrentEpisode);
@@ -598,6 +596,8 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         Scene newScene = mCurrentActivity == Constants.IN_VEHICLE ? mDrivingScene : mPrimaryScene;
         TransitionManager.go(newScene);
+
+        setPlayer();
     }
 
     private void openTimePicker() {
