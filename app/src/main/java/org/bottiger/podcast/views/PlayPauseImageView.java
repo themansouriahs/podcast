@@ -278,8 +278,9 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (!DRAW_PROGRESS)
+        if (!DRAW_PROGRESS) {
             return;
+        }
 
         int contentWidth = getWidth();
         int contentHeight = getHeight();
@@ -299,8 +300,9 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
         bounds.right = minSize - drawOffset; //contentWidth - drawOffset;
         bounds.bottom = (contentHeight-minSize)/2f + minSize - drawOffset; //contentWidth - drawOffset;
 
-        if (DEBUG)
+        if (DEBUG) {
             Log.d(TAG, "onDraw. Preparing => " + (mStatus == STATE_BUFFERING) + " status: " + mStatus);
+        }
 
         double elapsedTime = System.currentTimeMillis() - mStartTime;
         boolean showRotatingAnimation = mStatus == STATE_BUFFERING;// || animationStartedLessThanOneSecondAgo(mPreparingAnimationStarted);
@@ -367,9 +369,12 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
         defaultStartAngle = defaultStartAngle + DRAW_ANGLE_OFFSET;
         defaultEndAngle = defaultEndAngle + DRAW_ANGLE_OFFSET;
 
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "startAngle: " + defaultStartAngle + " endAngle: " + defaultEndAngle + " elapsed:" + elapsedTime + " lastStart: " + mLastProgressStart + " lastEnd: " + mLastProgressEnd);
+        }
 
+        int strokeWidth = contentWidth/15; // DRAW_WIDTH;
+        paintBorder.setStrokeWidth(strokeWidth);
         canvas.drawArc(bounds, (float)defaultStartAngle, (float)(defaultEndAngle - defaultStartAngle), false, paintBorder);
 
         if (refreshButton) {
