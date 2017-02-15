@@ -15,8 +15,8 @@
     <string name="pref_theme_default">1</string>
     <integer name="gpodder_last_sync_default">0</integer>
 
-    <string name="player_fast_forward_default">60</string>
-    <string name="player_rewind_default">60</string>
+    <string name="player_fast_forward_default">120</string>
+    <string name="player_rewind_default">120</string>
 
     <integer name="skip_into_default">90</integer>
 
