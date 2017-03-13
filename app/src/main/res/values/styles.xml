@@ -51,6 +51,7 @@
         <item name="themeTextColorFaded">@color/grayDark</item>
 
         <item name="icon_fill_color">@color/pitch_black</item>
+        <item name="icon_fill_color_inv">@color/white_opaque</item>
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

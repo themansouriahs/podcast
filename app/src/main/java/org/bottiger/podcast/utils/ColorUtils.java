@@ -90,7 +90,7 @@ public class ColorUtils {
         }
     }
 
-    public static void tintButton(@NonNull Button argButton, @NonNull @ColorInt int argColor) {
+    public static void tintButton(@NonNull Button argButton, @ColorInt int argColor) {
         argButton.setTextColor(argColor);
     }
 

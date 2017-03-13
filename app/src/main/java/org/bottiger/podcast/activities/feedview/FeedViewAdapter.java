@@ -191,7 +191,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public void  onViewDetachedFromWindow(EpisodeViewHolder holder) {
+    public void onViewDetachedFromWindow(EpisodeViewHolder holder) {
         SoundWaves.getAppContext(mActivity).getPlayer().removeListener(holder.mPlayPauseButton);
         holder.mDownloadButton.enabledProgressListener(false);
         super.onViewDetachedFromWindow(holder);
