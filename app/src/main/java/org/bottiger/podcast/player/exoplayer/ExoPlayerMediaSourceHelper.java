@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
@@ -44,7 +45,23 @@ public class ExoPlayerMediaSourceHelper {
         mainHandler = new Handler(argContext.getMainLooper());
         eventLogger = new EventLogger();
 
-        mediaDataSourceFactory = new DefaultDataSourceFactory(mContext, HttpUtils.getUserAgent(mContext));
+        String userAgent = HttpUtils.getUserAgent(mContext);
+
+        // Default parameters, except allowCrossProtocolRedirects is true
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
+                userAgent,
+                null /* listener */,
+                DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+                true /* allowCrossProtocolRedirects */
+        );
+
+        //mediaDataSourceFactory = new DefaultDataSourceFactory(mContext, userAgent);
+        mediaDataSourceFactory = new DefaultDataSourceFactory(
+                mContext,
+                null /* listener */,
+                httpDataSourceFactory
+        );
     }
 
     @NonNull
