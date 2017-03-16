@@ -40,7 +40,7 @@
             android:layout_alignBottom="@id/download_episode_image"
             android:layout_alignParentRight="true"
             android:background="@null"
-            android:onClick="@{viewModel.onClickRemove}"
+            android:onClick="@{viewModel::onClickRemove}"
             />
 
         <TextView

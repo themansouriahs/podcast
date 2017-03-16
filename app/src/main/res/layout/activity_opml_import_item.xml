@@ -48,7 +48,7 @@
         android:layout_alignBottom="@id/opml_subscription_title"
         android:paddingLeft="16dp"
         android:layout_alignParentRight="true"
-        android:onClick="@{subscription.IsSubscribed ? handlers.onClickRemoveMark : handlers.onClickMark}"
+        android:onClick="@{subscription.IsSubscribed ? handlers::onClickRemoveMark : handlers::onClickMark}"
         android:checked="@{subscription.IsSubscribed}"
         android:enabled="@{!(subscription.IsSubscribed &amp;&amp; !subscription.IsDirty)}" />
 
