@@ -47,6 +47,8 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.StorageUtils;
+import org.bottiger.podcast.utils.ThemeHelper;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.dialogs.DialogOpenVideoExternally;
 import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
 
@@ -260,7 +262,9 @@ public class PlayPauseImageView extends PlayPauseView implements DownloadObserve
     }
 
     public void setColor(@ColorInt int argColor, @ColorInt int argOuterColor) {
-        float scale = 1.3f;
+        final float scale_base = 1.3f;
+
+        float scale = UIUtils.isInNightMode(getResources()) ? 1/scale_base : scale_base;
         int maxColor = 255;
 
         float red = Math.min(Color.red(argColor)*scale, maxColor);
