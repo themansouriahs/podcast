@@ -2,7 +2,10 @@ package org.bottiger.podcast.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
@@ -27,6 +30,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,6 +44,8 @@ public class OPMLImportExport {
 	private static final String filenameOut = "podcasts_export.opml";
 	private static final int ACTIVITY_CHOOSE_FILE = 3;
 	private static final int FILE_SELECT_CODE = 0;
+
+	private static final String CLIPBOARD_LABEL = "opml_data";
 
 	public File file;
 	public File fileOut;
@@ -230,22 +237,30 @@ public class OPMLImportExport {
 		}
 
 		SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
-		//toastMsg(opmlSuccesfullyExported);
 	}
 
-//	public static String toOPML(LongSparseArray<ISubscription> argSubscriptions) {
-//		OpmlWriter opmlWriter = new OpmlWriter();
-//		StringWriter sw = new StringWriter();
-//
-//		try {
-//			opmlWriter.writeDocument(argSubscriptions, sw);
-//		} catch (IOException e) {
-//			Log.d("toOPML", "Failed converting subscriptions to OPML");
-//			return "";
-//		}
-//
-//		return sw.toString();
-//	}
+	public void exportSubscriptionsToClipboard() {
+
+		Writer writer = new StringWriter();
+		OpmlWriter opmlWriter = new OpmlWriter();
+
+		SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
+
+		try {
+			opmlWriter.writeDocument(subscriptionList, writer);
+		} catch (IOException e) {
+			toastMsg(opmlFailedToExport);
+			return;
+		}
+
+		String opmldata = writer.toString();
+		ClipData clipData = ClipData.newPlainText(CLIPBOARD_LABEL, opmldata);
+
+		ClipboardManager clipboard = (ClipboardManager)mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+		clipboard.setPrimaryClip(clipData);
+
+		SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_EXPORT);
+	}
 
 	@NonNull
 	public static String getFilename() {

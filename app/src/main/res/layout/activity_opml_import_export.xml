@@ -98,6 +98,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/bOMPLexport" />
+
+                <Button
+                    android:text="@string/opml_export_clipboard_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/bOMPL_clipboard_export" />
+
             </LinearLayout>
 
         </LinearLayout>

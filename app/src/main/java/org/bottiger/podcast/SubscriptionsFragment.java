@@ -58,8 +58,9 @@ public class SubscriptionsFragment extends Fragment {
     private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
     private static final String EXTRAS_CODE = "path";
     private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
-    private static final int RESULT_IMPORT = 201;
-    private static final int RESULT_EXPORT = 202;
+    public static final int RESULT_IMPORT = 201;
+    public static final int RESULT_EXPORT = 202;
+    public static final int RESULT_EXPORT_TO_CLIPBOARD = 203;
     private static final String EXPORT_FILENAME = "/podcast_export.opml";
 
     /**
@@ -437,6 +438,11 @@ public class SubscriptionsFragment extends Fragment {
                 Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory() + EXPORT_FILENAME);// NoI18N
                 importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory() + EXPORT_FILENAME));
                 Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory() + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
+            } else if (resultCode == RESULT_EXPORT_TO_CLIPBOARD) {
+                Log.d(TAG, "EXPORT SUBSCRIPTIONS TO CLIPBOARD");// NoI18N
+
+                importExport.exportSubscriptionsToClipboard();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_clipboard_toast), Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -96,7 +96,12 @@
     <string name="opml_export_explanation">Export your subscriptions to the internal storage. They are stored on /STORAGE/podcasts.opml</string>
     <string name="opml_import_button">Import OPML</string>
     <string name="opml_export_button">Export to storage</string>
+    <string name="opml_export_clipboard_button">Export to clipboard</string>
+
+    <!-- Exported to: "Path"-->
     <string name="opml_exported_to_toast">"Exported to "</string>
+
+    <string name="opml_exported_to_clipboard_toast">"OPML data exported to clipboard"</string>
 
     <!-- For playing media on another device, like a chromecast -->
     <string name="media_route_menu_title">Cast</string>

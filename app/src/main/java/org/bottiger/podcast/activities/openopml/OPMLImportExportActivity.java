@@ -17,6 +17,10 @@ import android.widget.Button;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
 
+import static org.bottiger.podcast.SubscriptionsFragment.RESULT_EXPORT;
+import static org.bottiger.podcast.SubscriptionsFragment.RESULT_EXPORT_TO_CLIPBOARD;
+import static org.bottiger.podcast.SubscriptionsFragment.RESULT_IMPORT;
+
 public class OPMLImportExportActivity extends ToolbarActivity {
 
     /*
@@ -30,8 +34,6 @@ public class OPMLImportExportActivity extends ToolbarActivity {
     private static final String MimeType = "file/xml";
     private static final String[] MIME_TYPES = {"file/xml", "application/xml", "text/xml", "text/x-opml", "text/plain"};
     private static final String TAG = "OPML_io_act";
-    private static final int RESULT_IMPORT = 201;
-    private static final int RESULT_EXPORT = 202;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +96,21 @@ public class OPMLImportExportActivity extends ToolbarActivity {
                     setResult(RESULT_EXPORT, null);
                 } else {
                     getParent().setResult(RESULT_EXPORT, null);
+                }
+                finish();
+            }
+        });
+
+        Button exportClipboardOPML = (Button) findViewById(R.id.bOMPL_clipboard_export);
+        exportClipboardOPML.setOnClickListener(new View.OnClickListener() {
+            @Nullable
+            @Override
+            public void onClick(View view) {
+                //The return data is not checked in this particular case
+                if (getParent() == null) {
+                    setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
+                } else {
+                    getParent().setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
                 }
                 finish();
             }
