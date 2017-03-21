@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.util.SortedList;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.bottiger.podcast.ApplicationConfiguration;
@@ -551,7 +552,10 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
         where.append(" )");
 
-        where.append(" AND ").append(mSubscriptionFilter.toSQL());
+        String subscripttionFilter = mSubscriptionFilter.toSQL();
+        if (!TextUtils.isEmpty(subscripttionFilter)) {
+            where.append(" AND ").append(subscripttionFilter);
+        }
 
         // show only downloaded
         if (showOnlyDownloadedVal) {
