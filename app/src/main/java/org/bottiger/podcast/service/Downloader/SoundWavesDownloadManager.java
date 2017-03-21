@@ -19,6 +19,7 @@ import android.util.Log;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.TopActivity;
+import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.DownloadProgressPublisher;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -252,6 +253,12 @@ public class SoundWavesDownloadManager extends Observable {
         @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         @Override
         public void downloadCompleted(IEpisode argEpisode) throws SecurityException {
+
+            if (!(argEpisode instanceof FeedItem)) {
+                VendorCrashReporter.report("DownloadedSlimEpisode", "Can not download a slim episode");
+                return;
+            }
+
             FeedItem item = (FeedItem) argEpisode;
             item.setDownloaded(true);
 
