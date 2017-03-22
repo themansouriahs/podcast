@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 371        // even - release. Odd - development
-        versionName "0.151" // even - release. Odd - development
+        versionCode 372        // even - release. Odd - development
+        versionName "0.153" // even - release. Odd - development
         multiDexEnabled = true
 
         vectorDrawables.useSupportLibrary = true
@@ -126,6 +126,7 @@ dependencies {
     compile 'io.requery:sqlite-android:3.16.2'
     compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
     compile 'com.wdullaer:materialdatetimepicker:3.0.0'
+
     // Glide
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'net.steamcrafted:materialiconlib:1.1.2'
