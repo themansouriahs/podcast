@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 
 public class HeadsetReceiver extends BroadcastReceiver {
@@ -66,10 +67,17 @@ public class HeadsetReceiver extends BroadcastReceiver {
                 Log.d("HeadsetReceiver", "ACTION_DOWN => Stop Player");
                 argPlayerService.stop();
                 break;
-            case KeyEvent.KEYCODE_MEDIA_NEXT:
+            case KeyEvent.KEYCODE_MEDIA_NEXT: {
                 // FIXME implement this
-                argPlayerService.play(argPlayerService.getNext(), true);
+                IEpisode episode = argPlayerService.getNext();
+                boolean hasNext = episode != null;
+                if (hasNext) {
+                    argPlayerService.play(episode, true);
+                } else {
+                    argPlayerService.stop();
+                }
                 break;
+            }
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                 // TODO: ensure that doing this in rapid succession actually plays the
                 // previous song
