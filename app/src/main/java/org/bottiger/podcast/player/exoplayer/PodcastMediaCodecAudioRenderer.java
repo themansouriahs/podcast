@@ -134,11 +134,12 @@ public class PodcastMediaCodecAudioRenderer extends MediaCodecAudioRenderer {
 
     @TargetApi(16)
     @Override
-    protected void onOutputFormatChanged(final MediaCodec codec, final MediaFormat format) {
+    protected void onOutputFormatChanged(final MediaCodec codec, final MediaFormat format) throws ExoPlaybackException {
         super.onOutputFormatChanged(codec, format);
 
-        if (DEBUG)
+        if (DEBUG) {
             Log.d(TAG, "onOutputFormatChanged");
+        }
 
         final int sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
         final int channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
