@@ -146,9 +146,17 @@ public class OkHttpDownloader extends DownloadEngineBase {
             }
 
             sink = Okio.buffer(Okio.sink(tmpFile));
-            sink.writeAll(response.body().source());
-            sink.close();
-            sink = null;
+
+            try {
+                sink.writeAll(response.body().source());
+                sink.close();
+                sink = null;
+            } catch (NullPointerException npe) {
+                String msg = "unable to aquire downl";
+                Log.d(TAG, msg);
+                onFailure(new FileNotFoundException(msg));
+                return;
+            }
 
             // If download was succesfull
             boolean movedFileSuccesfully = false;
@@ -229,7 +237,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
     }
 
     public void onFailure(Exception e) {
-        Log.w("Download", "Download Failed: " + e.getMessage());
+        Log.w(TAG, "Download Failed: " + e.getMessage());
 
         for(int i = 0; i < mExternalCallback.size(); i++) {
             int key = mExternalCallback.keyAt(i);

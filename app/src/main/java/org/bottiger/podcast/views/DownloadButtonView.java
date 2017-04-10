@@ -22,6 +22,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.service.DownloadStatus;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.UIUtils;
@@ -238,7 +239,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         int newProgress = argProgress.getProgress();
 
-        if (newProgress == 100) {
+        if (argProgress.getStatus() == org.bottiger.podcast.service.DownloadStatus.DONE) {
             if (mDownloadCompletedCallback != null) {
                 mDownloadCompletedCallback.FileComplete();
             }

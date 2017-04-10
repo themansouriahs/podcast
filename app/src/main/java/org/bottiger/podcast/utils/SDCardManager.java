@@ -41,8 +41,9 @@ public class SDCardManager {
     @RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     public static boolean getSDCardStatusAndCreate(@NonNull Context argContext) throws SecurityException, IOException {
         boolean b = getSDCardStatus();
-        if (b)
+        if (b) {
             createDir(argContext);
+        }
         return b;
     }
 
