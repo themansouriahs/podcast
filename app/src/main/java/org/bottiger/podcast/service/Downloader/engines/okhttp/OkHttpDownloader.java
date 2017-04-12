@@ -16,6 +16,7 @@ import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.Downloader.engines.DownloadEngineBase;
 import org.bottiger.podcast.service.Downloader.engines.ProgressListener;
 import org.bottiger.podcast.utils.ErrorUtils;
+import org.bottiger.podcast.utils.FileUtils;
 import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StrUtils;
 
@@ -162,16 +163,16 @@ public class OkHttpDownloader extends DownloadEngineBase {
             boolean movedFileSuccesfully = false;
             if (tmpFile.exists() && tmpFile.length() == contentLength) {
                 Log.d(TAG, "Renaming file");
-                movedFileSuccesfully = tmpFile.renameTo(finalFile);
+                movedFileSuccesfully = FileUtils.copy_file(tmpFile.getAbsolutePath(), finalFile.getAbsolutePath());
+                //tmpFile.renameTo(finalFile);
+                //movedFileSuccesfully = finalFile.exists();
                 Log.d(TAG, "File renamed");
-
-                if (movedFileSuccesfully) {
-                    onSucces(finalFile);
-                    Log.d(TAG, "post onSucces");
-                }
             }
 
-            if (!movedFileSuccesfully) {
+            if (movedFileSuccesfully) {
+                onSucces(finalFile);
+                Log.d(TAG, "post onSucces");
+            } else {
                 Log.d(TAG, "File already exists");
                 String msg = "Wrong file size. Expected: " + tmpFile.length() + ", got: " + contentLength; // NoI18N
                 onFailure(new FileNotFoundException(msg));

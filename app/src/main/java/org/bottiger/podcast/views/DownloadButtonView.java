@@ -225,8 +225,9 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
         FIXME: Becasue we register each button ASAP we can have a registered button without a EpisodeID
                 I should take a look at that.
          */
+        IEpisode episode = getEpisode();
         try {
-            if (!getEpisode().equals(argProgress.getEpisode())) {
+            if (!episode.equals(argProgress.getEpisode())) {
                 mProgress = 0;
                 setState(calcState());
                 invalidate();
@@ -239,7 +240,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
 
         int newProgress = argProgress.getProgress();
 
-        if (argProgress.getStatus() == org.bottiger.podcast.service.DownloadStatus.DONE) {
+        if (episode.isDownloaded(mContext)) {
             if (mDownloadCompletedCallback != null) {
                 mDownloadCompletedCallback.FileComplete();
             }
