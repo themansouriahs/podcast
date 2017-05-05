@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutActionItem;
@@ -17,6 +18,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWavesPreferenceFragment;
 import org.bottiger.podcast.utils.SDCardManager;
 import org.bottiger.podcast.utils.StorageUtils;
+import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.IOException;
 
@@ -165,6 +167,11 @@ public class AboutActivity extends MaterialAboutActivity {
         return new MaterialAboutActionItem.OnClickListener() {
             @Override
             public void onClick() {
+
+                if (!StrUtils.isValidUrl(argUrl)) {
+                    return;
+                }
+
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                         Uri.parse(argUrl));
                 startActivity(browserIntent);
