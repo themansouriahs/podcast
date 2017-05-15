@@ -9,7 +9,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 372        // even - release. Odd - development
+        versionCode 373        // even - release. Odd - development
         versionName "0.153" // even - release. Odd - development
         multiDexEnabled = true
 
@@ -122,11 +122,10 @@ dependencies {
     compile 'io.reactivex:rxjava:1.2.7'
     compile 'com.jakewharton.rxbinding:rxbinding:1.0.1'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.0.7'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'io.requery:sqlite-android:3.16.2'
-    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
+    compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
     compile 'com.wdullaer:materialdatetimepicker:3.0.0'
-
     // Glide
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'net.steamcrafted:materialiconlib:1.1.2'
@@ -187,23 +186,23 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:10.2.1'
-    amazonCompile 'com.google.android.gms:play-services-cast-framework:10.2.1'
-    amazonCompile 'com.google.android.gms:play-services-auth:10.2.1'
-    amazonCompile 'com.google.android.gms:play-services-location:10.2.1'
-    amazonCompile 'com.google.firebase:firebase-messaging:10.2.1'
+    amazonCompile 'com.google.android.gms:play-services-cast:10.2.4'
+    amazonCompile 'com.google.android.gms:play-services-cast-framework:10.2.4'
+    amazonCompile 'com.google.android.gms:play-services-auth:10.2.4'
+    amazonCompile 'com.google.android.gms:play-services-location:10.2.4'
+    amazonCompile 'com.google.firebase:firebase-messaging:10.2.4'
     // google cast
 
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:10.2.1'
+    googleCompile 'com.google.android.gms:play-services-analytics:10.2.4'
     // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:10.2.1'
-    googleCompile 'com.google.android.gms:play-services-cast-framework:10.2.1'
-    googleCompile 'com.google.android.gms:play-services-auth:10.2.1'
-    googleCompile 'com.google.android.gms:play-services-location:10.2.1'
-    googleCompile 'com.google.firebase:firebase-core:10.2.1'
-    googleCompile 'com.google.firebase:firebase-messaging:10.2.1'
-    googleCompile 'com.google.firebase:firebase-database:10.2.1'
+    googleCompile 'com.google.android.gms:play-services-cast:10.2.4'
+    googleCompile 'com.google.android.gms:play-services-cast-framework:10.2.4'
+    googleCompile 'com.google.android.gms:play-services-auth:10.2.4'
+    googleCompile 'com.google.android.gms:play-services-location:10.2.4'
+    googleCompile 'com.google.firebase:firebase-core:10.2.4'
+    googleCompile 'com.google.firebase:firebase-messaging:10.2.4'
+    googleCompile 'com.google.firebase:firebase-database:10.2.4'
     // google cast
     compile project(':soundwavescommon')
 }
