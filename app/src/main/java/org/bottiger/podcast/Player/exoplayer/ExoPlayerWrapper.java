@@ -57,7 +57,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.google.android.exoplayer2.SimpleExoPlayer.EXTENSION_RENDERER_MODE_PREFER;
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
 
 /**

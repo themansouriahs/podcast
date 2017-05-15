@@ -23,6 +23,7 @@ import android.media.PlaybackParams;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -35,6 +36,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
@@ -340,34 +342,6 @@ public final class NewExoPlayer implements ExoPlayer {
     }
 
     /**
-     * Sets the {@link PlaybackParams} governing audio playback.
-     *
-     * @param params The {@link PlaybackParams}, or null to clear any previously set parameters.
-     */
-    @TargetApi(23)
-    public void setPlaybackParams(PlaybackParams params) {
-        if (params != null) {
-            // The audio renderers will call this on the playback thread to ensure they can query
-            // parameters without failure. We do the same up front, which is redundant except that it
-            // ensures an immediate call to getPlaybackParams will retrieve the instance with defaults
-            // allowed, rather than this change becoming visible sometime later once the audio renderers
-            // receive the parameters.
-            params.allowDefaults();
-            playbackParamsHolder = new PlaybackParamsHolder(params);
-        } else {
-            playbackParamsHolder = null;
-        }
-        ExoPlayerMessage[] messages = new ExoPlayerMessage[audioRendererCount];
-        int count = 0;
-        for (Renderer renderer : renderers) {
-            if (renderer.getTrackType() == C.TRACK_TYPE_AUDIO) {
-                messages[count++] = new ExoPlayerMessage(renderer, C.MSG_SET_PLAYBACK_PARAMS, params);
-            }
-        }
-        player.sendMessages(messages);
-    }
-
-    /**
      * Returns the {@link PlaybackParams} governing audio playback, or null if not set.
      */
     @TargetApi(23)
@@ -515,6 +489,16 @@ public final class NewExoPlayer implements ExoPlayer {
     @Override
     public void seekTo(int windowIndex, long positionMs) {
         player.seekTo(windowIndex, positionMs);
+    }
+
+    @Override
+    public void setPlaybackParameters(@Nullable PlaybackParameters playbackParameters) {
+        player.setPlaybackParameters(playbackParameters);
+    }
+
+    @Override
+    public PlaybackParameters getPlaybackParameters() {
+        return player.getPlaybackParameters();
     }
 
     @Override
