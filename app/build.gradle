@@ -108,7 +108,7 @@ repositories {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile('com.googlecode.json-simple:json-simple:1.1.1') {
@@ -125,7 +125,7 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'io.requery:sqlite-android:3.16.2'
     compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
-    compile 'com.wdullaer:materialdatetimepicker:3.0.0'
+    compile 'com.wdullaer:materialdatetimepicker:3.1.1'
     // Glide
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'net.steamcrafted:materialiconlib:1.1.2'
@@ -140,14 +140,14 @@ dependencies {
     compile 'com.android.support:mediarouter-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:percent:25.3.1'
-    compile 'jp.wasabeef:recyclerview-animators:2.2.3'
+    compile 'jp.wasabeef:recyclerview-animators:2.2.5'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.6'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.bugsnag:bugsnag-android:3.8.0'
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
     compile 'com.heinrichreimersoftware:material-intro:1.6'
     compile 'com.dmitrymalkovich.android:material-design-dimens:1.4'
-    compile 'com.github.daniel-stoneuk:material-about-library:1.4.2'
+    compile 'com.github.daniel-stoneuk:material-about-library:1.9.0'
 
     compile 'org.unbescape:unbescape:1.1.4.RELEASE'
 
@@ -170,7 +170,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
-    androidTestCompile 'com.squareup.okhttp3:okhttp:3.6.0'
+    androidTestCompile 'com.squareup.okhttp3:okhttp:3.7.0'
     androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2') {
         exclude module: 'support-annotations'
         exclude module: 'support-v4'
@@ -186,28 +186,29 @@ dependencies {
 
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:10.2.4'
-    amazonCompile 'com.google.android.gms:play-services-cast-framework:10.2.4'
-    amazonCompile 'com.google.android.gms:play-services-auth:10.2.4'
-    amazonCompile 'com.google.android.gms:play-services-location:10.2.4'
-    amazonCompile 'com.google.firebase:firebase-messaging:10.2.4'
+    amazonCompile 'com.google.android.gms:play-services-cast:10.2.6'
+    amazonCompile 'com.google.android.gms:play-services-cast-framework:10.2.6'
+    amazonCompile 'com.google.android.gms:play-services-auth:10.2.6'
+    amazonCompile 'com.google.android.gms:play-services-location:10.2.6'
+    amazonCompile 'com.google.firebase:firebase-messaging:10.2.6'
     // google cast
 
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:10.2.4'
+    googleCompile 'com.google.android.gms:play-services-analytics:10.2.6'
     // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:10.2.4'
-    googleCompile 'com.google.android.gms:play-services-cast-framework:10.2.4'
-    googleCompile 'com.google.android.gms:play-services-auth:10.2.4'
-    googleCompile 'com.google.android.gms:play-services-location:10.2.4'
-    googleCompile 'com.google.firebase:firebase-core:10.2.4'
-    googleCompile 'com.google.firebase:firebase-messaging:10.2.4'
-    googleCompile 'com.google.firebase:firebase-database:10.2.4'
+    googleCompile 'com.google.android.gms:play-services-cast:10.2.6'
+    googleCompile 'com.google.android.gms:play-services-cast-framework:10.2.6'
+    googleCompile 'com.google.android.gms:play-services-auth:10.2.6'
+    googleCompile 'com.google.android.gms:play-services-location:10.2.6'
+    googleCompile 'com.google.firebase:firebase-core:10.2.6'
+    googleCompile 'com.google.firebase:firebase-messaging:10.2.6'
+    googleCompile 'com.google.firebase:firebase-database:10.2.6'
     // google cast
     compile project(':soundwavescommon')
 }
 
 
+/*
 task nonfreeReleaseTask << {
     //apply plugin: 'com.google.gms.google-services'
 }
@@ -217,6 +218,6 @@ tasks.whenTaskAdded { task ->
         task.dependsOn nonfreeReleaseTask
     }
 }
+*/
 
-
-//apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.gms.google-services'

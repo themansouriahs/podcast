@@ -26,10 +26,12 @@ import android.support.annotation.NonNull;
 import android.view.Surface;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
@@ -57,6 +59,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.google.android.exoplayer2.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER;
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
 
 /**
@@ -524,6 +527,10 @@ public class ExoPlayerWrapper implements ExoPlayer.EventListener {
 
     }
 
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+    }
+
 
     @Override
     public void onLoadingChanged(boolean isLoading) {
@@ -595,7 +602,7 @@ public class ExoPlayerWrapper implements ExoPlayer.EventListener {
     private void initializePlayer(@NonNull Context argContext) {
 
         if (player == null) {
-            @SimpleExoPlayer.ExtensionRendererMode int extensionRendererModePrefer = EXTENSION_RENDERER_MODE_PREFER;
+            @DefaultRenderersFactory.ExtensionRendererMode int extensionRendererModePrefer = EXTENSION_RENDERER_MODE_PREFER;
 
             //eventLogger = new EventLogger();
             TrackSelection.Factory videoTrackSelectionFactory =

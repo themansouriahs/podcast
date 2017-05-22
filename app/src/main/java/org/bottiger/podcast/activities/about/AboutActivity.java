@@ -7,11 +7,12 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity;
-import com.danielstone.materialaboutlibrary.model.MaterialAboutActionItem;
+import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem;
+import com.danielstone.materialaboutlibrary.items.MaterialAboutItem;
+import com.danielstone.materialaboutlibrary.items.MaterialAboutItemOnClickAction;
+import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
-import com.danielstone.materialaboutlibrary.model.MaterialAboutItem;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
-import com.danielstone.materialaboutlibrary.model.MaterialAboutTitleItem;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
@@ -57,7 +58,7 @@ public class AboutActivity extends MaterialAboutActivity {
         MaterialAboutItem license = new MaterialAboutActionItem.Builder()
                 .text(R.string.pref_license_title)
                 .icon(R.drawable.ic_insert_drive_file_black_24dp)
-                .setOnClickListener(browserIntent("https://raw.githubusercontent.com/bottiger/SoundWaves/master/LICENSE.txt"))
+                .setOnClickAction(browserIntent("https://raw.githubusercontent.com/bottiger/SoundWaves/master/LICENSE.txt"))
                 .build();
 
         aboutCardBuilder.addItem(version);
@@ -67,35 +68,35 @@ public class AboutActivity extends MaterialAboutActivity {
                 .text(R.string.author_full_name)
                 .subText(R.string.author_country)
                 .icon(R.drawable.ic_person_black_24dp)
-                .setOnClickListener(browserIntent(""))
+                .setOnClickAction(browserIntent(""))
                 .build());
 
         authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
                 .text(R.string.github)
                 .subText(R.string.about_github_subtext)
                 .icon(R.drawable.github_circle)
-                .setOnClickListener(browserIntent("https://github.com/bottiger/SoundWaves"))
+                .setOnClickAction(browserIntent("https://github.com/bottiger/SoundWaves"))
                 .build());
 
         authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
                 .text(R.string.twitter)
                 .subText(R.string.about_twitter_subtext)
                 .icon(R.drawable.twitter)
-                .setOnClickListener(browserIntent("https://twitter.com/arvidbottiger"))
+                .setOnClickAction(browserIntent("https://twitter.com/arvidbottiger"))
                 .build());
 
         authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
                 .text(R.string.reddit)
                 .subText(R.string.about_reddit_subtext)
                 .icon(R.drawable.reddit)
-                .setOnClickListener(browserIntent("https://www.reddit.com/r/soundwavesapp/"))
+                .setOnClickAction(browserIntent("https://www.reddit.com/r/soundwavesapp/"))
                 .build());
 
         authorCardBuilder.addItem(new MaterialAboutActionItem.Builder()
                 .text(R.string.email)
                 .subText(ApplicationConfiguration.ACRA_MAIL)
                 .icon(R.drawable.email)
-                .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                .setOnClickAction(new MaterialAboutItemOnClickAction() {
                     @Override
                     public void onClick() {
                         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -133,14 +134,14 @@ public class AboutActivity extends MaterialAboutActivity {
                 .subText(podcastDir);
 
         if (hasPermission) {
-            fileTmpLocationBuilder.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+            fileTmpLocationBuilder.setOnClickAction(new MaterialAboutItemOnClickAction() {
                 @Override
                 public void onClick() {
                     StorageUtils.openFolderIntent(context, tmpDirFinal);
                 }
             });
 
-            filePodcastLocationBuilder.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+            filePodcastLocationBuilder.setOnClickAction(new MaterialAboutItemOnClickAction() {
                 @Override
                 public void onClick() {
                     StorageUtils.openFolderIntent(context, podcastDirFinal);
@@ -163,8 +164,8 @@ public class AboutActivity extends MaterialAboutActivity {
         return getString(R.string.mal_title_about);
     }
 
-    private MaterialAboutActionItem.OnClickListener browserIntent(@NonNull final String argUrl) {
-        return new MaterialAboutActionItem.OnClickListener() {
+    private MaterialAboutItemOnClickAction browserIntent(@NonNull final String argUrl) {
+        return new MaterialAboutItemOnClickAction() {
             @Override
             public void onClick() {
 

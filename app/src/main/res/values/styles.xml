@@ -355,4 +355,11 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="AppTheme.MaterialAboutActivity" parent="Theme.Mal.Light.DarkActionBar" >
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="icon_fill_color">@color/pitch_black</item>
+    </style>
+
 </resources>

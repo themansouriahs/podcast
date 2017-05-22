@@ -223,7 +223,8 @@
         </activity>
 
         <activity android:name=".activities.about.AboutActivity"
-            android:parentActivityName=".SettingsActivity">
+            android:parentActivityName=".SettingsActivity"
+            android:theme="@style/AppTheme.MaterialAboutActivity">
 
             <intent-filter>
                 <action android:name="org.bottiger.podcast.VIEW_ABOUT"/>
