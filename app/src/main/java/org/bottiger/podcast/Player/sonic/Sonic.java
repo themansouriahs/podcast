@@ -176,6 +176,6 @@ public class Sonic
     private native float getVolumeNative(long sonicID);
 
     static {
-        System.loadLibrary("sonic");
+        System.loadLibrary("sonic2");
     }
 }
