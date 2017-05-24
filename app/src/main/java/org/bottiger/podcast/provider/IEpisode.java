@@ -91,12 +91,14 @@ public interface IEpisode extends IDbItem {
     boolean canDownload();
     boolean isDownloaded(@NonNull Context argContext);
     boolean isMarkedAsListened();
-    boolean isNew();
     boolean isPlaying();
     boolean hasBeenDownloadedOnce();
 
     boolean isVideo();
     void setIsVideo(boolean argIsVideo);
+
+    boolean isNew();
+    void setIsNew(boolean argIsNew);
 
     void setIsParsing(boolean argIsParsing);
     void setIsParsing(boolean argIsParsing, boolean doNotify);

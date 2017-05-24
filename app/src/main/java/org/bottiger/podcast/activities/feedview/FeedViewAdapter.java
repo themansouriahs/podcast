@@ -128,6 +128,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
         String title = item.getTitle();
         String description = item.getDescription();
+        item.setIsNew(false);
 
         if (!TextUtils.isEmpty(title)) {
             episodeViewHolder.mTitle.setText(item.getTitle());
