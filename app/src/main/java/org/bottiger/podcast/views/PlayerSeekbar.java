@@ -38,7 +38,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 03-09-2014.
  */
-public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
+public class PlayerSeekbar extends android.support.v7.widget.AppCompatSeekBar implements ExoPlayer.EventListener {
 
     private static final String TAG = PlayerSeekbar.class.getSimpleName();
     private static final int RANGE_MAX = 1000;
@@ -82,12 +82,14 @@ public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
 
             IEpisode currentTopEpisode = PlayerService.getCurrentItem(getContext());
             if (mEpisode.equals(currentTopEpisode)) {
-                SoundWaves.getAppContext(getContext()).getPlayer().seekTo(timeMs);
+                GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
+                player.seekTo(timeMs);
             } else {
                 mEpisode.setOffset(timeMs);
                 setProgressMs(timeMs);
             }
 
+            mOverlay.bringToFront();
             invalidate();
         }
 
@@ -119,16 +121,16 @@ public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
                 return;
             }
 
-            Log.d("mPaintSeekInfo", "ProgressTracking1 mPaintSeekInfo => " + mPaintSeekInfo + " mThressholdCounter => " + mThressholdCounter);
+            Log.d(TAG, "ProgressTracking1 mPaintSeekInfo => " + mPaintSeekInfo + " mThressholdCounter => " + mThressholdCounter);
             if (mThressholdCounter > 0) {
                 mThressholdCounter--;
             } else {
                 mPaintSeekInfo = true;
             }
-            Log.d("mPaintSeekInfo", "ProgressTracking2 mPaintSeekInfo => " + mPaintSeekInfo + " mThressholdCounter => " + mThressholdCounter);
+            Log.d(TAG, "ProgressTracking2 mPaintSeekInfo => " + mPaintSeekInfo + " mThressholdCounter => " + mThressholdCounter);
 
             if (mDurationMs < 1) {
-                Log.d("PlayerSeekbar", "Duration unknown. Skipping overlay");
+                Log.d(TAG, "Duration unknown. Skipping overlay");
                 mPaintSeekInfo = false;
 
             }
@@ -167,12 +169,6 @@ public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
         init();
     }
 
-    @TargetApi(21)
-    public PlayerSeekbar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init();
-    }
-
     private void init() {
         if (isInEditMode()) {
             return;
@@ -186,7 +182,8 @@ public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
     public void setEpisode(@NonNull IEpisode argEpisode) {
         mEpisode = argEpisode;
 
-        int progress = getProgress(mEpisode, mEpisode.getOffset());
+        long offset = SoundWavesPlayerBase.getStartPosition(getContext(), mEpisode);
+        int progress = getProgress(mEpisode, offset);
 
         setProgress(progress);
 
@@ -255,17 +252,24 @@ public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
 
         if (mPaintSeekInfo) {
             Log.v(TAG, "Draw seekinfo");
+
+            /*
             if (params.height == 0) {
-                mOverlay.setVisibility(INVISIBLE);
+                //mOverlay.setVisibility(INVISIBLE);
                 params.height = mOverlay.getHeight();
                 params.width = mOverlay.getWidth();
                 mOverlay.bringToFront();
             }
+            */
+
+            mOverlay.setVisibility(VISIBLE);
+            mOverlay.bringToFront();
 
             mOverlay.getBackwards().setText(mBackwardsText);
             mOverlay.getCurrent().setText(mCurrentText);
             mOverlay.getForward().setText(mForwardText);
 
+            /*
             this.getLocationInWindow(loc);
 
             int offset =  (int)UIUtils.convertDpToPixel(50, getContext()); //FIXME this.getHeight()*4;
@@ -280,6 +284,7 @@ public class PlayerSeekbar extends SeekBar implements ExoPlayer.EventListener {
                 mOverlay.setLayoutParams(params);
                 mOverlay.setVisibility(VISIBLE);
             }
+            */
         } else {
             Log.d("PlayerSeekbar", "Remove seekinfo");
             if (mOverlay != null) {
