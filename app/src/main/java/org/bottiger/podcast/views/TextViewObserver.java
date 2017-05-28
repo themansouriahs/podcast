@@ -56,10 +56,14 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
         setOnChronometerTickListener(new OnChronometerTickListener() {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
-                long position = mPlayer.getCurrentPosition();
-                setText(StrUtils.formatTime(position));
+                setPosition();
             }
         });
+    }
+
+    private void setPosition() {
+        long position = mPlayer.isPlaying() ? mPlayer.getCurrentPosition() : SoundWavesPlayerBase.getStartPosition(getContext(), mEpisode);
+        setText(StrUtils.formatTime(position));
     }
 
     public IEpisode getEpisode() {
@@ -73,26 +77,11 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
-
-        // This happens when the playlist is empty and an episode is about to be played.
-        // The state change fires prior to the binding.
-        if (mEpisode == null)
-            return;
-
-        long base = elapsedRealtime() - mEpisode.getOffset();
-        setBase(base);
-        boolean isPlaying = playbackState == SoundWavesPlayerBase.STATE_READY && playWhenReady;
-        if (isPlaying && !mIsTicking) {
-            start();
-        } else if (!isPlaying && mIsTicking) {
-            stop();
-        }
-        mIsTicking = isPlaying;
+        update(playWhenReady, playbackState);
     }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-
     }
 
     @Override
@@ -107,11 +96,28 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
 
     @Override
     public void onPositionDiscontinuity() {
-
+        setPosition();
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
 
+    }
+
+    private void update(boolean playWhenReady, @SoundWavesPlayerBase.PlayerState int playbackState) {
+        // This happens when the playlist is empty and an episode is about to be played.
+        // The state change fires prior to the binding.
+        if (mEpisode == null)
+            return;
+
+        long base = elapsedRealtime() - mEpisode.getOffset();
+        setBase(base);
+        boolean isPlaying = playbackState == SoundWavesPlayerBase.STATE_READY && playWhenReady;
+        if (isPlaying && !mIsTicking) {
+            start();
+        } else if (!isPlaying && mIsTicking) {
+            stop();
+        }
+        mIsTicking = isPlaying;
     }
 }

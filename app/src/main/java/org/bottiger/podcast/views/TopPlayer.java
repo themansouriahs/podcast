@@ -58,6 +58,7 @@ import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.NewPlayerEvent;
 import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
+import org.bottiger.podcast.player.SoundWavesPlayerBase;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
@@ -1140,7 +1141,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     }
 
     private static void setPlayerProgress(@NonNull TextViewObserver argCurrentTime, @NonNull IEpisode argEpisode) {
-        long offset = argEpisode.getOffset();
+        long offset = SoundWavesPlayerBase.getStartPosition(argCurrentTime.getContext(), argEpisode);
         if (offset > 0) {
             argCurrentTime.setText(StrUtils.formatTime(offset));
         } else {

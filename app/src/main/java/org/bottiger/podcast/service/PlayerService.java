@@ -123,7 +123,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		sInstance = this;
 
-        wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
+        wifiLock = ((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, LOCK_NAME);
 
 		mPlayerStateManager = SoundWaves.getAppContext(this).getPlayerStateManager();
@@ -598,7 +598,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			speed = globalSpeed;
 		}
 
-		if (subscription != null && subscription instanceof Subscription) {
+		if (subscription instanceof Subscription) {
 			speed = ((Subscription) subscription).getPlaybackSpeed();
 		}
 
