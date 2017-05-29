@@ -23,7 +23,7 @@ android {
 
 
             //moduleName "hello-jni"
-            moduleName "sonic"
+            moduleName "sonic2"
             //moduleName "swutils"
         }
     }
