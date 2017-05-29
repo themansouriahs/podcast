@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
+
 import org.bottiger.podcast.BR;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -82,7 +84,10 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
 
         String artWork = episode.getArtwork(mContext);
         if (!TextUtils.isEmpty(artWork)) {
-            ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, null, true, false, true, ImageLoaderUtils.DEFAULT);
+            RequestOptions options = new RequestOptions();
+            options.centerCrop();
+            options.placeholder(R.drawable.generic_podcast);
+            ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, ImageLoaderUtils.DEFAULT, options);
         }
     }
 

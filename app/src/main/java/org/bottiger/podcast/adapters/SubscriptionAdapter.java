@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -23,7 +24,11 @@ import android.view.ViewGroup;
 
 import com.bignerdranch.android.multiselector.MultiSelector;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 
@@ -39,6 +44,7 @@ import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.WhitenessUtils;
 
 import java.util.List;
 
@@ -206,47 +212,75 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
                 if (getItemViewType(position) == GRID_TYPE) {
                     argHolder.setImagePlaceholderVisibility(VISIBLE);
-                    ImageLoaderUtils.getGlide(mActivity, image)
-                            .listener(new RequestListener() {
-                                @Override
-                                public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
-                                    argHolder.setImagePlaceholderVisibility(VISIBLE);
-                                    if (e != null) {
-                                        ErrorUtils.handleException(e);
-                                    }
-                                    return false;
-                                }
 
-                                @Override
-                                public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                    argHolder.setImagePlaceholderVisibility(GONE);
-                                    return false;
-                                }
-                            })
-                            .centerCrop()
-                            .placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription))
-                            .into(argHolder.image);
+
+                    RequestOptions options = new RequestOptions();
+                    options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
+                    options.centerCrop();
+                    RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
+                    builder.apply(options);
+                    builder.listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            argHolder.setImagePlaceholderVisibility(VISIBLE);
+                            if (e != null) {
+                                ErrorUtils.handleException(e);
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            argHolder.setImagePlaceholderVisibility(GONE);
+                            return false;
+                        }
+                    });
+                    builder.into(new BitmapImageViewTarget(argHolder.image) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            argHolder.image.setImageBitmap(resource);
+                        }
+                    });
                 } else {
-                    ImageLoaderUtils.getGlide(mActivity, image)
-                            .centerCrop()
-                            .placeholder(R.drawable.generic_podcast)
-                            .into(new BitmapImageViewTarget(argHolder.image) {
-                                @Override
-                                protected void setResource(Bitmap resource) {
-                                    RoundedBitmapDrawable circularBitmapDrawable =
-                                            RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
-                                    float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
+                    RequestOptions options = new RequestOptions();
+                    options.placeholder(R.drawable.generic_podcast);
+                    options.centerCrop();
+                    RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
+                    builder.apply(options);
+                    builder.into(new BitmapImageViewTarget(argHolder.image) {
+                        @Override
+                        protected void setResource(Bitmap resource) {
+                            RoundedBitmapDrawable circularBitmapDrawable =
+                                    RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
+                            float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
 
-                                    circularBitmapDrawable.setCornerRadius(radius);
+                            circularBitmapDrawable.setCornerRadius(radius);
 
-                                    argHolder.image.setImageDrawable(circularBitmapDrawable);
-                                }
-                            });
+                            argHolder.image.setImageDrawable(circularBitmapDrawable);
+                        }
+                    });
                 }
 
             }
         } else {
-            Glide.with(mActivity).load("").placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription)).into(argHolder.image);
+            RequestOptions options = new RequestOptions();
+            options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
+            options.fitCenter();
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, "");
+            builder.apply(options);
+            builder.into(new BitmapImageViewTarget(argHolder.image) {
+                @Override
+                protected void setResource(Bitmap resource) {
+                    RoundedBitmapDrawable circularBitmapDrawable =
+                            RoundedBitmapDrawableFactory.create(mActivity.getResources(), resource);
+                    float radius = mActivity.getResources().getDimension(R.dimen.playlist_image_radius_small);
+
+                    circularBitmapDrawable.setCornerRadius(radius);
+
+                    argHolder.image.setImageDrawable(circularBitmapDrawable);
+                }
+            });
+            //Glide.with(mActivity).load("").placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription)).into(argHolder.image);
         }
 
         if (argHolder.text_container != null) {
@@ -423,33 +457,5 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
         return pluralNew;
-    }
-
-    /*
-    Does not work properly
-     */
-    @MainThread
-    private synchronized void preloadImages(int argWidth, int argHeight) {
-
-        if (argWidth == prefetchWidth &&  argHeight == prefetchHeight) {
-            return;
-        }
-
-        if (argWidth <= 0 || argHeight <= 0) {
-            return;
-        }
-
-        if (mSubscriptions == null) {
-            return;
-        }
-
-        prefetchWidth = argWidth;
-        prefetchHeight = argHeight;
-
-        for (int i = 0; i < mSubscriptions.size(); i++) {
-            Subscription subscription = mSubscriptions.get(i);
-            ImageLoaderUtils.getGlide(mActivity, subscription.getUrl(), ImageLoaderUtils.NO_NETWORK)
-                    .override(prefetchWidth, prefetchHeight).preload();
-        }
     }
 }

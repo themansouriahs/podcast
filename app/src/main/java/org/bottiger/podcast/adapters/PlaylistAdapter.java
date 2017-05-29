@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -14,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
@@ -27,6 +30,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.Overlay;
 import org.bottiger.podcast.views.PlayPauseImageView;
 import org.bottiger.podcast.views.PlaylistViewHolder;
@@ -94,7 +98,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         String image = item.getArtwork(mActivity);
         if (StrUtils.isValidUrl(image)) {
             assert image != null;
-            ImageLoaderUtils.getGlide(mActivity, image).centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
+
+            RequestOptions options = new RequestOptions();
+            options.centerCrop();
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
+            builder.apply(options);
+            builder.into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
                 @Override
                 protected void setResource(Bitmap resource) {
                     RoundedBitmapDrawable circularBitmapDrawable =

@@ -25,8 +25,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.MainActivity;
@@ -337,13 +337,8 @@ public class NotificationPlayer extends BroadcastReceiver {
             ImageLoaderUtils.getGlide(mPlayerService, url)
                     .into(new SimpleTarget<Bitmap>(512, 512) {
                         @Override
-                        public void onResourceReady(Bitmap argBitmap, GlideAnimation anim) {
-                            displayNotification(isPlaying, argBitmap);
-                        }
-
-                        @Override
-                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                            return;
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            displayNotification(isPlaying, resource);
                         }
                     });
         }

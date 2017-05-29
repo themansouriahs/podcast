@@ -2,7 +2,6 @@ package org.bottiger.podcast.utils.image;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.data.DataFetcher;
-import com.bumptech.glide.load.model.stream.StreamModelLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +9,7 @@ import java.io.InputStream;
 /**
  * Created by aplb on 11-12-2016.
  */
+/*
 public class NetworkDisablingLoader implements StreamModelLoader<String> {
     @Override public DataFetcher<InputStream> getResourceFetcher(final String model, int width, int height) {
         return new DataFetcher<InputStream>() {
@@ -22,3 +22,4 @@ public class NetworkDisablingLoader implements StreamModelLoader<String> {
         };
     }
 }
+*/

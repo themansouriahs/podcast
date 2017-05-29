@@ -9,7 +9,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 377        // even - release. Odd - development
+        versionCode 378        // even - release. Odd - development
         versionName "0.157" // even - release. Odd - development
         multiDexEnabled = true
 
@@ -28,6 +28,8 @@ android {
         }
 
     }
+
+    android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
 
     dataBinding {
         enabled = true
@@ -141,8 +143,14 @@ dependencies {
     implementation 'io.requery:sqlite-android:3.16.2'
     implementation 'com.google.android.exoplayer:exoplayer:r2.4.0'
     implementation 'com.wdullaer:materialdatetimepicker:3.1.1'
+
     // Glide
-    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.github.bumptech.glide:glide:4.0.0-RC0'
+    implementation "com.github.bumptech.glide:okhttp3-integration:4.0.0-RC0"
+    implementation 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+    implementation "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC0"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+
     implementation 'net.steamcrafted:materialiconlib:1.1.2'
     implementation 'org.whispersystems:libpastelog:1.0.7'
     implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
