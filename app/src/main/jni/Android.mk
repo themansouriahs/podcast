@@ -18,7 +18,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 # Sonic
-LOCAL_MODULE    := sonic2
+LOCAL_MODULE    := sonic
 LOCAL_SRC_FILES := sonicjni.c sonic.c
 LOCAL_CFLAGS    := -Wall
 LOCAL_LDLIBS    := -llog
