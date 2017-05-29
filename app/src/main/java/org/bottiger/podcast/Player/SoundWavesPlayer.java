@@ -51,8 +51,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
     private boolean isPreparingMedia = false;
 
-    int bufferProgress = 0;
-    float playbackSpeed = 1.0f;
+    private int bufferProgress = 0;
+    private float playbackSpeed = 1.0f;
 
     @NonNull
     private NewExoPlayer mExoplayer;

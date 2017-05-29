@@ -302,12 +302,22 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
                 url);
     }
 
-    static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+    public static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
+        GenericMediaPlayerInterface player = SoundWaves.getAppContext(argContext).getPlayer();
         long episodeOffset = argEpisode.getOffset();
-        long offset = Math.max(episodeOffset, 0);
+        if (argEpisode.equals(player.getEpisode()))
+        {
+            episodeOffset = player.getCurrentPosition();
+        }
+
+        long offset = Math.max(episodeOffset, 0); //always positive
+
+        long episodeLength = argEpisode.getDuration();
+        long epilogStart = episodeLength - 10 * 1000;// 10 sec
+        offset = Math.min(offset, epilogStart); // always have 10 sec left
 
         ISubscription subscription = argEpisode.getSubscription(argContext);
-        if (subscription != null && subscription.doSkipIntro()) {
+        if (subscription.doSkipIntro()) {
             long startSkipAmount = PreferenceHelper.getLongPreferenceValue(argContext, R.string.pref_skip_intro_key, R.integer.skip_into_default);
             offset = Math.max(offset, startSkipAmount);
         }
