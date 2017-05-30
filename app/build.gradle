@@ -57,6 +57,18 @@ android {
     productFlavors {
 
         dev {
+            // To avoid using legacy multidex when building from the command line,
+            // set minSdkVersion to 21 or higher. When using Android Studio 2.3 or higher,
+            // the build automatically avoids legacy multidex when deploying to a device running
+            // API level 21 or higher—regardless of what you set as your minSdkVersion.
+            minSdkVersion 21
+            versionNameSuffix "-dev"
+            //applicationIdSuffix '.dev'
+
+            // The following configuration limits the "dev" flavor to using
+            // English stringresources and xxhdpi screen-density resources.
+            resConfigs "en", "xxhdpi"
+
             buildConfigField "boolean", "DEV_MODE", "true"
             buildConfigField "boolean", "PRIVATE_MODE", "false"
             buildConfigField "boolean", "LIBRE_MODE", "true"
@@ -91,7 +103,8 @@ android {
 
     // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
     dexOptions {
-        maxProcessCount 4
+        preDexLibraries true
+        maxProcessCount 8
         javaMaxHeapSize "2g"
     }
 
