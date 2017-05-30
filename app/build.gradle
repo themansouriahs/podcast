@@ -9,8 +9,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 378        // even - release. Odd - development
-        versionName "0.158" // even - release. Odd - development
+        versionCode 380        // even - release. Odd - development
+        versionName "0.158.2" // even - release. Odd - development
         multiDexEnabled = true
 
         vectorDrawables.useSupportLibrary = true
@@ -71,7 +71,7 @@ android {
 
             buildConfigField "boolean", "DEV_MODE", "true"
             buildConfigField "boolean", "PRIVATE_MODE", "false"
-            buildConfigField "boolean", "LIBRE_MODE", "true"
+            buildConfigField "boolean", "LIBRE_MODE", "false"
         }
 
         free {
