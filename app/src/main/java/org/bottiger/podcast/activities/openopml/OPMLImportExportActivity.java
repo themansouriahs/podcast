@@ -88,7 +88,6 @@ public class OPMLImportExportActivity extends ToolbarActivity {
 
         Button exportOPML = (Button) findViewById(R.id.bOMPLexport);
         exportOPML.setOnClickListener(new View.OnClickListener() {
-            @Nullable
             @Override
             public void onClick(View view) {
                 //The return data is not checked in this particular case
