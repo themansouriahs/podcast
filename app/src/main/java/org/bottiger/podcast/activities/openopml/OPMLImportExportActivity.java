@@ -3,6 +3,7 @@ package org.bottiger.podcast.activities.openopml;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,9 +14,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
+import org.bottiger.podcast.utils.SDCardManager;
+
+import java.io.IOException;
 
 import static org.bottiger.podcast.SubscriptionsFragment.RESULT_EXPORT;
 import static org.bottiger.podcast.SubscriptionsFragment.RESULT_EXPORT_TO_CLIPBOARD;
@@ -46,6 +51,20 @@ public class OPMLImportExportActivity extends ToolbarActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, INTERNAL_STORAGE_PERMISSION_REQUEST);
 
         }
+
+        TextView opml_import_export_text = (TextView) findViewById(R.id.export_opml_text);
+        Resources res = getResources();
+        String opml_text = null;
+        try {
+            String dir = SDCardManager.getExportDir();
+            opml_text = String.format(res.getString(R.string.opml_export_explanation_dynamic), dir);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            opml_text = res.getString(R.string.opml_export_explanation_dynamic);
+        }
+
+        opml_import_export_text.setText(opml_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.opml_import_export_toolbar);
         if (toolbar != null) {
