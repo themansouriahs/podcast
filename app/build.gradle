@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
         applicationId "org.bottiger.podcast"
@@ -20,11 +20,12 @@ android {
 
         ndk {
             abiFilters "armeabi-v7a", "x86"
-
-
-            //moduleName "hello-jni"
-            moduleName "sonic2"
-            //moduleName "swutils"
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+                arguments '-DANDROID_PLATFORM=android-16', '-DANDROID_TOOLCHAIN=clang'
+            }
         }
     }
 
@@ -97,6 +98,16 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    // Encapsulates your external native build configurations.
+    externalNativeBuild {
+
+        // Encapsulates your CMake build configurations.
+        cmake {
+            // Provides a relative path to your CMake build script.
+            path "src/main/cpp/CMakeLists.txt"
+        }
     }
 }
 
