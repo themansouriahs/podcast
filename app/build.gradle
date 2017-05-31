@@ -161,8 +161,10 @@ dependencies {
 
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'
+
     compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
     compile 'com.google.http-client:google-http-client-gson:1.22.0'
+
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
@@ -194,6 +196,8 @@ dependencies {
     configurations.all {
         resolutionStrategy.force 'com.android.support:support-annotations:25.1.0'
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
+
+        exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
     // Espresso
 
