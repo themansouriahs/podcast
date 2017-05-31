@@ -9,7 +9,7 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 380        // even - release. Odd - development
+        versionCode 381        // even - release. Odd - development
         versionName "0.158.2" // even - release. Odd - development
         multiDexEnabled = true
 
@@ -150,8 +150,15 @@ dependencies {
     compile 'io.requery:sqlite-android:3.16.2'
     compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
     compile 'com.wdullaer:materialdatetimepicker:3.1.1'
+
     // Glide
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
+    compile "com.github.bumptech.glide:okhttp3-integration:4.0.0-RC0"
+    compile 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+    //compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC0"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+
+
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'
     compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
@@ -175,15 +182,15 @@ dependencies {
 
     compile 'org.unbescape:unbescape:1.1.4.RELEASE'
 
-    compile 'com.google.dagger:dagger:2.9'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.9'
+    compile 'com.google.dagger:dagger:2.10'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
 
     //compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.13'
     compile project(":armv7-fmmr")
 
     // For testing only
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'org.mockito:mockito-core:2.7.6'
     configurations.all {
         resolutionStrategy.force 'com.android.support:support-annotations:25.1.0'
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
