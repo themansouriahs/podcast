@@ -325,13 +325,11 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		IEpisode currentItem = getCurrentItem();
 
-		if (currentItem != null) {
-			if (argEpisode.equals(currentItem) && player.isInitialized()) {
-				if (!player.isPlaying()) {
-					start();
-				}
-				return true;
+		if (argEpisode.equals(currentItem) && player.isInitialized()) {
+			if (!player.isPlaying()) {
+				start();
 			}
+			return true;
 		}
 
 		currentItem = setCurrentItem(argEpisode);
@@ -374,8 +372,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		if (url == null) {
 			ISubscription subscription = argEpisode.getSubscription(this);
-			if (subscription != null)
-				VendorCrashReporter.report("Malform episode", "subscription: " + subscription.toString());
+			VendorCrashReporter.report("Malform episode", "subscription: " + subscription.toString());
 
 			Log.wtf(TAG, "Malform episode");
 			return false;
