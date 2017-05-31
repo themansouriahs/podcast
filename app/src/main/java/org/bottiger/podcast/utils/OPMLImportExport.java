@@ -188,8 +188,8 @@ public class OPMLImportExport {
 	private void toastMsg(final CharSequence msg) {
 		Activity activity = null;
 
-		if (mActivity instanceof Activity) {
-			activity = (Activity) mActivity;
+		if (mActivity != null) {
+			activity = mActivity;
 		}
 
 		if (activity == null) return;
@@ -218,6 +218,7 @@ public class OPMLImportExport {
 
 			fileWriter = new FileWriter(fileOut);
 		} catch (IOException e) {
+			toastMsg(opmlFailedToExport);
 			VendorCrashReporter.handleException(e);
 		}
 

@@ -23,6 +23,7 @@ import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.AppWidgetTarget;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.Library;
@@ -103,6 +104,10 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         // package, but it needs this because on the other side it's the widget host inflating
         // the layout from our package).
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_default);
+
+        Intent appIntent = new Intent(context, MainActivity.class);
+        PendingIntent intent = PendingIntent.getActivity(context, 0, appIntent, 0);
+        views.setOnClickPendingIntent(R.id.widget_playlist_main, intent);
 
         boolean playlistEmpty = playlist.size() == 0;
         int emptyTextVisibility = playlistEmpty ? View.VISIBLE : View.GONE;
