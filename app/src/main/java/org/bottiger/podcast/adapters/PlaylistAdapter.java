@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -30,9 +29,8 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.utils.WhitenessUtils;
 import org.bottiger.podcast.views.Overlay;
-import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayPauseButton;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 import java.lang.annotation.Retention;
@@ -150,7 +148,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);
         }
 
-        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
+        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseButton.PLAYLIST);
         viewHolder.mPlayPauseButton.setStatus(STATE_IDLE);
         viewHolder.downloadButton.setEpisode(item);
 
@@ -191,7 +189,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.seekbar.setEpisode(argEpisode);
         holder.seekbar.setOverlay(mOverlay);
 
-        holder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
+        holder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseButton.PLAYLIST);
         holder.downloadButton.setEpisode(argEpisode);
 
         ISubscription subscription = argEpisode.getSubscription(context);

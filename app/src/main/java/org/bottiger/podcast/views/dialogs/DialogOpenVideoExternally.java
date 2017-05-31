@@ -13,7 +13,7 @@ import android.support.annotation.NonNull;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
-import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayPauseButton;
 
 /**
  * Created by aplb on 15-09-2015.
@@ -46,7 +46,7 @@ public class DialogOpenVideoExternally extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         // Open another player with the video
                         persistChoice(prefs, openExternallyKey, true);
-                        PlayPauseImageView.openVideoExternally(sEpisode, activity);
+                        PlayPauseButton.openVideoExternally(sEpisode, activity);
                         sEpisode = null;
                     }
                 })

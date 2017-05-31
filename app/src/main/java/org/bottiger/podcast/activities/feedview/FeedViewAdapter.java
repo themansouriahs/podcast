@@ -26,7 +26,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
-import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayPauseButton;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -164,8 +164,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             playerStatus = STATE_READY;
         }
 
-        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
-        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseImageView.FEEDVIEW);
+        episodeViewHolder.mPlayPauseButton.setEpisode(item, PlayPauseButton.FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(item, PlayPauseButton.FEEDVIEW);
         episodeViewHolder.mDownloadButton.setEpisode(item);
 
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);

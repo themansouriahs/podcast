@@ -36,7 +36,7 @@
         android:progress="30" />
 
 
-    <org.bottiger.podcast.views.PlayPauseImageView
+    <org.bottiger.podcast.views.PlayPauseButton
         android:id="@+id/playpause"
         app:layout_widthPercent="25%"
         android:layout_height="match_parent"

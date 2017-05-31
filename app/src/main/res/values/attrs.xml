@@ -79,7 +79,7 @@
         <attr name="lineColor" format="color"/>
     </declare-styleable>
 
-    <declare-styleable name="PlayPauseImageView">
+    <declare-styleable name="PlayPauseButton">
        <attr name="drawBackground" format="boolean" />
     </declare-styleable>
 

@@ -28,7 +28,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
 
     private RelativeLayout mMainContainer;
 
-    public PlayPauseImageView mPlayPauseButton;
+    public PlayPauseButton mPlayPauseButton;
     public PlayerButtonView mForward;
 
     public ScrollView mExpandedLayoutBottom;
@@ -61,7 +61,7 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder implements Expan
         mActivity = argActivity;
 
         mMainContainer = (RelativeLayout) view.findViewById(R.id.main_player_container);
-        mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.list_image);
+        mPlayPauseButton = (PlayPauseButton) view.findViewById(R.id.list_image);
         mPodcastImage = (ImageViewTinted) view.findViewById(R.id.podcast_image);
         mMainTitle = (TextView) view.findViewById(R.id.episode_title);
         mSecondaryTitle = (TextView) view.findViewById(R.id.podcast_title);

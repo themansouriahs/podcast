@@ -20,7 +20,7 @@
         android:layout_alignParentLeft="true"
         android:scaleType="centerCrop"/>
 
-    <org.bottiger.podcast.views.PlayPauseImageView
+    <org.bottiger.podcast.views.PlayPauseButton
         style="@style/PodcastImage"
         android:id="@+id/list_image"
         android:layout_alignParentRight="true"

@@ -82,7 +82,7 @@
         android:maxHeight="2dp"
         android:progress="30" />
 
-    <org.bottiger.podcast.views.PlayPauseImageView
+    <org.bottiger.podcast.views.PlayPauseButton
         android:id="@+id/playpause"
         android:layout_width="48dp"
         android:layout_height="48dp"

@@ -17,7 +17,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.FeedViewQueueButton;
-import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayPauseButton;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -52,7 +52,7 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
     public TextView mTitle;
     public TextView mTextSecondary;
     public TextView mDescription;
-    public PlayPauseImageView mPlayPauseButton;
+    public PlayPauseButton mPlayPauseButton;
     public FeedViewQueueButton mQueueButton;
     public DownloadButtonView mDownloadButton;
 
@@ -70,7 +70,7 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
         mTitle = (TextView) view.findViewById(R.id.title);
         mTextSecondary = (TextView) view.findViewById(R.id.subtitle);
         mDescription = (TextView) view.findViewById(R.id.episode_description);
-        mPlayPauseButton = (PlayPauseImageView) view.findViewById(R.id.play_pause_button);
+        mPlayPauseButton = (PlayPauseButton) view.findViewById(R.id.play_pause_button);
         mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
         mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
 

@@ -138,7 +138,7 @@ public class FeedViewQueueButton extends PlayerButtonView implements View.OnClic
         toggle();
     }
 
-    public synchronized void setEpisode(IEpisode argEpisode, @PlayPauseImageView.ButtonLocation int argLocation) {
+    public synchronized void setEpisode(IEpisode argEpisode, @PlayPauseButton.ButtonLocation int argLocation) {
         super.setEpisode(argEpisode);
         PlayerService ps = PlayerService.getInstance();
         if (ps != null) {
