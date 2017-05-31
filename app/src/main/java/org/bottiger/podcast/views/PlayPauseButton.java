@@ -1,5 +1,9 @@
 package org.bottiger.podcast.views;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -12,10 +16,12 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -23,10 +29,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Property;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.MimeTypeMap;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -54,6 +62,7 @@ import org.bottiger.podcast.views.drawables.PlayPauseDrawable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -68,11 +77,41 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * TODO: document your custom view class.
  */
-public class PlayPauseButton extends PlayPauseView implements DownloadObserver,
+public class PlayPauseButton extends View implements DownloadObserver,
                                                                 View.OnClickListener,
                                                                 ExoPlayer.EventListener {
 
     private static final String TAG = PlayPauseButton.class.getSimpleName();
+
+    private static final Property<PlayPauseButton, Integer> COLOR =
+            new Property<PlayPauseButton, Integer>(Integer.class, "color") {
+                @Override
+                public Integer get(PlayPauseButton v) {
+                    return v.getColor();
+                }
+
+                @Override
+                public void set(PlayPauseButton v, Integer value) {
+                    v.setColor(value);
+                }
+            };
+
+    private static final long PLAY_PAUSE_ANIMATION_DURATION = 200;
+
+    private ReentrantLock mLock = new ReentrantLock();
+
+    private PlayPauseDrawable mDrawable;
+    private final Paint mPaint = new Paint();
+    private final Paint mPaintBackground = new Paint();
+    private int mPauseBackgroundColor;
+    private int mPlayBackgroundColor;
+
+    private AnimatorSet mAnimatorSet;
+    private int mBackgroundColor;
+
+    private @ColorRes
+    int color1 = R.color.colorPrimaryDark;
+    private @ColorRes int color2 = R.color.colorPrimaryDark;
 
     private static final boolean DEBUG = false;
 
@@ -153,6 +192,18 @@ public class PlayPauseButton extends PlayPauseView implements DownloadObserver,
     private void init(Context argContext) {
 
         setWillNotDraw(false);
+        mBackgroundColor = ContextCompat.getColor(argContext, color1);
+        mPaint.setAntiAlias(true);
+        mPaint.setStyle(Paint.Style.FILL);
+
+        mPaintBackground.setAntiAlias(true);
+        mPaintBackground.setStyle(Paint.Style.FILL);
+
+        mDrawable = new PlayPauseDrawable(argContext);
+        mDrawable.setCallback(this);
+
+        mPauseBackgroundColor = ContextCompat.getColor(argContext, color1);
+        mPlayBackgroundColor = ContextCompat.getColor(argContext, color2);
 
         mContext = argContext;
 
@@ -209,6 +260,23 @@ public class PlayPauseButton extends PlayPauseView implements DownloadObserver,
             a.recycle();
         }
 
+    }
+
+    private int getColor() {
+        return mBackgroundColor;
+    }
+
+    @Override
+    protected boolean verifyDrawable(Drawable who) {
+        return who == mDrawable || super.verifyDrawable(who);
+    }
+
+    @MainThread
+    public void setColor(int color) {
+        mBackgroundColor = color;
+        mPlayBackgroundColor = color;
+        mPauseBackgroundColor = color;
+        invalidate();
     }
 
     /*
@@ -281,6 +349,16 @@ public class PlayPauseButton extends PlayPauseView implements DownloadObserver,
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        mPaint.setColor(mBackgroundColor);
+        final float radius_circle = Math.min(getWidth(), getHeight()) / 2f;
+        final float cx = getWidth()/2f;
+        final float cy = getHeight()/2f;
+        canvas.drawCircle(cx, cy, radius_circle, mPaint);
+
+        //float transY = (getHeight()-getWidth())/2f;
+        //canvas.translate(0, transY);
+        mDrawable.draw(canvas);
 
         if (!DRAW_PROGRESS) {
             return;
@@ -401,12 +479,7 @@ public class PlayPauseButton extends PlayPauseView implements DownloadObserver,
 
         return out;
     }
-
-
-    private boolean animationStartedLessThanOneSecondAgo(long argFirstDisplayed) {
-        return System.currentTimeMillis()-argFirstDisplayed < 1000 && argFirstDisplayed != -1;
-    }
-
+    
     private void setProgressMs(PlayerStatusProgressData argPlayerProgress) {
 
         // copy from seekbar
@@ -648,11 +721,48 @@ public class PlayPauseButton extends PlayPauseView implements DownloadObserver,
         }
     }
 
-    protected boolean drawIcon() {
-        return true;
+    public void setIconColor(@ColorInt int argColor) {
+        mDrawable.setTint(argColor);
+        invalidate();
     }
 
-    protected boolean drawBackground() {
-        return mDrawBackground;
+
+    public void setState(@PlayPauseDrawable.IconState int argState) {
+        mLock.lock();
+        try {
+            if (argState == mDrawable.getIconState())
+                return;
+
+            if (mAnimatorSet != null && mAnimatorSet.isRunning())
+                return;
+
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    public void animateChangeFrom(@PlayPauseDrawable.IconState int argFromState) {
+        mLock.lock();
+        try {
+            if (mAnimatorSet != null) {
+                mAnimatorSet.cancel();
+            }
+
+            mAnimatorSet = new AnimatorSet();
+            final boolean isPlay = mDrawable.isPlaying();
+            final ObjectAnimator colorAnim = ObjectAnimator.ofInt(this, COLOR, isPlay ? mPauseBackgroundColor : mPlayBackgroundColor);
+            colorAnim.setEvaluator(new ArgbEvaluator());
+            final Animator pausePlayAnim = argFromState == PlayPauseDrawable.IS_PLAYING ? mDrawable.getToPauseAnimator(): mDrawable.getToPlayAnimator();
+            mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+            mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
+            mAnimatorSet.playTogether(colorAnim, pausePlayAnim);
+            mAnimatorSet.start();
+        } finally {
+            mLock.unlock();
+        }
+    }
+
+    public boolean IsDisplayingPlayIcon() {
+        return !mDrawable.isPlaying();
     }
 }
