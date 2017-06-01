@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import org.bottiger.podcast.cloud.EventLogger;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCodeFactory;
@@ -91,6 +92,8 @@ public class SoundWaves extends MultiDexApplication {
         Log.v(TAG, "App start time: " + System.currentTimeMillis());
         super.onCreate();
         //Debug.startMethodTracing("startup6");
+
+        injectDependencies();
 
         UIUtils.setTheme(getApplicationContext());
 
@@ -298,6 +301,11 @@ public class SoundWaves extends MultiDexApplication {
                 getMediaBrowserCallback(),
                 null); // optional Bundle
         mMediaBrowser.connect();
+    }
+
+    private void injectDependencies() {
+        DependencyInjector.initialize(this);
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     @NonNull

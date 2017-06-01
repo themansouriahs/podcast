@@ -26,10 +26,12 @@ import android.util.Log;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
+import org.bottiger.podcast.player.Player;
 import org.bottiger.podcast.player.PlayerPhoneListener;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.playlist.Playlist;
@@ -49,6 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import io.reactivex.processors.FlowableProcessor;
 
@@ -74,6 +77,11 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public static final int NEXT_IN_PLAYLIST = 3;
 
 	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
+
+	@Inject
+	GenericMediaPlayerInterface mPlayer;
+
+	@Inject Playlist mPlaylist;
 
     private MediaControllerCompat mController;
 
@@ -121,6 +129,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		super.onCreate();
         Log.d(TAG, "PlayerService started");
 
+		DependencyInjector.applicationComponent().inject(this);
+		Log.d(TAG, "Service injection");
+
 		sInstance = this;
 
         wifiLock = ((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE))
@@ -131,7 +142,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		mPlayerStatusObservable = new PlayerStatusObservable(this);
 
-		SoundWaves.getAppContext(this).getPlayer().setPlayerService(this);
+		mPlayer.setPlayerService(this);
 
 		try {
 			mController = new MediaControllerCompat(getApplicationContext(), mPlayerStateManager.getToken()); // .fromToken( mSession.getSessionToken() );
@@ -223,9 +234,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public void onDestroy() {
 		sInstance = null;
         super.onDestroy();
-		GenericMediaPlayerInterface player = getPlayer();
-		if (player != null) {
-			player.release();
+		if (mPlayer != null) {
+			mPlayer.release();
 		}
 	}
 
@@ -255,7 +265,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		mNotificationManager.cancel(NotificationPlayer.NOTIFICATION_PLAYER_ID);
 
-		getPlayer().removeNotificationPlayer();
+		mPlayer.removeNotificationPlayer();
 	}
 
 	/**
@@ -265,16 +275,15 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		SoundWavesWidgetProvider.updateAllWidgets(this, mPlayerStateManager.getState());
 
-		getPlayer().updateNotificationPlayer();
+		mPlayer.updateNotificationPlayer();
 
         mPlayerStatusObservable.startProgressUpdate(isPlaying());
     }
 
 	public void playNext() {
         IEpisode item = getCurrentItem();
-        Playlist playlist = SoundWaves.getAppContext(this).getPlaylist();
 
-        IEpisode nextItem = playlist.getNext();
+        IEpisode nextItem = mPlaylist.getNext();
 
 		if (item != null && item instanceof FeedItem) {
             ((FeedItem)item).trackEnded(getContentResolver());
@@ -285,23 +294,22 @@ public class PlayerService extends MediaBrowserServiceCompat implements
             return;
         }
 
-        playlist.removeFirst();
-        playlist.notifyPlaylistChanged();
+        mPlaylist.removeFirst();
+        mPlaylist.notifyPlaylistChanged();
 
 		play(nextItem, false);
 	}
 
 	public void play() {
-		GenericMediaPlayerInterface player = getPlayer();
 
-		if (player == null)
+		if (mPlayer == null)
 			return;
 
-		if (player.isPlaying())
+		if (mPlayer.isPlaying())
 			return;
 
         if (mItem == null)
-			setCurrentItem(SoundWaves.getAppContext(this).getPlaylist().first());
+			setCurrentItem(mPlaylist.first());
 
         if (mItem == null)
             return;
@@ -316,32 +324,29 @@ public class PlayerService extends MediaBrowserServiceCompat implements
      */
 	public boolean play(@NonNull IEpisode argEpisode, boolean triggeredManually) {
 
-		GenericMediaPlayerInterface player = getPlayer();
-
 		// Pause the current episode in order to save the current state
-		if (player.isPlaying()) {
-			player.pause();
+		if (mPlayer.isPlaying()) {
+			mPlayer.pause();
 		}
 
 		IEpisode currentItem = getCurrentItem();
 
-		if (argEpisode.equals(currentItem) && player.isInitialized()) {
-			if (!player.isPlaying()) {
+		if (argEpisode.equals(currentItem) && mPlayer.isInitialized()) {
+			if (!mPlayer.isPlaying()) {
 				start();
 			}
 			return true;
 		}
 
 		currentItem = setCurrentItem(argEpisode);
-        Playlist playlist = SoundWaves.getAppContext(this).getPlaylist();
 
         if (triggeredManually)
-            playlist.setAsFrist(currentItem);
+            mPlaylist.setAsFrist(currentItem);
 
         float speed = getPlaybackSpeed(this, currentItem);
 
-        player.setPlaybackSpeed(speed);
-        player.setDataSourceAsync(currentItem);
+        mPlayer.setPlaybackSpeed(speed);
+        mPlayer.setDataSourceAsync(currentItem);
 
 		updateMetadata(currentItem);
 
@@ -360,7 +365,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@MainThread
 	public boolean toggle(@NonNull IEpisode argEpisode) {
 
-        if (getPlayer().isPlaying()) {
+        if (mPlayer.isPlaying()) {
             IEpisode item = getCurrentItem();
             if (argEpisode.equals(item)) {
                 pause();
@@ -397,18 +402,18 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	}
 
 	private void start() {
-		if (!getPlayer().isPlaying()) {
+		if (!mPlayer.isPlaying()) {
 			if (mItem == null)
-				setCurrentItem(SoundWaves.getAppContext(this).getPlaylist().first());
+				mPlaylist.first();
 
 			if (mItem == null)
 				return;
 
-			getPlayer().setVolume(1.0f);
+			mPlayer.setVolume(1.0f);
 
-            takeWakelock(getPlayer().isSteaming());
-			SoundWaves.getAppContext(this).getPlaylist().setAsFrist(mItem);
-			getPlayer().start();
+            takeWakelock(mPlayer.isSteaming());
+			mPlaylist.setAsFrist(mItem);
+			mPlayer.start();
 
 			notifyStatusChanged();
 		}
@@ -418,17 +423,15 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		stopForeground(false);
 
-		GenericMediaPlayerInterface player = getPlayer();
-
-		if (!player.isPlaying()) {
+		if (!mPlayer.isPlaying()) {
 			return;
 		}
 
 		if (mItem != null) {
-            mItem.setOffset(player.getCurrentPosition());
+            mItem.setOffset(mPlayer.getCurrentPosition());
 		}
 
-		player.pause();
+		mPlayer.pause();
         releaseWakelock();
 
 		notifyStatusChanged();
@@ -436,14 +439,14 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	public void stop() {
 		pause();
-		getPlayer().stop();
+		mPlayer.stop();
 		mItem = null;
 		dis_notifyStatus();
 	}
 
 	public void halt() {
         dis_notifyStatus();
-		getPlayer().pause();
+		mPlayer.pause();
 	}
 
 	public static boolean isPlaying() {
@@ -459,22 +462,12 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		return player.isPlaying();
 	}
 
-	public long seek(long offset) {
-		offset = offset < 0 ? 0 : offset;
-
-		mItem.setOffset(offset);
-
-		notifyStatusChanged();
-
-		return getPlayer().seekTo(offset);
-	}
-
 	public long position() {
-		return getPlayer().getCurrentPosition();
+		return mPlayer.getCurrentPosition();
 	}
 
 	public long duration() {
-		return getPlayer().getCurrentPosition();
+		return mPlayer.getCurrentPosition();
 	}
 
 	public IEpisode setCurrentItem(@Nullable IEpisode argEpisode) {
@@ -518,7 +511,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	 */
     @Nullable
 	public IEpisode getNext() {
-		IEpisode next = SoundWaves.getAppContext(this).getPlaylist().nextEpisode();
+		IEpisode next = mPlaylist.nextEpisode();
 		if (next != null)
 			return next;
 		return null;
@@ -576,7 +569,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		if (!chapterProcessor.hasSubscribers())
 			return;
 
-		IEpisode episode = SoundWaves.getAppContext(this).getPlaylist().first();
+		IEpisode episode = mPlaylist.first();
 		long currentPosition = position();
 		Integer lastChapterIndex = ChapterUtil.getCurrentChapterIndex(episode, lastPosition);
 		Integer currentChapterIndex = ChapterUtil.getCurrentChapterIndex(episode, currentPosition);
