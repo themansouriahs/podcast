@@ -159,6 +159,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     public void setDataSourceAsync(@NonNull IEpisode argEpisode) throws SecurityException {
         super.setDataSourceAsync(argEpisode);
 
+        seekTo(startPos);
+
         try {
 
             String path = getDataSourceUrl(argEpisode, mContext);
@@ -173,6 +175,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
             Uri uri = Uri.parse(path);
             setDataSource(mPlayerService, uri);
+            prepare();
 
             setAudioStreamType(PlayerStateManager.AUDIO_STREAM);
 
@@ -190,10 +193,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         setOnCompletionListener(completionListener);
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
-
-        seekTo(startPos);
-
-        prepare();
 
         mIsInitialized = true;
 
@@ -470,15 +469,10 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     }
 
     @Override
-    public void prepare() {
-        //mExoplayer.prepare();
-    }
-
-    @Override
     public void setDataSource(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException, IOException {
         ExoPlayerMediaSourceHelper mediaSourceHelper = new ExoPlayerMediaSourceHelper(context);
         MediaSource source = mediaSourceHelper.buildMediaSource(uri);
-        mExoplayer.prepare(source);
+        mExoplayer.prepare(source, true, false);
     }
 
     @Override

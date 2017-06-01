@@ -365,4 +365,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public long timeUntilFadeout() {
         return mSleepTimer - System.currentTimeMillis();
     }
+
+    public void prepare() throws IllegalStateException, IOException {
+
+    }
 }
