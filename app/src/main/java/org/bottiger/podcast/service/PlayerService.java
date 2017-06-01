@@ -78,9 +78,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	private static @PlayerService.NextTrack int nextTrack = NEXT_IN_PLAYLIST;
 
-	@Inject
-	GenericMediaPlayerInterface mPlayer;
-
+	@Inject GenericMediaPlayerInterface mPlayer;
 	@Inject Playlist mPlaylist;
 
     private MediaControllerCompat mController;

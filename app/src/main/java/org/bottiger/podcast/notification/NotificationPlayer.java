@@ -38,7 +38,7 @@ import org.bottiger.podcast.utils.ImageLoaderUtils;
 
 public class NotificationPlayer extends BroadcastReceiver {
 
-    private static final String TAG = "NotificationPlayer";
+    private static final String TAG = NotificationPlayer.class.getSimpleName();
 
     public static final String toggleAction = ApplicationConfiguration.packageName + ".TOGGLE";
     public static final String nextAction = ApplicationConfiguration.packageName + ".NEXT";
