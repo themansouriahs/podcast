@@ -42,7 +42,7 @@ import static org.bottiger.podcast.service.PlayerService.getCurrentItem;
  */
 public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlayerBase {
 
-    private static final String TAG = "SoundWavesPlayerBase";
+    private static final String TAG = SoundWavesPlayer.class.getSimpleName();
 
     private static final float MARK_AS_LISTENED_RATIO_THRESHOLD = 0.9f;
     private static final float MARK_AS_LISTENED_MINUTES_LEFT_THRESHOLD = 5f;
@@ -189,6 +189,54 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             return;
         }
 
+        mExoplayer.addListener(new ExoPlayer.EventListener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+            }
+
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+            }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                if (playbackState == STATE_ENDED) {
+                    completionListener.onCompletion(SoundWavesPlayer.this);
+                }
+
+                if (playbackState == STATE_BUFFERING) {
+                    bufferListener.onBufferingUpdate(SoundWavesPlayer.this, 0);
+                }
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                errorListener.onError(SoundWavesPlayer.this, error.type, 0);
+            }
+
+            @Override
+            public void onPositionDiscontinuity() {
+
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+            }
+        });
+
+
+        mExoplayer
+
+
+
         setOnCompletionListener(completionListener);
         setOnBufferingUpdateListener(bufferListener);
         setOnErrorListener(errorListener);
@@ -255,7 +303,9 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
      */
     public void pause() {
 
-        mExoplayer.setPlayWhenReady(false);
+        if (isPlaying()) {
+            mExoplayer.setPlayWhenReady(false);
+        }
 
         mStatus = PlayerStatusObservable.PAUSED;
 
@@ -270,6 +320,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         @Override
         public void onCompletion(GenericMediaPlayerInterface mp) {
             Log.d(TAG, "OnCompletionListener");
+
+            mExoplayer.stop();
             mPlayerStateManager.updateState(PlaybackStateCompat.STATE_STOPPED, 0, playbackSpeed);
 
             if (!isPreparingMedia)
@@ -302,26 +354,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
                 SoundWaves.getAppContext(mPlayerService).getLibraryInstance().updateEpisode(feedItem);
             }
-
-            final boolean doPlayNext = PreferenceHelper.getBooleanPreferenceValue(mPlayerService,
-                    R.string.pref_continuously_playing_key,
-                    R.bool.pref_delete_when_finished_default);
-
-
-            Handler mainHandler = new Handler(mPlayerService.getMainLooper());
-
-            Runnable myRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    SoundWaves.getAppContext(mContext).getPlaylist().removeFirst();
-                    mPlayerService.stop();
-
-                    if (doPlayNext) {
-                        mPlayerService.play();
-                    }
-                }
-            };
-            mainHandler.post(myRunnable);
         }
     };
 

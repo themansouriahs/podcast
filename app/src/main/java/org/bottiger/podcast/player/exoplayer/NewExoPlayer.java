@@ -125,7 +125,7 @@ public final class NewExoPlayer implements ExoPlayer {
 
     }
 
-    private static final String TAG = "SimpleExoPlayer";
+    private static final String TAG = NewExoPlayer.class.getSimpleName();
     private static final int MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY = 50;
 
     private final ExoPlayer player;
