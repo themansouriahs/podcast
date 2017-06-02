@@ -1,10 +1,27 @@
 //apply plugin: 'idea'
 apply plugin: 'com.android.application'
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion '25.0.3'
-
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
@@ -25,23 +42,19 @@ android {
             }
         }
     }
-
     dataBinding {
         enabled = true
     }
-
     // Point Gradle at the directory where you want to root all of your native code
     // There is a default directory but I prefer to control which directories to use
     // and there will be a point later where keeping control over this is important
     sourceSets.main {
         jni.srcDirs = ["src/main/jni"];
     }
-
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
     }
-
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
@@ -50,7 +63,6 @@ android {
         exclude 'LICENSE.txt'
         exclude 'META-INF/rxjava.properties'
     }
-
     productFlavors {
 
         dev {
@@ -93,27 +105,24 @@ android {
             buildConfigField "boolean", "LIBRE_MODE", "false"
         }
     }
-
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
-
     // http://stackoverflow.com/questions/22851103/android-studio-gradle-error-multiple-dex-files-define
     dexOptions {
         preDexLibraries true
         maxProcessCount 8
         javaMaxHeapSize "2g"
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
     // Encapsulates your external native build configurations.
     externalNativeBuild {
 
@@ -142,7 +151,6 @@ dependencies {
     //compile 'com.google.apis:google-api-services-drive:+'
     compile 'io.reactivex:rxandroid:1.2.1'
     // Because RxAndroid releases are few and far between, it is recommended you also
-
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     compile 'io.reactivex:rxjava:1.2.7'
     compile 'com.jakewharton.rxbinding:rxbinding:1.0.1'
@@ -151,21 +159,16 @@ dependencies {
     compile 'io.requery:sqlite-android:3.16.2'
     compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
     compile 'com.wdullaer:materialdatetimepicker:3.1.1'
-
     // Glide
     compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
-    compile "com.github.bumptech.glide:okhttp3-integration:4.0.0-RC0"
+    compile 'com.github.bumptech.glide:okhttp3-integration:4.0.0-RC0'
     //compile 'com.github.bumptech.glide:compiler:4.0.0-RC0'
     //compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC0"
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
-
-
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'
-
     compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
     compile 'com.google.http-client:google-http-client-gson:1.22.0'
-
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
@@ -182,15 +185,11 @@ dependencies {
     compile 'com.heinrichreimersoftware:material-intro:1.6'
     compile 'com.dmitrymalkovich.android:material-design-dimens:1.4'
     compile 'com.github.daniel-stoneuk:material-about-library:1.9.0'
-
     compile 'org.unbescape:unbescape:1.1.4.RELEASE'
-
     compile 'com.google.dagger:dagger:2.10'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
-
     //compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.13'
-    compile project(":armv7-fmmr")
-
+    compile project(':armv7-fmmr')
     // For testing only
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.7.6'
@@ -201,7 +200,6 @@ dependencies {
         exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
     // Espresso
-
     // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
@@ -216,10 +214,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-
-
     // Free version
-
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
     amazonCompile 'com.google.android.gms:play-services-cast:10.2.6'
@@ -228,7 +223,6 @@ dependencies {
     amazonCompile 'com.google.android.gms:play-services-location:10.2.6'
     amazonCompile 'com.google.firebase:firebase-messaging:10.2.6'
     // google cast
-
     // Play Store
     googleCompile 'com.google.android.gms:play-services-analytics:10.2.6'
     // analytics
