@@ -1,8 +1,12 @@
 package org.bottiger.podcast.dependencyinjector;
 
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.dependencyinjector.SoundWavesModule;
 import org.bottiger.podcast.service.PlayerService;
+import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 
 import javax.inject.Singleton;
 
@@ -15,6 +19,7 @@ import dagger.Component;
 @Singleton
 @Component(modules = {SoundWavesModule.class})
 public interface SoundWavesComponent {
-    void inject(SoundWaves argApp);
-    void inject(PlayerService argPlayerservice);
+    void inject(@NonNull SoundWaves argApp);
+    void inject(@NonNull PlayerService argPlayerservice);
+    void inject(@NonNull DialogPlaylistFilters argPlaylistFilters);
 }

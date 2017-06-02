@@ -1,6 +1,8 @@
 package org.bottiger.podcast.dependencyinjector;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.bottiger.podcast.SoundWaves;
@@ -19,9 +21,11 @@ import dagger.Provides;
 @Module
 public class SoundWavesModule {
     private final SoundWaves mSoundWaves;
+    private final SharedPreferences mSharedPreferences;
 
     public SoundWavesModule(@NonNull Context argContext) {
         mSoundWaves = SoundWaves.getAppContext(argContext);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(argContext);
     }
 
     @Provides
@@ -40,6 +44,12 @@ public class SoundWavesModule {
     @Singleton
     public Playlist providePlaylist() {
         return mSoundWaves.getPlaylist();
+    }
+
+    @Provides
+    @Singleton
+    public SharedPreferences provideSharedPreferences() {
+        return mSharedPreferences;
     }
 
 }

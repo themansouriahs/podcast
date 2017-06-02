@@ -3,6 +3,7 @@ package org.bottiger.podcast.views.dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.playlist.PlaylistData;
@@ -35,15 +37,15 @@ import org.bottiger.podcast.provider.Subscription;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by Arvid on 8/18/2015.
  */
 public class DialogPlaylistFilters extends DialogFragment {
 
-    private Activity mContext;
-    @Nullable  private Playlist mPlaylist;
-
-    private SharedPreferences mSharedPreferences;
+    @Inject Playlist mPlaylist;
+    @Inject SharedPreferences mSharedPreferences;
 
     private static boolean modifyingState = false;
 
@@ -59,7 +61,7 @@ public class DialogPlaylistFilters extends DialogFragment {
     private android.support.v7.widget.SwitchCompat mOnlyDownloaded;
     private Spinner mPlaylistOrderSpinner;
 
-    private PlaylistData mPlaylistData = new PlaylistData();;
+    private PlaylistData mPlaylistData = new PlaylistData();
 
     private CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
@@ -102,18 +104,15 @@ public class DialogPlaylistFilters extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        mContext = getActivity();
-        mPlaylist = SoundWaves.getAppContext(mContext).getPlaylist();
-
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        DependencyInjector.applicationComponent().inject(this);
+        Activity context = getActivity();
 
         initSubscriptionFilters(mPlaylist);
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         // Get the layout inflater
-        LayoutInflater inflater = mContext.getLayoutInflater();
+        LayoutInflater inflater = context.getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_playlist_filters, null);
 
         mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
@@ -125,7 +124,7 @@ public class DialogPlaylistFilters extends DialogFragment {
 
         mPlaylistOrderSpinner = (Spinner) view.findViewById(R.id.drawer_playlist_sort_order);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(mContext,
+        ArrayAdapter<CharSequence> adapterSortOrder = ArrayAdapter.createFromResource(context,
                 R.array.playlist_sort_order, R.layout.simple_spinner_item_sw);
         // Specify the layout to use when the list of choices appears
         adapterSortOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -297,16 +296,6 @@ public class DialogPlaylistFilters extends DialogFragment {
         }
 
         setRadioButtonState();
-    }
-
-    private void bindPlaylistFilter(@NonNull LinearLayout argView) {
-        final DialogPlaylistContent mDialogPlaylistContent = new DialogPlaylistContent(mContext, mPlaylist);
-        argView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDialogPlaylistContent.performClick();
-            }
-        });
     }
 
     private void checkAll() {
