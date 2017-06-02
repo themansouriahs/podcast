@@ -159,8 +159,6 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     public void setDataSourceAsync(@NonNull IEpisode argEpisode) throws SecurityException {
         super.setDataSourceAsync(argEpisode);
 
-        seekTo(startPos);
-
         try {
 
             String path = getDataSourceUrl(argEpisode, mContext);
@@ -175,6 +173,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
             Uri uri = Uri.parse(path);
             setDataSource(mPlayerService, uri);
+            seekTo(startPos);
             prepare();
 
             setAudioStreamType(PlayerStateManager.AUDIO_STREAM);
