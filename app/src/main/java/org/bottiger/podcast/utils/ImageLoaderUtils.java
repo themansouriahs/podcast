@@ -56,6 +56,7 @@ public class ImageLoaderUtils {
 
         bitmapRequestBuilder = requestManager.asBitmap();
 
+        noNetwork = false;
         if (noNetwork) {
             //bitmapRequestBuilder = bitmapRequestBuilder.using(new NetworkDisablingLoader()).load(argUrl);
         } else {
