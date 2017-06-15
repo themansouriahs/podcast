@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 /** Reads OPML documents. */
 public class OpmlReader {
-	private static final String TAG = "OpmlReader";
+	private static final String TAG = OpmlReader.class.getSimpleName();
 	
 	// ATTRIBUTES
 	private boolean isInOpml = false;
@@ -28,6 +28,8 @@ public class OpmlReader {
 	 */
 	public ArrayList<OpmlElement> readDocument(Reader reader)
 			throws XmlPullParserException, IOException {
+		Log.i(TAG, "readDocument");
+
 		elementList = new ArrayList<>();
 		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -38,21 +40,19 @@ public class OpmlReader {
 		while (eventType != XmlPullParser.END_DOCUMENT) {
 			switch (eventType) {
 			case XmlPullParser.START_DOCUMENT:
-				if (ApplicationConfiguration.DEBUGGING)
-					Log.d(TAG, "Reached beginning of document");
+				Log.d(TAG, "Reached beginning of document");
 				break;
 			case XmlPullParser.START_TAG:
 				String elementName = xpp.getName();
 				if (elementName.equals(OpmlSymbols.OPML)) {
 					isInOpml = true;
-					if (ApplicationConfiguration.DEBUGGING)
-						Log.d(TAG, "Reached beginning of OPML tree.");
+					Log.d(TAG, "Reached beginning of OPML tree.");
 				} else if (isInOpml && elementName.equals(OpmlSymbols.OUTLINE)) {
-					if (ApplicationConfiguration.DEBUGGING)
-						Log.d(TAG, "Found new Opml element");
+					Log.d(TAG, "Found new Opml element");
 					OpmlElement element = new OpmlElement();
 					
 					final String title = xpp.getAttributeValue(null, OpmlSymbols.TITLE);
+
 					if (title != null) {
 						Log.i(TAG, "Using title: " + title);
 						element.setText(title);
@@ -61,10 +61,12 @@ public class OpmlReader {
 						element.setText(xpp.getAttributeValue(null, OpmlSymbols.TEXT));			
 					}
 					String xmlUrl = xpp.getAttributeValue(null, OpmlSymbols.XMLURL);
-					if (xmlUrl != null)
+					if (xmlUrl != null) {
 						element.setXmlUrl(xmlUrl);
-					else
+					} else {
 						element.setXmlUrl(xpp.getAttributeValue(null, OpmlSymbols.URL));
+					}
+
 					element.setHtmlUrl(xpp.getAttributeValue(null, OpmlSymbols.HTMLURL));
 					element.setType(xpp.getAttributeValue(null, OpmlSymbols.TYPE));
 					if (element.getXmlUrl() != null) {
@@ -74,9 +76,7 @@ public class OpmlReader {
 						}
 						elementList.add(element);
 					} else {
-						if (ApplicationConfiguration.DEBUGGING)
-							Log.d(TAG,
-									"Skipping element because of missing xml url");
+						Log.d(TAG,"Skipping element because of missing xml url");
 					}
 				}
 				break;
@@ -84,8 +84,7 @@ public class OpmlReader {
 			eventType = xpp.next();
 		}
 
-		if (ApplicationConfiguration.DEBUGGING)
-			Log.d(TAG, "Parsing finished.");
+		Log.d(TAG, "Parsing finished.");
 
 		return elementList;
 	}

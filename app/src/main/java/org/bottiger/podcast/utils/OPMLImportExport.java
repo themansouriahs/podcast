@@ -10,10 +10,12 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v7.util.SortedList;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.parser.opml.OpmlElement;
@@ -40,6 +42,8 @@ import java.util.List;
 
 public class OPMLImportExport {
 
+	private static final String TAG = OPMLImportExport.class.getSimpleName();
+
 	private static final String filename = "podcasts.opml";
 	private static final String filenameOut = "podcasts_export.opml";
 	private static final int ACTIVITY_CHOOSE_FILE = 3;
@@ -61,6 +65,7 @@ public class OPMLImportExport {
 			Manifest.permission.READ_EXTERNAL_STORAGE,
 			Manifest.permission.WRITE_EXTERNAL_STORAGE})
 	public OPMLImportExport(Activity argActivity) {
+		Log.i(TAG, "OPMLImportExport");
 		this.mActivity = argActivity;
 		this.contentResolver = argActivity.getContentResolver();
 
@@ -76,6 +81,7 @@ public class OPMLImportExport {
 			Manifest.permission.READ_EXTERNAL_STORAGE,
 			Manifest.permission.WRITE_EXTERNAL_STORAGE})
 	public List<SlimSubscription> readSubscriptionsFromOPML(@NonNull Reader argOPMLReader) {
+		Log.i(TAG, "readSubscriptionsFromOPML(): " + argOPMLReader.toString());
 
 		int numImported = 0;
 		BufferedReader reader;
@@ -83,20 +89,25 @@ public class OPMLImportExport {
 		LinkedList<SlimSubscription> opmlSubscriptions = new LinkedList<>();
 
 		try {
+			Log.i(TAG, "try to read the opml buffer");
 			reader = new BufferedReader(argOPMLReader);
 
 			OpmlReader omplReader = new OpmlReader();
 			elements = omplReader.readDocument(reader);
 		} catch (FileNotFoundException e) {
+			Log.e(TAG, "FileNotFoundException: " + e.toString());
 			toastMsg(opmlNotFound);
 		} catch (XmlPullParserException e) {
+			Log.e(TAG, "XmlPullParserException: " + e.toString());
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			Log.e(TAG, "IOException: " + e.toString());
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+		Log.i(TAG, "Read the OPML file. Found a number of elements: " + elements.size());
 		for (int i = 0; i < elements.size(); i++) {
 			OpmlElement element = elements.get(i);
 
@@ -107,6 +118,7 @@ public class OPMLImportExport {
 			try {
 				parsedUrl = new URL(url);
 			} catch (MalformedURLException e) {
+				Log.e(TAG, "Malform URL: " + url);
 				e.printStackTrace();
 				continue;
 			}
@@ -129,62 +141,6 @@ public class OPMLImportExport {
 		return opmlSubscriptions;
 	}
 
-//	public int importSubscriptions(File ftest) {
-//		int numImported = 0;
-//		BufferedReader reader;
-//
-//		if (!initInputOutputFiles()) {
-//			return 0;
-//		}
-//
-//		try {
-//			reader = new BufferedReader(new FileReader(ftest));
-//
-//			OpmlReader omplReader = new OpmlReader();
-//			ArrayList<OpmlElement> opmlElements = omplReader
-//					.readDocument(reader);
-//			numImported = importElements(opmlElements);
-//
-//		} catch (FileNotFoundException e) {
-//			toastMsg(opmlNotFound);
-//		} catch (XmlPullParserException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		if (numImported > 0) {
-//			Resources res = mActivity.getResources();
-//			String formattedString = res.getQuantityString(R.plurals.subscriptions_imported, numImported, numImported);
-//			toastMsg(formattedString);
-//			SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.OPML_IMPORT);
-//		}
-//
-//		return numImported;
-//	}
-
-//	private int importElements(ArrayList<OpmlElement> elements) {
-//		int numImported = 0;
-//		List<Subscription> importedSubscriptions = new LinkedList<>();
-//
-//		Subscription subscription;
-//		Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
-//
-//		for (OpmlElement element : elements) {
-//			String url = element.getXmlUrl();
-//
-//			if (!library.IsSubscribed(url)) {
-//				SoundWaves.getAppContext(mActivity).getLibraryInstance().subscribe(url);
-//				numImported++;
-//				importedSubscriptions.add(SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(url));
-//			}
-//		}
-//
-//		return numImported;
-//	}
-
 	private void toastMsg(final CharSequence msg) {
 		Activity activity = null;
 
@@ -192,11 +148,16 @@ public class OPMLImportExport {
 			activity = mActivity;
 		}
 
-		if (activity == null) return;
+		if (activity == null) {
+			Log.wtf(TAG, "no activity to post to!");
+			return;
+		}
 
+		Log.i(TAG, "posting toast on main thread " + msg);
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				Log.i(TAG, "On main thread " + msg);
 				int duration = Toast.LENGTH_LONG;
 				Toast.makeText(mActivity, msg, duration).show();
 			}
@@ -204,8 +165,10 @@ public class OPMLImportExport {
 	}
 
 	public void exportSubscriptions(File fileOut) {
+		Log.i(TAG, "exportSubscriptions(): " + fileOut);
 
 		if (!initInputOutputFiles()) {
+			Log.e(TAG, "Could not initialize input/output files");
 			return;
 		}
 
@@ -213,16 +176,19 @@ public class OPMLImportExport {
 
 		try {
 			if (!fileOut.exists()) {
+				Log.i(TAG, "Creating output file");
 				fileOut.createNewFile();
 			}
 
 			fileWriter = new FileWriter(fileOut);
 		} catch (IOException e) {
+			Log.e(TAG, "Could not create output file: " + e.toString());
 			toastMsg(opmlFailedToExport);
 			VendorCrashReporter.handleException(e);
 		}
 
 		if (fileWriter == null) {
+			Log.e(TAG, "Could not create output file. Toast: " + opmlFailedToExport);
 			toastMsg(opmlFailedToExport);
 			return;
 		}
@@ -231,8 +197,10 @@ public class OPMLImportExport {
 		SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
 
 		try {
+			Log.i(TAG, "Writing output");
 			opmlWriter.writeDocument(subscriptionList, fileWriter);
 		} catch (IOException e) {
+			Log.e(TAG, "Could not write output. Toast: " + opmlFailedToExport);
 			toastMsg(opmlFailedToExport);
 			return;
 		}
@@ -241,6 +209,7 @@ public class OPMLImportExport {
 	}
 
 	public void exportSubscriptionsToClipboard() {
+		Log.i(TAG, "exportSubscriptionsToClipboard()");
 
 		Writer writer = new StringWriter();
 		OpmlWriter opmlWriter = new OpmlWriter();
@@ -250,6 +219,7 @@ public class OPMLImportExport {
 		try {
 			opmlWriter.writeDocument(subscriptionList, writer);
 		} catch (IOException e) {
+			Log.e(TAG, "opmlFailedToExport()");
 			toastMsg(opmlFailedToExport);
 			return;
 		}
@@ -274,10 +244,12 @@ public class OPMLImportExport {
 	 * @throws SecurityException
 	 */
 	private boolean initInputOutputFiles() throws SecurityException {
+		Log.i(TAG, "initInputOutputFiles()");
 		try {
 			file = new File(SDCardManager.getSDCardRootDir() + "/" + filename);
 			fileOut = new File(SDCardManager.getExportDir() + "/" + filenameOut);
 		} catch (IOException e) {
+			Log.i(TAG, "Could not create OPML input/output files: " + e.toString());
 			e.printStackTrace();
 			return false;
 		}
@@ -286,11 +258,13 @@ public class OPMLImportExport {
 	}
 
 	public File getExportFile() {
+		Log.i(TAG, "getExportFile()");
 		initInputOutputFiles();
 		return fileOut;
 	}
 
 	public File getImportFile() {
+		Log.i(TAG, "getImportFile()");
 		initInputOutputFiles();
 		return file;
 	}
