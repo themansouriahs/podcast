@@ -199,6 +199,49 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             return;
         }
 
+        mExoplayer.addListener(new ExoPlayer.EventListener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+            }
+
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+            }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                if (playbackState == STATE_ENDED) {
+                    completionListener.onCompletion(SoundWavesPlayer.this);
+                }
+
+                if (playbackState == STATE_BUFFERING) {
+                    bufferListener.onBufferingUpdate(SoundWavesPlayer.this, 0);
+                }
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                errorListener.onError(SoundWavesPlayer.this, error.type, 0);
+            }
+
+            @Override
+            public void onPositionDiscontinuity() {
+
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+            }
+        });
+
         //setOnCompletionListener(completionListener);
         //setOnBufferingUpdateListener(bufferListener);
         //setOnErrorListener(errorListener);
