@@ -1,4 +1,4 @@
-SoundWaves Podcast Player
+साउंडवेव्स पॉडकास्ट प्लेयर
 
 Free Libre and Open Source Podcast player (podcatcher)
 

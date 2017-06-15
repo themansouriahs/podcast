@@ -9,7 +9,6 @@
   <string name="pref_download_on_update_title">Descàrrega automàtica</string>
   <string name="pref_download_on_update_description">Descarrega nous episodis automàticament quan estiguin disponibles</string>
   <string name="pref_downloaded_expire_description">%s</string>
-  <string name="pref_downloaded_expire_title">Límit d\'episodis descarregats</string>
   <string name="dialog_title_add_sub">Afegir podcast</string>
   <string name="dialog_message_add_sub">Introdueix la URL:</string>
   <string name="title_section2">Descobrir</string>
@@ -81,6 +80,7 @@
   <string name="pref_network_category_storage_experimental">Experimental</string>
   <string name="pref_delete_when_finished_title">Esborra després de reproduïr</string>
   <string name="pref_delete_when_finished_description">Els episodis s\'eliminen automàticament quan has acabat d\'escoltar-los</string>
+  <!--Exported to: "Path"-->
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Cast</string>
   <string name="bulk_download_instructions">Descarrega tots els episodis coincidents</string>
@@ -229,6 +229,7 @@
   <string name="app_intro_welcome_description">Per favor, dedica 10 segons a llegir aquestes pàgines introductòries</string>
   <!--The text before the number in the string: "Top 20 episodes"-->
   <!--The text after the number in the string: "Top 20 episodes"-->
+  <!--Used in the context: "Featured: <Podcats Title>"-->
   <plurals name="player_sleep">
     <item quantity="one">El reproductor s\'aturarà en %d minut</item>
     <item quantity="other">El reproductor s\'aturarà en %d minuts</item>

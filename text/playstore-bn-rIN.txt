@@ -1,16 +1,16 @@
-SoundWaves Podcast Player
+SoundWaves পডকাস্ট প্লেয়ার
 
-Free Libre and Open Source Podcast player (podcatcher)
+ফ্রি লিব্রে এবং ওপেন সোর্স পডকাস্ট প্লেয়ার (podcatcher)
 
-<b>About</b>
-This is my contribution to the Android ecosystem and podcast lovers. It's a modern, free podcatcher application which does not collect any of your data, asks for creepy permissions or other malicious things.
+সম্বন্ধে
+এটি অ্যান্ড্রয়েড ইকোসিস্টেম এবং পডকাস্ট প্রেমীদের জন্য আমার অবদান। এটি একটি আধুনিক, বিনামূল্যে podcatcher অ্যাপ্লিকেশন যা আপনার কোনো ডেটা সংগ্রহ করে না, বিরক্তিকর অনুমতি বা অন্যান্য জিনিসগুলির জন্য জিজ্ঞাসা করে না।
 
-<b>Selected Features</b>
-* All the basic features you expect
-* Free and open source
-* Modern (material) design
-* full gpodder.net support
-* chromecast support
-* Sonos support
-* No creepy permissions or data collection (without your acceptance)
-* A really nice developer who would love to hear if you have any problems whatsoever :)
+নির্বাচিত বৈশিষ্ট্য
+* সমস্ত বেসিক ফিচার যা আপনি চান
+ফ্রি এবং ওপেন 
+আধুনিক (মেটেরিয়াল) ডিজাইন
+* পূর্ণ gpodder.net সমর্থন
+* Chromecast সমর্থন
+* Sonos সমর্থন
+* কোন রকম বিরক্তিকর অনুমতি বা তথ্য সংগ্রহ করে না (আপনার অনুমতি ছাড়া)
+* একজন খুব ভাল ডেভেলপার, যে আপনার যেকোনো সমস্যা শুনতে ভালবাসে যদি আপনার কোন সমস্যা থাকে

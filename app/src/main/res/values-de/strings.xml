@@ -3,15 +3,18 @@
   <string name="app_name">SoundWaves</string>
   <string name="unsubscribe">Deabbonieren</string>
   <string name="pref_only_wifi_description">Mit Download warten, bis WLAN verfügbar ist</string>
+  <string name="pref_refresh_only_wifi_description">Aktualisierung der Feeds im Hintergrund verbieten</string>
   <string name="pref_only_wifi_title">Nur über WLAN herunterladen</string>
+  <string name="pref_refresh_only_wifi_title">Jede Datennutzung verbieten</string>
   <string name="pref_dark_theme">Dunklen Hintergrund für höheren Kontrast aktivieren</string>
   <string name="pref_dark_theme_title">Hintergrund</string>
   <string name="pref_download_on_update_title">Automatisch herunterladen</string>
   <string name="pref_download_on_update_description">Neue Folgen automatisch herunterladen</string>
   <string name="pref_downloaded_expire_description">%s</string>
-  <string name="pref_downloaded_expire_title">Speicher für heruntergeladene Folgen</string>
+  <string name="pref_downloaded_expire_title">Speicherlimit</string>
   <string name="dialog_title_add_sub">Podcast hinzufügen</string>
   <string name="dialog_message_add_sub">Bitte geben Sie eine URL ein:</string>
+  <string name="title_section3">Player</string>
   <string name="title_section2">Entdecken</string>
   <string name="title_section1">Abonnements</string>
   <string name="hello_world">Hallo Welt!</string>
@@ -62,6 +65,7 @@
   <string name="pref_help_static_field_description">Sie können auf vielerlei Art helfen: Programmieren, Übersetzen, UI, Icons/Grafik, Erstellen einer Webseite usw. Schauen Sie auf der Projektseite auf GitHub nach (github.com/bottiger/SoundWaves) oder schicken Sie mir eine E-Mail: bottiger@gmail.com</string>
   <string name="episode_title_unknown">Ohne Titel :(</string>
   <string name="podcast_title_unknown">Unbekannter Podcast-Titel</string>
+  <string name="subscription_instruction">Füge neue Podcasts hinzu indem du die Seite Entdecken rechts verwendest.\n\nDu kannst in den Einstellungen auch eine OPML Datei importieren oder mit gpodder.net synchronisieren.</string>
   <string name="filter_show_listened">Bereits gespielte anzeigen</string>
   <string name="auto_start_next">Automatisch nächste starten</string>
   <string name="drawer_playlist_filters">Filter</string>
@@ -81,6 +85,16 @@
   <string name="pref_network_category_storage_experimental">Experimentell</string>
   <string name="pref_delete_when_finished_title">Nach der Wiedergabe löschen</string>
   <string name="pref_delete_when_finished_description">Folgen nach vollständiger Wiedergabe automatisch löschen</string>
+  <string name="opml_import_export_toolbar_title">Importiere / Exportiere OPML Datei</string>
+  <string name="import_export_explanation">Importiere deine Abos</string>
+  <string name="opml_import_explanation">Wähle eine OPML Datei aus dem internen Speicher</string>
+  <string name="opml_export_explanation">Exportiere deine Abonnenments auf den internen Gerätespeicher. Sie werden unter /STORAGE/podcasts.opml abgelegt</string>
+  <string name="opml_import_button">Importiere OPML</string>
+  <string name="opml_export_button">In Speicher exportieren</string>
+  <string name="opml_export_clipboard_button">Zur Zwischenablage exportieren</string>
+  <!--Exported to: "Path"-->
+  <string name="opml_exported_to_toast">Exportiere zu</string>
+  <string name="opml_exported_to_clipboard_toast">OPML-Daten zur Zwischenablage exportiert</string>
   <!--For playing media on another device, like a chromecast-->
   <string name="media_route_menu_title">Besetzung</string>
   <string name="bulk_download_instructions">Alle passenden Folgen herunterladen</string>
@@ -117,7 +131,7 @@
   <string name="playlist_empty_title">Wiedergabeliste-Modus auswählen</string>
   <string name="playlist_empty_text_top">Nehmen Sie sich einen Moment Zeit, um darüber nachzudenken, wie Sie die App nutzen möchten</string>
   <string name="playlist_empty_text_bottom">Sie können das Verhalten der Wiedergabeliste anpassen, indem Sie das Symbol mit den drei kleinen Balken in der oberen Leiste antippen.</string>
-  <string name="playlist_empty_mode_one">Folgen manuell in die Wiedergabelite einfügen</string>
+  <string name="playlist_empty_mode_one">Folgen manuell in die Wiedergabeliste einfügen</string>
   <string name="playlist_empty_mode_two">Neueste Folgen</string>
   <string name="playlist_empty_mode_one_desc">Die Wiedergabeliste wird nur Folgen enthalten, die manuell hinzugefügt wurden </string>
   <string name="playlist_empty_mode_two_desc">Die Wiedergabeliste wird automatisch mit den neuesten Folgen befüllt. Sie können ausgewählte Folgen manuell hinzufügen.</string>
@@ -130,6 +144,7 @@
   <string name="action_filter">Wiedergabeliste filtern</string>
   <string name="snackbar_change">Ändern</string>
   <string name="apply_filters">Filter anwenden</string>
+  <string name="pref_gpodder_support_title">gpodder.net</string>
   <string name="gpodder_username">Benutzername</string>
   <string name="gpodder_password">Passwort</string>
   <string name="gpodder_device">Gerätebezeichnung</string>
@@ -163,6 +178,7 @@
   <string name="pref_help_beta_description">Wenn Sie als BETA-Tester beim Testen neuer Funktionen helfen wollen, besuchen Sie https://play.google.com/apps/testing/org.bottiger.podcast</string>
   <string name="activity_download_name">Download Manager</string>
   <string name="opml_import_toolbar_title">OPML Inhalt</string>
+  <string name="opml_import_toolbar_description">Podcasts die du abonnieren möchtest</string>
   <string name="download_manager_toolbar_title">Download-Warteschlange</string>
   <string name="download_manager_toolbar_description">Herunterzuladende Folgen</string>
   <string name="menu_clear_download">Leeren</string>
@@ -227,8 +243,71 @@
   <string name="intro_settings_done">Das war\'s. Happy Podcasting</string>
   <string name="app_intro_welcome_title">Willkommen bei SoundWaves</string>
   <string name="app_intro_welcome_description">Bitte schauen Sie sich diese Einführungsseiten kurz an.</string>
+  <string name="appintro_settings_description">Bitte prüfen Sie diese Einstellungen um ungewollten Datenverbrauch zu vermeiden</string>
+  <string name="webservices_discovery_engine_gpodder">gpodder.net</string>
+  <string name="webservices_discovery_engine_itunes">iTunes</string>
+  <string name="webservices_discovery_engine_audiosearch">Audiosear.ch</string>
+  <string name="webservices_discovery_engine_unknown">Unbekannte Suchmaschine</string>
+  <string name="subscription_authentication_required">Authentifizierung benötigt</string>
+  <string name="subscription_press_to_authenticate">Klicke zur Authentifizierung</string>
+  <string name="star_subscription">Abonnements favorisieren</string>
+  <string name="remove_episode_from_playlist">Folge von Wiedergabeliste entfernen</string>
+  <string name="import_subscription_confirm">Import</string>
+  <string name="feed_empty_no_network">Keine Netzwerkverbindung erkannt. Der Feed könnte ein Problem beim Laden haben</string>
+  <string name="feed_empty_parse_error">Der Feed könnte unvollständig oder der Server nicht erreichbar sein. Wenn du sicher bist, dass es funktionieren müsste und das Problem weiterhin besteht kontaktiere bitte %1$s</string>
+  <string name="feed_activity_loading_canceled">Laden des Feedinhalts abgebrochen</string>
+  <string name="preferences_category_import_export">Import/Export</string>
+  <string name="pref_import_export_category_title"><![CDATA[Import & Export]]></string>
+  <string name="pref_import_opml_title">Importiere OPML Datei</string>
+  <string name="pref_import_opml_summary">Eine OPML-Datei kann aus den meisten Podcasting-Anwendungen exportiert werden</string>
+  <string name="pref_export_opml_title">Exportiere OPML Datei</string>
+  <string name="pref_export_opml_summary">Exportiere deine aktuelle Aboliste in eine OPML Datei</string>
+  <string name="pref_download_only_when_charging_title">Nur Herunterladen während der Akku geladen wird</string>
+  <string name="pref_download_only_when_charging_description">Neue Folgen nur herunterladen wenn Akku geladen wird</string>
+  <string name="pref_store_on_sdcard_title">Podcasts auf SD Karte speichern</string>
+  <string name="pref_store_on_sdcard_description">Podcasts außerhalb des Standardordners zu speichern verhindert möglicherweise, dass andere Apps sie finden</string>
+  <string name="pref_license_title">Lizenz</string>
+  <string name="about_author">Autor</string>
+  <string name="author_country">Dänemark</string>
+  <string name="github">Github</string>
+  <string name="twitter">Twitter</string>
+  <string name="reddit">Reddit</string>
+  <string name="email">E-mail</string>
+  <string name="about_github_subtext">github.com/bottiger/SoundWaves</string>
+  <string name="about_twitter_subtext">\@arvidbottiger</string>
+  <string name="about_reddit_subtext">/r/soundwavesapp</string>
+  <string name="bulk_download_all">Alle Episoden in der Liste</string>
   <!--The text before the number in the string: "Top 20 episodes"-->
+  <string name="top_n_episodes_first">Top</string>
   <!--The text after the number in the string: "Top 20 episodes"-->
+  <string name="top_n_episodes_last">Folgen</string>
+  <string name="bulk_download_capacaity_warning">Du hast derzeit eine maximale Speicherkapazität von %1$d GB. Falls die Dateien dieses Limit beim Download überschreiten werden einige davon entfernt.</string>
+  <string name="preferences_category_notifications">Benachrichtigungen</string>
+  <string name="pref_notifications_category_title">Benachrichtigungen</string>
+  <string name="pref_download_notification_title">Downloadfortschritt</string>
+  <string name="pref_download_notification_summary">Zeige den Downloadfortschritt in einer Benachrichtigung</string>
+  <string name="pref_new_episode_notification_title">Neue Folgen</string>
+  <string name="pref_new_episode_notification_summary">Benachrichtigung wenn dein Abo neue Folgen enthält</string>
+  <string name="playlist_up_arrow_description">Nach oben scrollen um die Wiedergabeliste zu erreichen</string>
+  <string name="test_credentials_failed_server_timeout">Server antwortet nicht</string>
+  <string name="gpodder_dialog_positive_button">Verbinden</string>
+  <!--Used in the context: "Featured: <Podcats Title>"-->
+  <string name="featured_prefix">Empfohlen:</string>
+  <string name="pref_driving_mode_title">Fahrmodus</string>
+  <string name="pref_driving_mode_description">Vergrößere die Player-Oberfläche während der Fahrt</string>
+  <string name="menu_subscriptions_order_rating">Beliebtheit</string>
+  <string name="error_mising_storage_permission">Benötigt Zugriffsberechtigung auf den Speicher</string>
+  <string name="about_tmp_dir_title">Cacheverzeichnis</string>
+  <string name="about_podcast_dir_title">Podcast-Speicherort</string>
+  <string name="about_app_settings_into">Geräteeinstellungen</string>
+  <plurals name="notification_new_episodes_title">
+    <item quantity="one">%d neue Folge</item>
+    <item quantity="other">%d neue Folgen</item>
+  </plurals>
+  <plurals name="notification_new_episodes_summary">
+    <item quantity="one">+ %d zusätzliche</item>
+    <item quantity="other">+ %d zusätzliche</item>
+  </plurals>
   <plurals name="player_sleep">
     <item quantity="one">Player wird in %d Minute schlafen</item>
     <item quantity="other">Player wird in %d Minuten schlafen</item>

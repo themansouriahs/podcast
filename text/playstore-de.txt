@@ -6,10 +6,10 @@ Freier Open Source Podcast Player (Podcatcher)
 Das hier ist mein Beitrag zum Android Ecosystem und für alle Podcastliebhaber. Es ist eine moderne, freie Podcatcher Anwendung die keine Ihrer Daten sammelt, erschreckende Berechtigungen fordert oder andere bösartige Dinge tut.
 
 <b>Ausgewählte Funktionalitäten</b>
-* All the basic features you expect
+Alle Grundfunktionen die du erwartest
 * Frei und Open Source
 * Modernes (Material) Design
-* full gpodder.net support
+* Volle gPodder Unterstützung
 * ChromeCast Unterstützung
 * Sonos Unterstützung
 * Keine erschreckenden Berechtigungen oder Datensammlung (ohne Ihre Zustimmung)

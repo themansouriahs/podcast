@@ -8,20 +8,6 @@
     <item>5 GB</item>
     <item>Ubegrænset</item>
   </string-array>
-  <string-array name="pref_player_seek_entries">
-    <item>5 sekunder</item>
-    <item>10 sekunder</item>
-    <item>20 sekunder</item>
-    <item>30 sekunder</item>
-    <item>1 minut</item>
-  </string-array>
-  <string-array name="pref_player_seek_entries_values">
-    <item>5</item>
-    <item>10</item>
-    <item>20</item>
-    <item>30</item>
-    <item>60</item>
-  </string-array>
   <string-array name="playlist_sort_order">
     <item>Sorter efter: Nyeste</item>
     <item>Sorter efter: Ældste</item>
