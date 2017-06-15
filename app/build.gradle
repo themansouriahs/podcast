@@ -136,8 +136,19 @@ android {
 
 repositories {
     mavenCentral()
-    maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://jitpack.io'
+    }
+    maven {
+        // Google Maven Repository
+        url 'https://maven.google.com'
+    }
 }
+
+
+//dependencies
+ext.supportLibraryVersion = '25.4.0'
+ext.playServicesVersion = '10.2.6' // 11.0.1
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -157,7 +168,7 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'io.requery:sqlite-android:3.16.2'
-    compile 'com.google.android.exoplayer:exoplayer:r2.4.0'
+    compile 'com.google.android.exoplayer:exoplayer:r2.4.2'
     compile 'com.wdullaer:materialdatetimepicker:3.1.1'
     // Glide
     compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
@@ -165,18 +176,21 @@ dependencies {
     //compile 'com.github.bumptech.glide:compiler:4.0.0-RC0'
     //compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC0"
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'
     compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
     compile 'com.google.http-client:google-http-client-gson:1.22.0'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:palette-v7:25.3.1'
-    compile 'com.android.support:cardview-v7:25.3.1'
-    compile 'com.android.support:mediarouter-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:percent:25.3.1'
+
+    compile "com.android.support:support-v4:$supportLibraryVersion"
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    compile "com.android.support:palette-v7:$supportLibraryVersion"
+    compile "com.android.support:cardview-v7:$supportLibraryVersion"
+    compile "com.android.support:mediarouter-v7:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
+    compile "com.android.support:percent:$supportLibraryVersion"
+
     compile 'jp.wasabeef:recyclerview-animators:2.2.5'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.6'
     compile 'com.nineoldandroids:library:2.4.0'
@@ -217,22 +231,22 @@ dependencies {
     // Free version
     // Amazon version
     amazonCompile fileTree(dir: 'src/amazon/libs', include: ['*.jar'])
-    amazonCompile 'com.google.android.gms:play-services-cast:10.2.6'
-    amazonCompile 'com.google.android.gms:play-services-cast-framework:10.2.6'
-    amazonCompile 'com.google.android.gms:play-services-auth:10.2.6'
-    amazonCompile 'com.google.android.gms:play-services-location:10.2.6'
-    amazonCompile 'com.google.firebase:firebase-messaging:10.2.6'
+    amazonCompile "com.google.android.gms:play-services-cast:$playServicesVersion"
+    amazonCompile "com.google.android.gms:play-services-cast-framework:$playServicesVersion"
+    amazonCompile "com.google.android.gms:play-services-auth:$playServicesVersion"
+    amazonCompile "com.google.android.gms:play-services-location:$playServicesVersion"
+    amazonCompile "com.google.firebase:firebase-messaging:$playServicesVersion"
     // google cast
     // Play Store
-    googleCompile 'com.google.android.gms:play-services-analytics:10.2.6'
+    googleCompile "com.google.android.gms:play-services-analytics:$playServicesVersion"
     // analytics
-    googleCompile 'com.google.android.gms:play-services-cast:10.2.6'
-    googleCompile 'com.google.android.gms:play-services-cast-framework:10.2.6'
-    googleCompile 'com.google.android.gms:play-services-auth:10.2.6'
-    googleCompile 'com.google.android.gms:play-services-location:10.2.6'
-    googleCompile 'com.google.firebase:firebase-core:10.2.6'
-    googleCompile 'com.google.firebase:firebase-messaging:10.2.6'
-    googleCompile 'com.google.firebase:firebase-database:10.2.6'
+    googleCompile "com.google.android.gms:play-services-cast:$playServicesVersion"
+    googleCompile "com.google.android.gms:play-services-cast-framework:$playServicesVersion"
+    googleCompile "com.google.android.gms:play-services-auth:$playServicesVersion"
+    googleCompile "com.google.android.gms:play-services-location:$playServicesVersion"
+    googleCompile "com.google.firebase:firebase-core:$playServicesVersion"
+    googleCompile "com.google.firebase:firebase-messaging:$playServicesVersion"
+    googleCompile "com.google.firebase:firebase-database:$playServicesVersion"
     // google cast
     compile project(':soundwavescommon')
 }
