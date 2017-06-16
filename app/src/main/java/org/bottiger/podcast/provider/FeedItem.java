@@ -1,6 +1,12 @@
 package org.bottiger.podcast.provider;
 
 import android.Manifest;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
@@ -39,9 +45,14 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
+@Entity(tableName = ItemColumns.TABLE_NAME,
+		indices = {@Index(ItemColumns.LAST_UPDATE), @Index(ItemColumns.STATUS), @Index(ItemColumns.SUBS_ID), @Index(ItemColumns.URL)},
+		foreignKeys = @ForeignKey(entity = Subscription.class,
+				parentColumns = SubscriptionColumns._ID,
+				childColumns = ItemColumns.SUBS_ID))
 public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
-	private static final String TAG = "FeedItem";
+	private static final String TAG = FeedItem.class.getSimpleName();
 
     // Se Subscription.java for details
     private static final int IS_VIDEO 					= 1;
@@ -57,113 +68,69 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	/**
 	 * Unique ID
 	 */
+	@PrimaryKey()
+	@ColumnInfo(name = ItemColumns._ID)
 	public long id;
-
-	/**
-	 * Unique ID of the file on the remote server
-	 */
-	@Deprecated
-	public String remote_id;
 
 	/**
 	 * URL of the episode:
 	 * http://podcast.dr.dk/P1/p1debat/2013/p1debat_1301171220.mp3
 	 */
+	@ColumnInfo(name = ItemColumns.URL)
 	private String url;
-
-	/**
-	 * Currently not persisted.
-	 * A mLink to the show notes
-	 */
-	public String link_show_notes;
 
 	/**
 	 * Title of the episode
 	 */
+	@ColumnInfo(name = ItemColumns.TITLE)
 	private String title;
 
 	/**
 	 * Name of Publisher
 	 */
+	@ColumnInfo(name = ItemColumns.AUTHOR)
 	public String author;
-
-	/**
-	 * Date Published
-	 */
-    @Deprecated
-	public String date;
 
     /**
      * Date Published
      */
+	@ColumnInfo(name = ItemColumns.PUB_DATE)
     public long pub_date;
 
 	/**
 	 * Episode mDescription in text
 	 */
+	@ColumnInfo(name = ItemColumns.CONTENT)
 	public String content;
-
-	/**
-	 * Also an URL
-	 */
-	@Deprecated
-	public String resource;
-
-	/**
-	 * Duration as String hh:mm:ss or mm:ss 02:23:34
-	 */
-	@Deprecated
-	public String duration_string;
 
 	/**
 	 * Duration in milliseconds
 	 */
+	@ColumnInfo(name = ItemColumns.DURATION_MS)
 	public long duration_ms;
 
 	/**
 	 * URL to relevant episode image
 	 */
+	@ColumnInfo(name = ItemColumns.IMAGE_URL)
 	public String image;
 
 	/**
 	 * Unique ID of the subscription the episode belongs to
 	 */
+	@ColumnInfo(name = ItemColumns.SUBS_ID)
 	public long sub_id;
 
 	/**
 	 * Total size of the episode in bytes
 	 */
+	@ColumnInfo(name = ItemColumns.FILESIZE)
 	public long filesize;
-
-	/**
-	 * Size of the file on disk in bytes
-	 */
-	@Deprecated
-	public long chunkFilesize;
-
-	/**
-	 * Filename of the episode on disk. sn209.mp3
-	 */
-	public String filename;
-
-	/**
-	 * Episode number.
-	 */
-	@Deprecated
-	public int episodeNumber;
-
-	/**
-	 * Download reference ID as returned by
-	 * http://developer.android.com/reference
-	 * /android/app/DownloadManager.html#enqueue
-	 * (android.app.DownloadManager.Request)
-	 */
-	@Deprecated
-	private long downloadReferenceID;
 
 	/**
 	 * Flags for filtering downloaded items
 	 */
+	@ColumnInfo(name = ItemColumns.IS_DOWNLOADED)
 	public Boolean isDownloaded;
 
 	/**
@@ -171,6 +138,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * http://developer
 	 * .android.com/reference/android/media/NDKMediaPlayer.html#seekTo(int)
 	 */
+	@ColumnInfo(name = ItemColumns.OFFSET)
 	public long offset;
 
 	/**
@@ -178,19 +146,13 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * Now I will use it as a bitmask for keeping track of episode specific status related things,
 	 * like "is this episode a video or not"
 	 */
+	@ColumnInfo(name = ItemColumns.STATUS)
 	public int status;
-
-	@Deprecated
-	public long failcount;
-	// failcount is currently used for two purposes:
-	// 1. counts the number of times we fail to download, and
-	// when we exceed a predefined max, we pause the download.
-	// 2. when an item is in the extended_player, failcount is used as
-	// the order of the item in the list.
 
 	/**
 	 * Have to listened to this episode yet?
 	 */
+	@ColumnInfo(name = ItemColumns.LISTENED)
 	public int listened;
 
 	/**
@@ -204,48 +166,118 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	 * * If an episode is being played on demand it will replace other episodes with the priority one.
 	 * * Other episodes, with priorities above 1, will just be pushed down the playlist.
 	 */
+	@ColumnInfo(name = ItemColumns.PRIORITY)
 	public int priority;
 
 	/**
 	 * Filesize as reported by the RSS feed
 	 */
+	@ColumnInfo(name = ItemColumns.LENGTH)
 	public long length;
 
 	/**
 	 * The time the record in the database was updated the last time. measured
 	 * in: System.currentTimeMillis()
 	 */
+	@ColumnInfo(name = ItemColumns.LAST_UPDATE)
 	public long lastUpdate;
-
-	/**
-	 * The URI of the podcast episode
-	 */
-	@Deprecated
-	public String uri;
 
 	/**
 	 * Title of the parent subscription
 	 */
+	@ColumnInfo(name = ItemColumns.SUB_TITLE)
 	public String sub_title;
 
 	/**
 	 * The time the episode was created locally
 	 */
+	@ColumnInfo(name = ItemColumns.CREATED)
 	public long created_at;
 
-	static String[] DATE_FORMATS = {
-			"EEE, dd MMM yyyy HH:mm:ss Z",
-			"EEE, d MMM yy HH:mm z",
-			"EEE, d MMM yyyy HH:mm:ss z",
-			"EEE, d MMM yyyy HH:mm z",
-			"d MMM yy HH:mm z",
-			"d MMM yy HH:mm:ss z",
-			"d MMM yyyy HH:mm z",
-			"d MMM yyyy HH:mm:ss z",
-			"yyyy-MM-dd HH:mm",
-			"yyyy-MM-dd HH:mm:ss",
-			"EEE,dd MMM yyyy HH:mm:ss Z"
-	};
+	//region Deprecated fields
+
+	/**
+	 * Size of the file on disk in bytes
+	 */
+	@Deprecated
+	@Ignore
+	public long chunkFilesize;
+
+	/**
+	 * The URI of the podcast episode
+	 */
+	@Deprecated
+	@Ignore
+	public String uri;
+
+	/**
+	 * Date Published
+	 */
+	@Deprecated
+	@Ignore
+	public String date;
+
+	/**
+	 * Unique ID of the file on the remote server
+	 */
+	@Deprecated
+	@ColumnInfo(name = ItemColumns.REMOTE_ID)
+	public String remote_id;
+
+	@Deprecated
+	@Ignore
+	public long failcount;
+	// failcount is currently used for two purposes:
+	// 1. counts the number of times we fail to download, and
+	// when we exceed a predefined max, we pause the download.
+	// 2. when an item is in the extended_player, failcount is used as
+	// the order of the item in the list.
+
+	/**
+	 * Currently not persisted.
+	 * A mLink to the show notes
+	 */
+	@Ignore
+	public String link_show_notes;
+
+	/**
+	 * Also an URL
+	 */
+	@Deprecated
+	@ColumnInfo(name = ItemColumns.RESOURCE)
+	public String resource;
+
+	/**
+	 * Duration as String hh:mm:ss or mm:ss 02:23:34
+	 */
+	@Deprecated
+	@Ignore
+	public String duration_string;
+
+	/**
+	 * Episode number.
+	 */
+	@Deprecated
+	@Ignore
+	public int episodeNumber;
+
+	/**
+	 * Download reference ID as returned by
+	 * http://developer.android.com/reference
+	 * /android/app/DownloadManager.html#enqueue
+	 * (android.app.DownloadManager.Request)
+	 */
+	@Deprecated
+	@Ignore
+	private long downloadReferenceID;
+
+	/**
+	 * Filename of the episode on disk. sn209.mp3
+	 */
+	@Ignore
+	public String filename;
+
+	//endregion
 
 	public static String default_formatZ = "yyyy-MM-dd HH:mm:ss Z";
 	public static String default_format = "yyyy-MM-dd HH:mm:ss";

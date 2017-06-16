@@ -1,5 +1,8 @@
 package org.bottiger.podcast.provider;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -28,6 +31,8 @@ import javax.annotation.Nullable;
 
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
+@Entity(tableName = SubscriptionColumns.TABLE_NAME,
+		indices = {@Index(SubscriptionColumns.LAST_ITEM_UPDATED), @Index(ItemColumns.URL)})
 public class Subscription extends BasePodcastSubscription {
 
 	private static final String TAG = Subscription.class.getSimpleName();
