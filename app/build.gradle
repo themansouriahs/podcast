@@ -152,7 +152,7 @@ repositories {
 //dependencies
 ext.espressoVersion = '2.2.2'
 ext.supportLibraryVersion = '25.4.0'
-ext.playServicesVersion = '10.2.6' // 11.0.1
+ext.playServicesVersion = '11.0.1'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
