@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import org.bottiger.podcast.R;
@@ -28,7 +30,7 @@ import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.views.Overlay;
-import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayPauseButton;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 
 import java.lang.annotation.Retention;
@@ -94,7 +96,12 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         String image = item.getArtwork(mActivity);
         if (StrUtils.isValidUrl(image)) {
             assert image != null;
-            ImageLoaderUtils.getGlide(mActivity, image).centerCrop().into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
+
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
+            options.centerCrop();
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
+            builder.apply(options);
+            builder.into(new BitmapImageViewTarget(viewHolder.mPodcastImage) {
                 @Override
                 protected void setResource(Bitmap resource) {
                     RoundedBitmapDrawable circularBitmapDrawable =
@@ -141,7 +148,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
             viewHolder.mPlaylistPosition.setVisibility(View.GONE);
         }
 
-        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseImageView.PLAYLIST);
+        viewHolder.mPlayPauseButton.setEpisode(item, PlayPauseButton.PLAYLIST);
         viewHolder.mPlayPauseButton.setStatus(STATE_IDLE);
         viewHolder.downloadButton.setEpisode(item);
 
@@ -182,7 +189,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         holder.seekbar.setEpisode(argEpisode);
         holder.seekbar.setOverlay(mOverlay);
 
-        holder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
+        holder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseButton.PLAYLIST);
         holder.downloadButton.setEpisode(argEpisode);
 
         ISubscription subscription = argEpisode.getSubscription(context);

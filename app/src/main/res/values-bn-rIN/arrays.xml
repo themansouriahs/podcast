@@ -1,2 +1,46 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources/>
+<resources>
+  <string-array name="entries_download_file_expire">
+    <item>100 MB</item>
+    <item>1 GB</item>
+    <item>2 GB</item>
+    <item>3 GB</item>
+    <item>5 GB</item>
+    <item>সীমাহীন</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries">
+    <item>5 সেকেন্ড</item>
+    <item>10 সেকেন্ড</item>
+    <item>20 সেকেন্ড</item>
+    <item>30 সেকেন্ড</item>
+    <item>1 মিনিট</item>
+    <item>2 মিনিট</item>
+    <item>5 মিনিট</item>
+    <item>10 মিনিট</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+    <item>120</item>
+    <item>300</item>
+    <item>600</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>অটো</item>
+    <item>একটি তালিকা</item>
+    <item>2 কলাম</item>
+    <item>3 কলাম</item>
+  </string-array>
+  <string-array name="pref_theme_entries">
+    <item>লাইট (default)</item>
+    <item>ডার্ক</item>
+    <item>অটো (ডে/ নাইট)</item>
+  </string-array>
+  <string-array name="playlist_sort_order">
+    <item>সাজানোর ক্রম: নতুন</item>
+    <item>সাজানোর ক্রম: পুরাতন</item>
+  </string-array>
+</resources>

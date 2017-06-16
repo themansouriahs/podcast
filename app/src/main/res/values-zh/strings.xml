@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <!--Exported to: "Path"-->
   <!--For playing media on another device, like a chromecast-->
   <!--When downloading and parsing the content of a feed-->
   <!--Search engine for searching for new podcasts-->
@@ -13,4 +14,5 @@
   <!--The audio engine has an option to remove periods of silence in an audio file.-->
   <!--The text before the number in the string: "Top 20 episodes"-->
   <!--The text after the number in the string: "Top 20 episodes"-->
+  <!--Used in the context: "Featured: <Podcats Title>"-->
 </resources>

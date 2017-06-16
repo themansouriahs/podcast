@@ -11,6 +11,8 @@ import android.support.v7.util.SortedList;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
@@ -272,7 +274,12 @@ public abstract class BaseSubscription implements ISubscription {
                     public Boolean apply(Context context) throws Exception {
                         try {
                             String url = getImageURL();
-                            Glide.with(context).load(url).diskCacheStrategy(ImageLoaderUtils.SW_DiskCacheStrategy).into(200, 200).get();
+                            RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
+                            options.diskCacheStrategy(ImageLoaderUtils.SW_DiskCacheStrategy);
+
+                            RequestManager rm = Glide.with(context);
+
+                            rm.load(url).apply(options).into(200, 200).get();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             return false;

@@ -11,7 +11,7 @@ import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.views.PlayPauseImageView;
+import org.bottiger.podcast.views.PlayPauseButton;
 
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
 
@@ -52,8 +52,8 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
 
         episodeViewHolder.DisplayDescription = true;
 
-        episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);
-        episodeViewHolder.mQueueButton.setEpisode(argEpisode, PlayPauseImageView.DISCOVERY_FEEDVIEW);
+        episodeViewHolder.mPlayPauseButton.setEpisode(argEpisode, PlayPauseButton.DISCOVERY_FEEDVIEW);
+        episodeViewHolder.mQueueButton.setEpisode(argEpisode, PlayPauseButton.DISCOVERY_FEEDVIEW);
         episodeViewHolder.mDownloadButton.setVisibility(View.INVISIBLE);
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) episodeViewHolder.mQueueButton.getLayoutParams();

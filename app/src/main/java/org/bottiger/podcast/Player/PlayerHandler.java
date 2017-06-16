@@ -16,7 +16,7 @@ import org.bottiger.podcast.service.PlayerService;
  */
 public class PlayerHandler {
 
-    private static final String TAG  = "PlayerHandler";
+    private static final String TAG  = PlayerHandler.class.getSimpleName();
 
     private static final boolean CONTINUOUS_PLAYING_DEFAULT = false;
     private static final int FADE_OUT_DURATION_SECONDS = 30;

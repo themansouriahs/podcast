@@ -39,8 +39,10 @@ import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
+import org.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
+import java.io.IOException;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -434,10 +436,16 @@ public class SubscriptionsFragment extends Fragment {
 
             }
             else if (resultCode == RESULT_EXPORT) {
+                String export_dir = null;
+                try {
+                    export_dir = SDCardManager.getExportDir();
+                } catch (IOException e) {
+                    VendorCrashReporter.report("EXPORT FAIL", "Cannot export OPML file");
+                }
                 Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
-                Log.d(TAG, "Export to: " + Environment.getExternalStorageDirectory() + EXPORT_FILENAME);// NoI18N
-                importExport.exportSubscriptions(new File(Environment.getExternalStorageDirectory() + EXPORT_FILENAME));
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + Environment.getExternalStorageDirectory() + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Export to: " + export_dir + EXPORT_FILENAME);// NoI18N
+                importExport.exportSubscriptions(new File(export_dir + EXPORT_FILENAME));
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + export_dir + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_EXPORT_TO_CLIPBOARD) {
                 Log.d(TAG, "EXPORT SUBSCRIPTIONS TO CLIPBOARD");// NoI18N
 

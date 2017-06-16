@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.PreloadTarget;
 
 import org.bottiger.podcast.provider.PersistedSubscription;
@@ -17,11 +19,11 @@ import org.bottiger.podcast.utils.StrUtils;
 public abstract class BasePodcastSubscription extends PersistedSubscription {
 
     public void fetchImage(@NonNull Context argContext) {
-        PreloadTarget<Bitmap> preloadTarget = PreloadTarget.obtain(500, 500);
         String url = getImageURL();
         if (StrUtils.isValidUrl(url)) {
-            ImageLoaderUtils.getGlide(argContext.getApplicationContext(), url)
-                    .into(preloadTarget);
+            RequestManager rm = Glide.with(argContext.getApplicationContext()); //ImageLoaderUtils.getGlide(argContext.getApplicationContext(), url);
+            PreloadTarget<Bitmap> preloadTarget = PreloadTarget.obtain(rm, 500, 500);
+            rm.asBitmap().load(url).into(preloadTarget);
         }
     }
 

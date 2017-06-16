@@ -8,8 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.util.LruCache;
 
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.listeners.PaletteListener;
 import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
@@ -75,8 +75,7 @@ public class PaletteHelper {
         ImageLoaderUtils.getGlide(argActivity, url)
                 .into(new SimpleTarget<Bitmap>(200, 200) {
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
-
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                         Flowable.just(resource)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.computation())
@@ -103,10 +102,6 @@ public class PaletteHelper {
                                 }
                             }
                         });
-                    }
-
-                    @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
                     }
                 });
     }

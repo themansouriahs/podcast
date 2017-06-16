@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import org.bottiger.podcast.cloud.EventLogger;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.Analytics.AnalyticsFactory;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCodeFactory;
@@ -91,6 +93,9 @@ public class SoundWaves extends MultiDexApplication {
         Log.v(TAG, "App start time: " + System.currentTimeMillis());
         super.onCreate();
         //Debug.startMethodTracing("startup6");
+
+        enableStrictMode();
+        injectDependencies();
 
         UIUtils.setTheme(getApplicationContext());
 
@@ -298,6 +303,30 @@ public class SoundWaves extends MultiDexApplication {
                 getMediaBrowserCallback(),
                 null); // optional Bundle
         mMediaBrowser.connect();
+    }
+
+    private void injectDependencies() {
+        DependencyInjector.initialize(this);
+        DependencyInjector.applicationComponent().inject(this);
+    }
+
+    private void enableStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    //.penaltyDeath() // also penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    //.detectLeakedClosableObjects() // problem with okhttp
+                    .penaltyLog()
+                    //.penaltyDeath()
+                    .build());
+        }
     }
 
     @NonNull

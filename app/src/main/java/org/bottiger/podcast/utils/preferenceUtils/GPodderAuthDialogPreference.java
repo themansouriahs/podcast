@@ -11,18 +11,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.widget.RxTextView;
+import com.jakewharton.rxbinding2.InitialValueObservable;
+import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.utils.AuthenticationUtils;
 import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderAPI;
 import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function4;
+import io.reactivex.observers.DisposableObserver;
 import retrofit2.Callback;
-import rx.Observable;
-import rx.Observer;
-import rx.functions.Func4;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -35,12 +42,12 @@ public class GPodderAuthDialogPreference extends DialogPreference {
 
     private static final String TAG = "GPodderAuthDialog";
 
-    private Observable<CharSequence> _usernameChangeObservable;
-    private Observable<CharSequence> _passwordChangeObservable;
-    private Observable<CharSequence> _serverChangeObservable;
-    private Observable<CharSequence> _deviceNameChangeObservable;
+    private InitialValueObservable<CharSequence> _usernameChangeObservable;
+    private InitialValueObservable<CharSequence> _passwordChangeObservable;
+    private InitialValueObservable<CharSequence> _serverChangeObservable;
+    private InitialValueObservable<CharSequence> _deviceNameChangeObservable;
 
-    private rx.Subscription _subscription = null;
+    private Disposable _subscription = null;
 
     private EditText mUsernameView;
     private EditText mPasswordView;
@@ -165,8 +172,8 @@ public class GPodderAuthDialogPreference extends DialogPreference {
             editor.commit();
         }
 
-        if (_subscription != null && !_subscription.isUnsubscribed()) {
-            _subscription.unsubscribe();
+        if (_subscription != null && !_subscription.isDisposed()) {
+            _subscription.dispose();
         }
     }
 
@@ -176,13 +183,10 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                 _passwordChangeObservable,
                 _serverChangeObservable,
                 _deviceNameChangeObservable,
-                new Func4<CharSequence, CharSequence, CharSequence, CharSequence, Boolean>() {
-                    @Override
-                    public Boolean call(CharSequence newEmail,
-                                        CharSequence newPassword,
-                                        CharSequence newServer,
-                                        CharSequence newDevice) {
+                new Function4<CharSequence, CharSequence, CharSequence, CharSequence, Boolean>() {
 
+                    @Override
+                    public Boolean apply(CharSequence newEmail, CharSequence newPassword, CharSequence newServer, CharSequence newDevice) throws Exception {
                         boolean serverValid = !isEmpty(newServer) && StrUtils.isValidUrl(newServer.toString());
                         if (!serverValid) {
                             mServerView.setError("Invalid url");
@@ -196,22 +200,10 @@ public class GPodderAuthDialogPreference extends DialogPreference {
                         boolean credentialsValid = AuthenticationUtils.validateCredentials(newEmail.toString(), newPassword.toString());
 
                         return serverValid && deviceNameValid && credentialsValid;
-
                     }
-                })
-                .subscribe(new Observer<Boolean>() {
+                }).subscribe(new Consumer<Boolean>() {
                     @Override
-                    public void onCompleted() {
-                        Log.d(TAG, "completed");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "there was an error");
-                    }
-
-                    @Override
-                    public void onNext(Boolean formValid) {
+                    public void accept(Boolean formValid) throws Exception {
                         AuthenticationUtils.disableButton(mTestCredentials, formValid);
                     }
                 });

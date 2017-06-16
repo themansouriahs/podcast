@@ -125,7 +125,7 @@ public final class NewExoPlayer implements ExoPlayer {
 
     }
 
-    private static final String TAG = "SimpleExoPlayer";
+    private static final String TAG = NewExoPlayer.class.getSimpleName();
     private static final int MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY = 50;
 
     private final ExoPlayer player;
@@ -887,19 +887,6 @@ public final class NewExoPlayer implements ExoPlayer {
         if (renderers[audioRendererIndex] != null) {
             ((org.bottiger.podcast.player.exoplayer.PodcastMediaCodecAudioRenderer) renderers[audioRendererIndex]).setSpeed(argNewSpeed);
         }
-        /*
-        if (renderers[ExoPlayerWrapper.TYPE_AUDIO] != null) {
-
-            if (renderers[ExoPlayerWrapper.TYPE_AUDIO] instanceof PodcastAudioRendererV21) {
-                ((PodcastAudioRendererV21) renderers[ExoPlayerWrapper.TYPE_AUDIO]).setSpeed(argNewSpeed);
-            } else {
-                player.sendMessage(renderers[ExoPlayerWrapper.TYPE_AUDIO],
-                        MediaCodecAudioRenderer.MSG_SET_PLAYBACK_PARAMS,
-                        new PlaybackParams().setSpeed(argNewSpeed));
-            }
-        }
-        */
-
         notifyAudioEngineChange(argNewSpeed);
     }
 

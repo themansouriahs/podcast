@@ -875,6 +875,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     public void notifyFiltersChanged() {
         setIsLoaded(false);
         mLibrary.loadPlaylist(this);
+        populatePlaylist(MAX_SIZE, true);
     }
 
     @Override

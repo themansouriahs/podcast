@@ -1,2 +1,46 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources/>
+<resources>
+  <string-array name="entries_download_file_expire">
+    <item>100 एमबी</item>
+    <item>1 जीबी</item>
+    <item>2 जीबी</item>
+    <item>3 जीबी</item>
+    <item>5 जीबी</item>
+    <item>असीमित</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries">
+    <item>5 सेकंड</item>
+    <item>10 सेकंड</item>
+    <item>20 सेकंड</item>
+    <item>30 सेकंड</item>
+    <item>1 मिनट</item>
+    <item>2 मिनट</item>
+    <item>5 मिनट</item>
+    <item>10 मिनट</item>
+  </string-array>
+  <string-array name="pref_player_seek_entries_values">
+    <item>5</item>
+    <item>10</item>
+    <item>20</item>
+    <item>30</item>
+    <item>60</item>
+    <item>120</item>
+    <item>300</item>
+    <item>600</item>
+  </string-array>
+  <string-array name="pref_subscriptions_columns_entries">
+    <item>ऑटो</item>
+    <item>एक सूचि</item>
+    <item>2 कॉलम</item>
+    <item>3 कॉलम</item>
+  </string-array>
+  <string-array name="pref_theme_entries">
+    <item>प्रकाश (default)</item>
+    <item>अंधेरा</item>
+    <item>ऑटो (दिन/रा त)</item>
+  </string-array>
+  <string-array name="playlist_sort_order">
+    <item>द्वारा क्रमबद्ध: सबसे हालिया</item>
+    <item>द्वारा क्रमबद्ध: सबसे पुराना</item>
+  </string-array>
+</resources>

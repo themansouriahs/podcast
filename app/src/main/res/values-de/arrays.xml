@@ -8,12 +8,25 @@
     <item>5 GB</item>
     <item>Unbegrenzt</item>
   </string-array>
+  <string-array name="pref_player_seek_entries">
+    <item>5 Sekunden</item>
+    <item>10 Sekunden</item>
+    <item>20 Sekunden</item>
+    <item>30 Sekunden</item>
+    <item>1 Minute</item>
+    <item>2 Minuten</item>
+    <item>5 Minuten</item>
+    <item>10 Minuten</item>
+  </string-array>
   <string-array name="pref_player_seek_entries_values">
     <item>5</item>
     <item>10</item>
     <item>20</item>
     <item>30</item>
     <item>60</item>
+    <item>120</item>
+    <item>300</item>
+    <item>600</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries">
     <item>Automatisch</item>

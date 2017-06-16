@@ -19,7 +19,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.widget.RxTextView;
+import com.jakewharton.rxbinding2.InitialValueObservable;
+import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -32,15 +33,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
-import rx.Observable;
-import rx.Observer;
-import rx.functions.Func2;
 
 import static org.bottiger.podcast.utils.okhttp.AuthenticationInterceptor.AUTHENTICATION_HEADER;
 
@@ -56,10 +58,10 @@ public class DialogFeedAuthentication extends DialogFragment {
 
     OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
 
-    private rx.Subscription _subscription = null;
+    private Disposable _subscription = null;
 
-    private Observable<CharSequence> _usernameChangeObservable;
-    private Observable<CharSequence> _passwordChangeObservable;
+    private InitialValueObservable<CharSequence> _usernameChangeObservable;
+    private InitialValueObservable<CharSequence> _passwordChangeObservable;
 
     public static DialogFeedAuthentication newInstance(@NonNull String argUrl) {
         DialogFeedAuthentication frag = new DialogFeedAuthentication();
@@ -151,33 +153,22 @@ public class DialogFeedAuthentication extends DialogFragment {
         _subscription = Observable.combineLatest(
                 _usernameChangeObservable,
                 _passwordChangeObservable,
-                new Func2<CharSequence, CharSequence, Boolean>() {
-                    @Override
-                    public Boolean call(CharSequence newEmail,
-                                        CharSequence newPassword) {
+                new BiFunction<CharSequence, CharSequence, Boolean>() {
 
+                    @Override
+                    public Boolean apply(CharSequence newEmail, CharSequence newPassword) throws Exception {
                         boolean credentialsValid = AuthenticationUtils.validateCredentials(newEmail.toString(), newPassword.toString());
 
                         return credentialsValid;
-
                     }
-                })//
-                .subscribe(new Observer<Boolean>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.d(TAG, "completed");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "there was an error");
-                    }
-
-                    @Override
-                    public void onNext(Boolean formValid) {
-                        AuthenticationUtils.disableButton(testCredentials, formValid);
-                    }
-                });
+                })
+                .subscribe(new Consumer<Boolean>() {
+                               @Override
+                               public void accept(Boolean formValid) throws Exception {
+                                   AuthenticationUtils.disableButton(testCredentials, formValid);
+                               }
+                           }
+                );
 
         builder.setView(view);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -211,8 +202,8 @@ public class DialogFeedAuthentication extends DialogFragment {
 
     @Override
     public void onDestroyView() {
-        if (_subscription != null && !_subscription.isUnsubscribed()) {
-            _subscription.unsubscribe();
+        if (_subscription != null && !_subscription.isDisposed()) {
+            _subscription.dispose();
         }
         super.onDestroyView();
     }

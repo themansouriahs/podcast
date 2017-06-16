@@ -3,6 +3,7 @@ package org.bottiger.podcast.activities.openopml;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,15 +14,21 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.ToolbarActivity;
+import org.bottiger.podcast.utils.SDCardManager;
+
+import java.io.IOException;
 
 import static org.bottiger.podcast.SubscriptionsFragment.RESULT_EXPORT;
 import static org.bottiger.podcast.SubscriptionsFragment.RESULT_EXPORT_TO_CLIPBOARD;
 import static org.bottiger.podcast.SubscriptionsFragment.RESULT_IMPORT;
 
 public class OPMLImportExportActivity extends ToolbarActivity {
+
+    private static final String TAG = OPMLImportExportActivity.class.getSimpleName();
 
     /*
     The status codes can be changed, they just need to be the same in all activities, it doesn't matter the number,
@@ -33,7 +40,6 @@ public class OPMLImportExportActivity extends ToolbarActivity {
     private static final String EXPORT_RETURN_CODE = "RETURN_EXPORT";
     private static final String MimeType = "file/xml";
     private static final String[] MIME_TYPES = {"file/xml", "application/xml", "text/xml", "text/x-opml", "text/plain"};
-    private static final String TAG = "OPML_io_act";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +47,25 @@ public class OPMLImportExportActivity extends ToolbarActivity {
         setContentView(R.layout.activity_opml_import_export);
 
         //PERMISSION CHECK
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "Requesting read storage permission");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, INTERNAL_STORAGE_PERMISSION_REQUEST);
-
         }
+
+        TextView opml_import_export_text = (TextView) findViewById(R.id.export_opml_text);
+        Resources res = getResources();
+        String opml_text;
+        try {
+            String dir = SDCardManager.getExportDir();
+            opml_text = String.format(res.getString(R.string.opml_export_explanation_dynamic), dir);
+
+        } catch (IOException e) {
+            Log.e(TAG, "Could not access the OPML export dir");
+            e.printStackTrace();
+            opml_text = res.getString(R.string.opml_export_explanation_dynamic);
+        }
+
+        opml_import_export_text.setText(opml_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.opml_import_export_toolbar);
         if (toolbar != null) {
@@ -69,13 +89,14 @@ public class OPMLImportExportActivity extends ToolbarActivity {
         importOPML.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e(TAG, "Import OPML clicked");
                 Intent chooseFile;
                 Intent intent;
                 chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                 //Unless you have an external file manager, this not seems to work, the mimetype is wrong or something
 
                 //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    chooseFile.setType("*/*");
+                chooseFile.setType("*/*");
                 //chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
                 //} else {
                 //    chooseFile.setType(MimeType);
@@ -88,9 +109,9 @@ public class OPMLImportExportActivity extends ToolbarActivity {
 
         Button exportOPML = (Button) findViewById(R.id.bOMPLexport);
         exportOPML.setOnClickListener(new View.OnClickListener() {
-            @Nullable
             @Override
             public void onClick(View view) {
+                Log.e(TAG, "Export OPML to filesystem clicked");
                 //The return data is not checked in this particular case
                 if (getParent() == null) {
                     setResult(RESULT_EXPORT, null);
@@ -106,6 +127,8 @@ public class OPMLImportExportActivity extends ToolbarActivity {
             @Nullable
             @Override
             public void onClick(View view) {
+                Log.e(TAG, "Export OPML to clipboard clicked");
+
                 //The return data is not checked in this particular case
                 if (getParent() == null) {
                     setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
@@ -122,17 +145,21 @@ public class OPMLImportExportActivity extends ToolbarActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
-            Log.d(TAG, "Operation cancelled because of error or by user");// NoI18N
+            Log.e(TAG, "Operation cancelled because of error or by user");// NoI18N
             //finish();
         }
         if (requestCode == ACTIVITY_CHOOSE_FILE_STATUS_CODE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
+
+            Log.e(TAG, "onActivityResult returned RESULT_OK. uri: " + uri);// NoI18N
             //RETURN THE VALUE TO THE APP AND CLOSE
             Intent returnData = new Intent();
             if (getParent() == null) {
+                Log.e(TAG, "getParent() == null");// NoI18N
                 returnData.setData(uri);
                 setResult(RESULT_IMPORT, returnData);
             } else {
+                Log.e(TAG, "getParent() != null");// NoI18N
                 getParent().setResult(RESULT_IMPORT, data);
             }
             finish();

@@ -19,8 +19,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.IEpisode;
@@ -165,15 +165,10 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         ImageLoaderUtils.getGlide(mPlayerService, url)
                 .into(new SimpleTarget<Bitmap>(bitmapSize, bitmapSize) {
                     @Override
-                    public void onResourceReady(Bitmap argBitmap, GlideAnimation anim) {
-                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, argBitmap);
-                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, argBitmap);
-                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, argBitmap);
-                        mSession.setMetadata(mMetaBuilder.build());
-                    }
-
-                    @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, resource);
+                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, resource);
+                        mMetaBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, resource);
                         mSession.setMetadata(mMetaBuilder.build());
                     }
                 });

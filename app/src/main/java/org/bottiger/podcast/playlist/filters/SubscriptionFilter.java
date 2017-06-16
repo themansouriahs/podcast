@@ -137,7 +137,7 @@ public class SubscriptionFilter implements IPlaylistFilter, SharedPreferences.On
         editor.putInt(mModeKey, argMode);
         editor.putString(mValueKey, value);
 
-        editor.apply();
+        editor.commit();
     }
 
     public boolean showListened() {

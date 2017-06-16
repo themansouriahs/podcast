@@ -44,9 +44,10 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	private static final String TAG = "FeedItem";
 
     // Se Subscription.java for details
-    private static final int IS_VIDEO = 1;
-	private static final int HAS_BEEN_DOWNLOADED_ONCE = (1 << 2);
-	private static final int IS_FAVORITE = (1 << 3);
+    private static final int IS_VIDEO 					= 1;
+	private static final int HAS_BEEN_DOWNLOADED_ONCE   = (1 << 2);
+	private static final int IS_FAVORITE 				= (1 << 3);
+	private static final int IS_NEW 					= (1 << 4);
 
 	/*
 	 * Let's document these retared fields! They are totally impossible to guess
@@ -596,10 +597,6 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 		return this.listened == 1;
 	}
 
-	public boolean isNew() {
-		return pub_date >= Library.episodeNewThreshold();
-	}
-
 	/**
 	 * @param argIsDownloaded the isDownloaded to set
 	 */
@@ -1022,6 +1019,39 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 			status |= HAS_BEEN_DOWNLOADED_ONCE;
 		else
 			status &= ~HAS_BEEN_DOWNLOADED_ONCE;
+
+		notifyPropertyChanged(EpisodeChanged.CHANGED);
+	}
+
+	public boolean isNew() {
+		boolean dateIsNew = pub_date >= Library.episodeNewThreshold();
+
+		if (!dateIsNew)
+		{
+			return false;
+		}
+
+		if (!BitMaskUtils.IsBitmaskInitialized(status))
+			return dateIsNew;
+
+		boolean newSettingsValue = IsSettingEnabled(IS_NEW);
+
+		if (!newSettingsValue)
+		{
+			return newSettingsValue;
+		}
+
+		return dateIsNew;
+	}
+
+	public void setIsNew(boolean argIsNew) {
+		status = initStatus();
+		status |= IS_NEW;
+
+		if (argIsNew)
+			status |= IS_NEW;
+		else
+			status &= ~IS_NEW;
 
 		notifyPropertyChanged(EpisodeChanged.CHANGED);
 	}

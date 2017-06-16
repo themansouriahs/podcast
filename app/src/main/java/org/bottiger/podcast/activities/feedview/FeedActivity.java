@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +36,14 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.ApplicationConfiguration;
 import org.bottiger.podcast.R;
@@ -275,17 +283,19 @@ public class FeedActivity extends TopActivity {
 
         if (mPhotoView.getDrawable() == null) {
             ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
-            ImageLoaderUtils.getGlide(getApplicationContext(), mUrl)
-                    .placeholder(cd)
-                    .fitCenter()
-                    .into(new BitmapImageViewTarget(mPhotoView) {
-                        @Override
-                        protected void setResource(Bitmap resource) {
-                            boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(resource);
-                            mMultiShrinkScroller.setUseGradient(isWhite);
-                            mPhotoView.setImageBitmap(resource);
-                        }
-                    });
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(getApplicationContext());
+            options.placeholder(cd);
+            options.fitCenter();
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(getApplicationContext(), mUrl);
+            builder.apply(options);
+            builder.into(new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                    boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(resource);
+                    mMultiShrinkScroller.setUseGradient(isWhite);
+                    mPhotoView.setImageBitmap(resource);
+                }
+            });
         }
     }
 

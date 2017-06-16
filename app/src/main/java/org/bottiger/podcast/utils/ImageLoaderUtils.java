@@ -3,6 +3,7 @@ package org.bottiger.podcast.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -12,20 +13,19 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bumptech.glide.BitmapRequestBuilder;
-import com.bumptech.glide.DrawableTypeRequest;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.service.Downloader.SoundWavesDownloadManager;
-import org.bottiger.podcast.utils.image.NetworkDisablingLoader;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -42,31 +42,38 @@ public class ImageLoaderUtils {
     public static final int NO_NETWORK = 2;
     public static final int DEFAULT = 3;
 
-    public static final DiskCacheStrategy SW_DiskCacheStrategy = DiskCacheStrategy.SOURCE;
+    public static final DiskCacheStrategy SW_DiskCacheStrategy = DiskCacheStrategy.ALL;
 
-    public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl) {
-        return getGlide(argContext, argUrl, DEFAULT);
+    public static RequestBuilder<Bitmap> getGlide(@NonNull Context argContext, @NonNull String argUrl) {
+        return getGlide(argContext, argUrl, null);
     }
 
-    public static BitmapRequestBuilder getGlide(@NonNull Context argContext, @NonNull String argUrl, @NetworkPolicy int argAllowNetwork) {
+    public static RequestBuilder<Bitmap> getGlide(@NonNull Context argContext, @NonNull String argUrl, @Nullable RequestOptions argRequestOptions) {
         RequestManager requestManager = Glide.with(argContext);
 
-        DrawableTypeRequest drawableTypeRequest;
-        BitmapRequestBuilder bitmapRequestBuilder;
-        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext, false) != SoundWavesDownloadManager.NETWORK_OK);
+        RequestBuilder<Bitmap> bitmapRequestBuilder;
 
-        if (noNetwork) {
-            drawableTypeRequest = requestManager.using(new NetworkDisablingLoader()).load(argUrl);
-        } else {
-            drawableTypeRequest = requestManager.load(argUrl);
-        }
+        bitmapRequestBuilder = requestManager.asBitmap();
 
-         bitmapRequestBuilder = drawableTypeRequest
-                 .asBitmap()
-                 .diskCacheStrategy( SW_DiskCacheStrategy );
+        RequestOptions options = argRequestOptions == null ? getRequestOptions(argContext) : argRequestOptions;
+        bitmapRequestBuilder.apply(options);
 
+        bitmapRequestBuilder = bitmapRequestBuilder.load(argUrl);
 
         return bitmapRequestBuilder;
+    }
+
+    public static RequestOptions getRequestOptions(@NonNull Context argContext) {
+        return getRequestOptions(argContext, DEFAULT);
+    }
+
+    public static RequestOptions getRequestOptions(@NonNull Context argContext, @NetworkPolicy int argAllowNetwork) {
+        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext, false) != SoundWavesDownloadManager.NETWORK_OK);
+
+        RequestOptions options = new RequestOptions();
+        options.onlyRetrieveFromCache(noNetwork);
+
+        return options;
     }
 
     @Deprecated
@@ -75,20 +82,15 @@ public class ImageLoaderUtils {
                                      boolean argUsePlaceholder,
                                      boolean argRoundedCorners,
                                      @NetworkPolicy int argNetworkPolicy) {
-        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners, argNetworkPolicy);
+        loadImageUsingGlide(argImageView, argUrl, null, true, argUsePlaceholder, argRoundedCorners, argNetworkPolicy, null);
     }
 
+    @Deprecated
     public static void loadImageInto(@NonNull View argImageView,
                                      @Nullable String argUrl,
-                                     @Nullable Transformation argTransformation,
-                                     boolean argDoCrop,
-                                     boolean argUsePlaceholder,
-                                     boolean argRoundedCorners,
-                                     @NetworkPolicy int argNetworkPolicy) {
-        if (argUrl == null)
-            return;
-
-        loadImageUsingGlide(argImageView, argUrl, argTransformation, argDoCrop, argUsePlaceholder, argRoundedCorners, argNetworkPolicy);
+                                     @NetworkPolicy int argNetworkPolicy,
+                                     @NonNull RequestOptions options) {
+        loadImageUsingGlide(argImageView, argUrl, null, true, false, false, argNetworkPolicy, options);
     }
 
     private static void loadImageUsingGlide(final @NonNull View argTargetView,
@@ -97,7 +99,8 @@ public class ImageLoaderUtils {
                                             boolean argDoCrop,
                                             boolean argUsePlaceholder,
                                             final boolean argRounddedCorners,
-                                            @NetworkPolicy int argNetworkPolicy) {
+                                            @NetworkPolicy int argNetworkPolicy,
+                                            @Nullable RequestOptions options) {
         Context context = argTargetView.getContext();
 
         Target target;
@@ -108,30 +111,30 @@ public class ImageLoaderUtils {
             target = getViewTarget(argTargetView, argRounddedCorners);
         }
 
-        BitmapRequestBuilder builder = ImageLoaderUtils.getGlide(context, argUrl, argNetworkPolicy);
+        RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, argUrl, options);
 
-        if (argDoCrop)
-            builder.centerCrop();
-        else
-            builder.override(512, 512).fitCenter();
+        if (options == null) {
+            options = ImageLoaderUtils.getRequestOptions(context);
+            if (argDoCrop)
+                options.centerCrop();
+            else
+                options.override(512, 512).fitCenter();
 
-        if (argUsePlaceholder) {
-            builder.placeholder(R.drawable.generic_podcast);
+            if (argUsePlaceholder) {
+                options.placeholder(R.drawable.generic_podcast);
+            }
         }
 
+        builder.apply(options);
         builder.into(target);
     }
 
     private static SimpleTarget<Bitmap> getViewTarget(@NonNull final View argImageView, final boolean argRounddedCorners) {
         return new SimpleTarget<Bitmap>(512, 512) {
             @Override
-            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                BitmapDrawable bd = new BitmapDrawable(argImageView.getResources(), bitmap);
-                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    argImageView.setBackgroundDrawable(bd);
-                } else {
-                    argImageView.setBackground(bd);
-                }
+            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                BitmapDrawable bd = new BitmapDrawable(argImageView.getResources(), resource);
+                argImageView.setBackground(bd);
             }
         };
     }

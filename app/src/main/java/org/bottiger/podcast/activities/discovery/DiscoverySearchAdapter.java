@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
+import com.bumptech.glide.request.RequestOptions;
+
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
@@ -71,7 +73,10 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.getDescription().setText(subscription.getDescription());
 
         try {
-            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), null, false, true, true, ImageLoaderUtils.NETWORK);
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
+            options.centerCrop();
+            options.placeholder(R.drawable.generic_podcast);
+            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), ImageLoaderUtils.NETWORK, options);
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }

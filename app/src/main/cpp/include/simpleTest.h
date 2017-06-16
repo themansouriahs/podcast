@@ -1,0 +1,8 @@
+//
+// Created by Arvid on 8/30/2015.
+//
+
+#ifndef SOUNDWAVES_SIMPLETEST_H
+#define SOUNDWAVES_SIMPLETEST_H
+
+#endif //SOUNDWAVES_SIMPLETEST_H

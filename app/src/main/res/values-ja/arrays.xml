@@ -14,6 +14,9 @@
     <item>20 秒</item>
     <item>30 秒</item>
     <item>1 分</item>
+    <item>2 分</item>
+    <item>5 分</item>
+    <item>10 分</item>
   </string-array>
   <string-array name="pref_player_seek_entries_values">
     <item>5</item>
@@ -21,6 +24,9 @@
     <item>20</item>
     <item>30</item>
     <item>60</item>
+    <item>120</item>
+    <item>300</item>
+    <item>600</item>
   </string-array>
   <string-array name="pref_subscriptions_columns_entries">
     <item>自動</item>

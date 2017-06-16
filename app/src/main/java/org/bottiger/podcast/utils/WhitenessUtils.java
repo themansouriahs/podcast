@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Trace;
+import android.support.annotation.NonNull;
 
 /**
  * Utility class for determining whether Bitmaps contain a lot of white pixels in locations
@@ -37,7 +38,7 @@ public class WhitenessUtils {
      * Returns true if 20% of the image's top right corner is white, or 20% of the bottom
      * of the image is white.
      */
-    public static boolean isBitmapWhiteAtTopOrBottom(Bitmap largeBitmap) {
+    public static boolean isBitmapWhiteAtTopOrBottom(@NonNull Bitmap largeBitmap) {
         if (Build.VERSION.SDK_INT >= 18) {
             Trace.beginSection("isBitmapWhiteAtTopOrBottom");
         }
@@ -101,7 +102,7 @@ public class WhitenessUtils {
     /**
      * Scale down the bitmap in order to make color analysis faster. Taken from Palette.
      */
-    private static Bitmap scaleBitmapDown(Bitmap bitmap) {
+    private static Bitmap scaleBitmapDown(@NonNull Bitmap bitmap) {
         final int CALCULATE_BITMAP_MIN_DIMENSION = 100;
         final int minDimension = Math.min(bitmap.getWidth(), bitmap.getHeight());
 

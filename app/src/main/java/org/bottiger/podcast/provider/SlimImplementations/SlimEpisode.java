@@ -66,6 +66,11 @@ public class SlimEpisode extends BaseEpisode implements Parcelable {
         return false;
     }
 
+    @Override
+    public void setIsNew(boolean argIsNew) {
+        
+    }
+
     @Nullable
     @Override
     public String getArtwork(@NonNull Context argContext) {

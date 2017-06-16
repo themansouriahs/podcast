@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:clipToPadding="false">
 
-    <org.bottiger.podcast.views.PlayPauseImageView
+    <org.bottiger.podcast.views.PlayPauseButton
         android:id="@+id/play_pause_button"
         android:layout_width="@dimen/playpause_button_size_normal"
         android:layout_height="@dimen/playpause_button_size_normal"

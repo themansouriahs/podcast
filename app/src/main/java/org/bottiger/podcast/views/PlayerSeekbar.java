@@ -79,17 +79,16 @@ public class PlayerSeekbar extends android.support.v7.widget.AppCompatSeekBar im
             }
 
             long timeMs = mEpisode.getDuration() * seekBar.getProgress() / RANGE_MAX;
+            GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
 
             IEpisode currentTopEpisode = PlayerService.getCurrentItem(getContext());
             if (mEpisode.equals(currentTopEpisode)) {
-                GenericMediaPlayerInterface player = SoundWaves.getAppContext(getContext()).getPlayer();
                 player.seekTo(timeMs);
-            } else {
-                mEpisode.setOffset(timeMs);
-                setProgressMs(timeMs);
             }
 
-            mOverlay.bringToFront();
+            setProgressMs(timeMs);
+            mEpisode.setOffset(timeMs);
+
             invalidate();
         }
 
@@ -451,27 +450,27 @@ public class PlayerSeekbar extends android.support.v7.widget.AppCompatSeekBar im
 
     @Override
     public void onLoadingChanged(boolean isLoading) {
-
+        Log.d(TAG, "onLoadingChanged:" + isLoading);
     }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-
+        Log.d(TAG, "onTimelineChanged");
     }
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
+        Log.d(TAG, "onTracksChanged");
     }
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-
+        Log.d(TAG, "onPlayerError");
     }
 
     @Override
     public void onPositionDiscontinuity() {
-
+        Log.d(TAG, "onPositionDiscontinuity");
     }
 
     @Override

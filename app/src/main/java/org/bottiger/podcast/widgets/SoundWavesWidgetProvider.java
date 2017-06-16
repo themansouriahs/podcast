@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,8 +19,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.AppWidgetTarget;
 
+import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.Library;
@@ -101,6 +105,10 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
         // the layout from our package).
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_default);
 
+        Intent appIntent = new Intent(context, MainActivity.class);
+        PendingIntent intent = PendingIntent.getActivity(context, 0, appIntent, 0);
+        views.setOnClickPendingIntent(R.id.widget_playlist_main, intent);
+
         boolean playlistEmpty = playlist.size() == 0;
         int emptyTextVisibility = playlistEmpty ? View.VISIBLE : View.GONE;
         int playerVisibility = !playlistEmpty ? View.VISIBLE : View.GONE;
@@ -159,15 +167,18 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
 
             String imageUrl = episode.getArtwork(context);
             if (imageUrl != null) {
-                AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, views, R.id.widget_logo, appWidgetId);
+                AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.widget_logo, views, appWidgetId);
 
                 // image size
                 int imageSizeDp = (int) context.getResources().getDimension(R.dimen.widget_logo_size);
                 //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
 
-                ImageLoaderUtils.getGlide(context, imageUrl)
-                        .override(imageSizeDp, imageSizeDp)
-                        .into(appWidgetTarget);
+                RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
+                options.override(imageSizeDp, imageSizeDp);
+
+                RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, imageUrl);
+                builder.apply(options);
+                builder.into(appWidgetTarget);
             }
         }
 

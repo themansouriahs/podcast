@@ -305,7 +305,8 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
         GenericMediaPlayerInterface player = SoundWaves.getAppContext(argContext).getPlayer();
         long episodeOffset = argEpisode.getOffset();
-        if (argEpisode.equals(player.getEpisode()))
+
+        if (player.isInitialized() && argEpisode.equals(player.getEpisode()))
         {
             episodeOffset = player.getCurrentPosition();
         }
@@ -363,5 +364,9 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     public long timeUntilFadeout() {
         return mSleepTimer - System.currentTimeMillis();
+    }
+
+    public void prepare() throws IllegalStateException, IOException {
+
     }
 }

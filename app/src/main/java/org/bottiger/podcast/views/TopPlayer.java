@@ -47,6 +47,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -138,7 +139,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     @Nullable private TextView mEpisodeInfo;
     @Nullable private TextViewObserver mCurrentTime;
     @Nullable private TextView mTotalTime;
-    @Nullable private PlayPauseImageView mPlayPauseButton;
+    @Nullable private PlayPauseButton mPlayPauseButton;
     @Nullable private PlayerSeekbar mPlayerSeekbar;
     @Nullable private DownloadButtonView mPlayerDownloadButton;
     @Nullable private MaterialFavoriteButton mFavoriteButton;
@@ -157,7 +158,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     @Nullable private PlayerSeekbar mDrivingSeekbar;
     @Nullable private TextViewObserver mDrivingCurrentTime;
     @Nullable private TextView mDrivingTotalTime;
-    @Nullable private PlayPauseImageView mDrivingPlayPause;
+    @Nullable private PlayPauseButton mDrivingPlayPause;
     @Nullable private ImageView mDrivingFastForward;
     @Nullable private ImageView mDrivingReverse;
     @Nullable private ImageView mDrivingPhoto;
@@ -333,11 +334,11 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         mCurrentTime            =    (TextViewObserver) findViewById(R.id.current_time);
         mTotalTime              =    (TextView) findViewById(R.id.total_time);
 
-        mPlayPauseButton        =    (PlayPauseImageView) findViewById(R.id.playpause);
+        mPlayPauseButton        =    (PlayPauseButton) findViewById(R.id.playpause);
         mPlayerSeekbar          =    (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
         mPlayerDownloadButton   =    (DownloadButtonView) findViewById(R.id.download);
 
-        mPlayPauseButton = (PlayPauseImageView) findViewById(R.id.playpause);
+        mPlayPauseButton = (PlayPauseButton) findViewById(R.id.playpause);
         mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
         mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
         mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
@@ -528,7 +529,10 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         setDynamicColors(iSubscription, argEpisode);
 
         Log.v("MissingImage", "Setting image");
-        ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
+        RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
+        options.placeholder(R.drawable.generic_podcast);
+        options.override(512, 512).fitCenter();
+        ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, ImageLoaderUtils.DEFAULT, options);
 
         float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
         setPlaybackSpeedView(speed);
@@ -554,7 +558,12 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             bindPlayPauseButton(mDrivingPlayPause, argEpisode);
             bindSeekButton(mDrivingReverse, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.BACKWARDS);
             bindSeekButton(mDrivingFastForward, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.FORWARD);
-            ImageLoaderUtils.loadImageInto(mDrivingPhoto, artworkURL, null, false, false, false, ImageLoaderUtils.DEFAULT);
+
+
+            RequestOptions requestOptions = ImageLoaderUtils.getRequestOptions(getContext());
+            requestOptions.placeholder(R.drawable.generic_podcast);
+            requestOptions.override(512, 512).fitCenter();
+            ImageLoaderUtils.loadImageInto(mDrivingPhoto, artworkURL, ImageLoaderUtils.DEFAULT, requestOptions);
         }
     }
 
@@ -580,7 +589,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             mDrivingSeekbar = (PlayerSeekbar) mDrivingLayout.findViewById(R.id.top_player_seekbar);
             mDrivingCurrentTime = (TextViewObserver) mDrivingLayout.findViewById(R.id.current_time);
             mDrivingTotalTime = (TextView) mDrivingLayout.findViewById(R.id.total_time);
-            mDrivingPlayPause = (PlayPauseImageView) mDrivingLayout.findViewById(R.id.playpause);
+            mDrivingPlayPause = (PlayPauseButton) mDrivingLayout.findViewById(R.id.playpause);
             mDrivingFastForward = (ImageView) mDrivingLayout.findViewById(R.id.top_player_fastforward);
             mDrivingReverse = (ImageView) mDrivingLayout.findViewById(R.id.top_player_rewind);
             mDrivingPhoto = (ImageView) mDrivingLayout.findViewById(R.id.session_photo);
@@ -1193,9 +1202,9 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
                 argOverlay));
     }
 
-    private static void bindPlayPauseButton(@Nullable PlayPauseImageView argPlayPauseImageView, @NonNull IEpisode argEpisode) {
-        argPlayPauseImageView.setEpisode(argEpisode, PlayPauseImageView.PLAYLIST);
-        argPlayPauseImageView.setStatus(STATE_READY);
+    private static void bindPlayPauseButton(@Nullable PlayPauseButton argPlayPauseButton, @NonNull IEpisode argEpisode) {
+        argPlayPauseButton.setEpisode(argEpisode, PlayPauseButton.PLAYLIST);
+        argPlayPauseButton.setStatus(STATE_READY);
     }
 
     private static void bindDuration(@Nullable TextView argDurationView, @NonNull IEpisode argEpisode) {

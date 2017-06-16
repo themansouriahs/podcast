@@ -94,6 +94,8 @@
     <string name="import_export_explanation">Import your subscriptions</string>
     <string name="opml_import_explanation">Select an OPML file from your internal storage</string>
     <string name="opml_export_explanation">Export your subscriptions to the internal storage. They are stored on /STORAGE/podcasts.opml</string>
+    <string name="opml_export_explanation_dynamic">Export your subscriptions to the internal storage. They are stored on %1$s/podcasts.opml</string>
+    <string name="opml_export_explanation_fail">The OPML file cannot not be exported to internal storage. Please contact the developer!</string>
     <string name="opml_import_button">Import OPML</string>
     <string name="opml_export_button">Export to storage</string>
     <string name="opml_export_clipboard_button">Export to clipboard</string>
