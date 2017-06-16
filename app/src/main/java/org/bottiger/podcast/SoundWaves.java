@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -93,6 +94,7 @@ public class SoundWaves extends MultiDexApplication {
         super.onCreate();
         //Debug.startMethodTracing("startup6");
 
+        enableStrictMode();
         injectDependencies();
 
         UIUtils.setTheme(getApplicationContext());
@@ -306,6 +308,25 @@ public class SoundWaves extends MultiDexApplication {
     private void injectDependencies() {
         DependencyInjector.initialize(this);
         DependencyInjector.applicationComponent().inject(this);
+    }
+
+    private void enableStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    //.penaltyDeath() // also penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    //.detectLeakedClosableObjects() // problem with okhttp
+                    .penaltyLog()
+                    //.penaltyDeath()
+                    .build());
+        }
     }
 
     @NonNull
