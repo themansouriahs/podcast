@@ -29,8 +29,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 386        // even - release. Odd - development
-        versionName "0.158.8" // even - release. Odd - development
+        versionCode 389        // even - release. Odd - development
+        versionName "0.158.9" // even - release. Odd - development
         multiDexEnabled = true
 
         vectorDrawables.useSupportLibrary = true
