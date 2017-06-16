@@ -274,7 +274,7 @@ public abstract class BaseSubscription implements ISubscription {
                     public Boolean apply(Context context) throws Exception {
                         try {
                             String url = getImageURL();
-                            RequestOptions options = new RequestOptions();
+                            RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
                             options.diskCacheStrategy(ImageLoaderUtils.SW_DiskCacheStrategy);
 
                             RequestManager rm = Glide.with(context);

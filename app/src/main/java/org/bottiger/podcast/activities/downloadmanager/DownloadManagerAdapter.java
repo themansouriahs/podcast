@@ -84,7 +84,7 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
 
         String artWork = episode.getArtwork(mContext);
         if (!TextUtils.isEmpty(artWork)) {
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
             options.centerCrop();
             options.placeholder(R.drawable.generic_podcast);
             ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, ImageLoaderUtils.DEFAULT, options);

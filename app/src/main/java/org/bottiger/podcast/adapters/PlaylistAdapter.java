@@ -97,7 +97,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         if (StrUtils.isValidUrl(image)) {
             assert image != null;
 
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
             options.centerCrop();
             RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
             builder.apply(options);

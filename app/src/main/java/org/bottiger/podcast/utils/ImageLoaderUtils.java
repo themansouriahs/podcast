@@ -45,27 +45,35 @@ public class ImageLoaderUtils {
     public static final DiskCacheStrategy SW_DiskCacheStrategy = DiskCacheStrategy.ALL;
 
     public static RequestBuilder<Bitmap> getGlide(@NonNull Context argContext, @NonNull String argUrl) {
-        return getGlide(argContext, argUrl, DEFAULT);
+        return getGlide(argContext, argUrl, null);
     }
 
-    public static RequestBuilder<Bitmap> getGlide(@NonNull Context argContext, @NonNull String argUrl, @NetworkPolicy int argAllowNetwork) {
+    public static RequestBuilder<Bitmap> getGlide(@NonNull Context argContext, @NonNull String argUrl, @Nullable RequestOptions argRequestOptions) {
         RequestManager requestManager = Glide.with(argContext);
 
         RequestBuilder<Bitmap> bitmapRequestBuilder;
-        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext, false) != SoundWavesDownloadManager.NETWORK_OK);
 
         bitmapRequestBuilder = requestManager.asBitmap();
 
-        noNetwork = false;
-        if (noNetwork) {
-            //bitmapRequestBuilder = bitmapRequestBuilder.using(new NetworkDisablingLoader()).load(argUrl);
-        } else {
-            bitmapRequestBuilder = bitmapRequestBuilder.load(argUrl);
-        }
+        RequestOptions options = argRequestOptions == null ? getRequestOptions(argContext) : argRequestOptions;
+        bitmapRequestBuilder.apply(options);
 
-        //                 .diskCacheStrategy( SW_DiskCacheStrategy );
+        bitmapRequestBuilder = bitmapRequestBuilder.load(argUrl);
 
         return bitmapRequestBuilder;
+    }
+
+    public static RequestOptions getRequestOptions(@NonNull Context argContext) {
+        return getRequestOptions(argContext, DEFAULT);
+    }
+
+    public static RequestOptions getRequestOptions(@NonNull Context argContext, @NetworkPolicy int argAllowNetwork) {
+        boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext, false) != SoundWavesDownloadManager.NETWORK_OK);
+
+        RequestOptions options = new RequestOptions();
+        options.onlyRetrieveFromCache(noNetwork);
+
+        return options;
     }
 
     @Deprecated
@@ -103,10 +111,10 @@ public class ImageLoaderUtils {
             target = getViewTarget(argTargetView, argRounddedCorners);
         }
 
-        RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, argUrl, argNetworkPolicy);
+        RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, argUrl, options);
 
         if (options == null) {
-            options = new RequestOptions();
+            options = ImageLoaderUtils.getRequestOptions(context);
             if (argDoCrop)
                 options.centerCrop();
             else

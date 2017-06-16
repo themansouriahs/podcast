@@ -173,7 +173,7 @@ public class SoundWavesWidgetProvider extends AppWidgetProvider {
                 int imageSizeDp = (int) context.getResources().getDimension(R.dimen.widget_logo_size);
                 //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
 
-                RequestOptions options = new RequestOptions();
+                RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
                 options.override(imageSizeDp, imageSizeDp);
 
                 RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, imageUrl);

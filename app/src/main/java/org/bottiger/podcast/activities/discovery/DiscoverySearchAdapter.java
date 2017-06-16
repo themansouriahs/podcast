@@ -73,7 +73,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.getDescription().setText(subscription.getDescription());
 
         try {
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
             options.centerCrop();
             options.placeholder(R.drawable.generic_podcast);
             ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), ImageLoaderUtils.NETWORK, options);

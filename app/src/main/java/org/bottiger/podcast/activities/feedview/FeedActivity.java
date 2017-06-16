@@ -283,7 +283,7 @@ public class FeedActivity extends TopActivity {
 
         if (mPhotoView.getDrawable() == null) {
             ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(getApplicationContext());
             options.placeholder(cd);
             options.fitCenter();
             RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(getApplicationContext(), mUrl);

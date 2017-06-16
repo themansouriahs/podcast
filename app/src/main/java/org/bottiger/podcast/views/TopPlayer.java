@@ -529,7 +529,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         setDynamicColors(iSubscription, argEpisode);
 
         Log.v("MissingImage", "Setting image");
-        RequestOptions options = new RequestOptions();
+        RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
         options.placeholder(R.drawable.generic_podcast);
         options.override(512, 512).fitCenter();
         ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, ImageLoaderUtils.DEFAULT, options);
@@ -560,7 +560,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             bindSeekButton(mDrivingFastForward, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.FORWARD);
 
 
-            RequestOptions requestOptions = new RequestOptions();
+            RequestOptions requestOptions = ImageLoaderUtils.getRequestOptions(getContext());
             requestOptions.placeholder(R.drawable.generic_podcast);
             requestOptions.override(512, 512).fitCenter();
             ImageLoaderUtils.loadImageInto(mDrivingPhoto, artworkURL, ImageLoaderUtils.DEFAULT, requestOptions);

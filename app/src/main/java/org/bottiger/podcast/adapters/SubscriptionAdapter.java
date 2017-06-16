@@ -214,11 +214,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                     argHolder.setImagePlaceholderVisibility(VISIBLE);
 
 
-                    RequestOptions options = new RequestOptions();
+                    RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
                     options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
                     options.centerCrop();
-                    RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
-                    builder.apply(options);
+                    RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image, options);
                     builder.listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -242,7 +241,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                         }
                     });
                 } else {
-                    RequestOptions options = new RequestOptions();
+                    RequestOptions options =ImageLoaderUtils.getRequestOptions(mActivity);
                     options.placeholder(R.drawable.generic_podcast);
                     options.centerCrop();
                     RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
@@ -263,7 +262,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
             }
         } else {
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
             options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
             options.fitCenter();
             RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, "");
