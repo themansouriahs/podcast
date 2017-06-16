@@ -84,14 +84,7 @@ public class ExoPlayerMediaSourceHelper {
             case C.TYPE_HLS:
                 return new HlsMediaSource(uri, mediaDataSourceFactory, mainHandler, eventLogger);
             case C.TYPE_OTHER: {
-                DefaultExtractorsFactory defaultExtractorsFactory = new DefaultExtractorsFactory();
-
-                // FIXME: https://github.com/google/ExoPlayer/issues/2895
-                defaultExtractorsFactory.setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING);
-
-                ExtractorMediaSource extractorMediaSource = new ExtractorMediaSource(uri, mediaDataSourceFactory, defaultExtractorsFactory,
-                        mainHandler, eventLogger);
-                return extractorMediaSource;
+                return new ExtractorMediaSource(uri, mediaDataSourceFactory, new DefaultExtractorsFactory(), mainHandler, eventLogger);
             }
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);

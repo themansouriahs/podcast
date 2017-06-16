@@ -614,7 +614,7 @@ public class Subscription extends BasePodcastSubscription {
 		float parsedSpeed = parsePlaybackSpeed();
 
 		if (parsedSpeed == PlaybackSpeed.UNDEFINED)
-			return PlaybackSpeed.DEFAULT;
+			return PlaybackSpeed.UNDEFINED;
 
 		return parsedSpeed;
 	}

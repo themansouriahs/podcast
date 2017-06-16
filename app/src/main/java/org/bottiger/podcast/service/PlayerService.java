@@ -587,7 +587,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 		}
 
 		if (subscription instanceof Subscription) {
-			speed = ((Subscription) subscription).getPlaybackSpeed();
+			float subscriptionSpeed = ((Subscription) subscription).getPlaybackSpeed();
+			speed = subscriptionSpeed != PlaybackSpeed.UNDEFINED ? subscriptionSpeed : speed;
 		}
 
 		return speed;
