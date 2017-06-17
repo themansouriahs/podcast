@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider.base;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.ColorInt;
@@ -19,6 +20,7 @@ import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
@@ -53,18 +55,31 @@ public abstract class BaseSubscription implements ISubscription {
     protected boolean mIsLoaded = false;
     protected boolean mIsRefreshing = false;
 
-    protected int mPrimaryColor = -1;
-    protected int mPrimaryTintColor = -1;
-    protected int mSecondaryColor = -1;
-
     /**
      * See SubscriptionColumns for documentation
      */
-    protected String mTitle;
-    protected String mImageURL;
-    protected String mDescription;
-    protected String mUrlString;
-    protected String mLink;
+    @ColumnInfo(name = SubscriptionColumns.TITLE)
+    public String mTitle;
+
+    @ColumnInfo(name = SubscriptionColumns.IMAGE_URL)
+    public String mImageURL;
+
+    @ColumnInfo(name = SubscriptionColumns.URL)
+    public String mUrlString;
+
+    @ColumnInfo(name = SubscriptionColumns.DESCRIPTION)
+    public String mDescription;
+
+    @ColumnInfo(name = SubscriptionColumns.PRIMARY_COLOR)
+    public int mPrimaryColor = -1;
+
+    @ColumnInfo(name = SubscriptionColumns.PRIMARY_TINT_COLOR)
+    public int mPrimaryTintColor = -1;
+
+    @ColumnInfo(name = SubscriptionColumns.SECONDARY_COLOR)
+    public int mSecondaryColor = -1;
+
+    public String mLink;
 
     private Single<ColorExtractor> mColorObservable;
 

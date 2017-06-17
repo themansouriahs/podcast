@@ -31,8 +31,6 @@ import javax.annotation.Nullable;
 
 import io.requery.android.database.sqlite.SQLiteDatabase;
 
-@Entity(tableName = SubscriptionColumns.TABLE_NAME,
-		indices = {@Index(SubscriptionColumns.LAST_ITEM_UPDATED), @Index(ItemColumns.URL)})
 public class Subscription extends BasePodcastSubscription {
 
 	private static final String TAG = Subscription.class.getSimpleName();
@@ -72,25 +70,6 @@ public class Subscription extends BasePodcastSubscription {
 	public @interface Subscribed {}
 	public static final int STATUS_SUBSCRIBED = 1;
 	public static final int STATUS_UNSUBSCRIBED = 2;
-
-    /**
-     * See SubscriptionColumns for documentation
-     */
-	public String comment;
-	public String sync_id;
-	public long status;
-	public long lastUpdated;
-	public long lastItemUpdated;
-	public long fail_count;
-	@Deprecated public long auto_download;
-
-	public int new_episodes_cache;
-	private int episode_count_cache;
-
-	/**
-	 * Settings is a bitmasked int with various settings
-	 */
-	private int mSettings;
 
 	public String getLink() {
 		return mLink;
