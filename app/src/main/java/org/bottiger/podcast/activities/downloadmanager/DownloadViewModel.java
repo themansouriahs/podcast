@@ -1,5 +1,6 @@
 package org.bottiger.podcast.activities.downloadmanager;
 
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.Resources;
 import android.databinding.ObservableField;
@@ -26,7 +27,7 @@ import rx.schedulers.Schedulers;
  */
 public class DownloadViewModel {
 
-    private static final String TAG = "DownloadViewModel";
+    private static final String TAG = DownloadViewModel.class.getSimpleName();
 
     private static final int MAX_PROGRESS = 100;
 

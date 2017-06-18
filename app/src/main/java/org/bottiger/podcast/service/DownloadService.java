@@ -1,6 +1,7 @@
 package org.bottiger.podcast.service;
 
 import android.app.IntentService;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -40,7 +41,7 @@ public class DownloadService extends IntentService {
     private static final String PARAM_IN_MANUAL_START = "started_manual";
 
     private static ReentrantLock sLock = new ReentrantLock();
-    private static LinkedList<QueueEpisode> sQueue = new LinkedList<>();
+    private static MutableLiveData<List<QueueEpisode>> sLiveQueue = new MutableLiveData<>();
 
     private DownloadProgressPublisher mProgressPublisher;
     private SoundWavesDownloadManager mSoundWavesDownloadManager;
@@ -88,8 +89,15 @@ public class DownloadService extends IntentService {
         if (episode != null) {
             try {
                 sLock.lock();
-                if (!sQueue.contains(episode)) {
-                    sQueue.add(episode);
+                List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+                if (episodes == null)
+                    episodes = new LinkedList<>();
+
+                if (!episodes.contains(episode)) {
+                    episodes.add(episode);
+
+                    sLiveQueue.setValue(episodes);
                     postQueueChangedEvent(episode.getEpisode(), SoundWavesDownloadManager.ADDED);
                 }
             } finally {
@@ -113,8 +121,11 @@ public class DownloadService extends IntentService {
             sLock.lock();
             int queueChanced = 0;
 
-            for (int i = 0; i < sQueue.size() && !downloadStarted; i++) {
-                episode = sQueue.getFirst();
+            List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+            int size = episodes == null ? 0 : episodes.size();
+            for (int i = 0; i < size && !downloadStarted; i++) {
+                episode = episodes.get(i);
 
                 if (episode != null) {
                     boolean canDownload = false;
@@ -127,7 +138,8 @@ public class DownloadService extends IntentService {
                         downloadStarted = true;
                     } else {
                         // in case the download couldn't start
-                        sQueue.remove(episode);
+                        //sQueue.remove(episode);
+                        episodes.remove(episode);
                         queueChanced++;
 
                         // This need to be more general and work for SlimEpisodes
@@ -137,6 +149,8 @@ public class DownloadService extends IntentService {
                     }
                 }
             }
+
+            sLiveQueue.postValue(episodes);
 
             if (queueChanced > 0) {
                 postQueueChangedEvent(null, SoundWavesDownloadManager.UNDEFINED);
@@ -156,7 +170,9 @@ public class DownloadService extends IntentService {
         mEngine.addCallback(mSoundWavesDownloadManager.getIDownloadEngineCallback());
 
         Log.d(TAG, "Start downloading: " + feedItem);
-        mEngine.startDownload(sQueue.size() > 0);
+        List<QueueEpisode> episodes = sLiveQueue.getValue();
+        int size = episodes != null ? episodes.size() : 0;
+        mEngine.startDownload(size > 0);
 
         if (feedItem instanceof FeedItem) {
             mProgressPublisher.addEpisode((FeedItem) feedItem);
@@ -193,13 +209,25 @@ public class DownloadService extends IntentService {
         return queueEpisode;
     }
 
+    @Deprecated
     @NonNull
     public static List<QueueEpisode> getQueue() {
-        return sQueue;
+        List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+        if (episodes == null) {
+            return new LinkedList<>();
+        }
+
+        return episodes;
+    }
+
+    @NonNull
+    public static MutableLiveData<List<QueueEpisode>> getLiveQueue() {
+        return sLiveQueue;
     }
 
     public static int getSize() {
-        return sQueue.size();
+        return getQueue().size();
     }
 
     public static void removeFirst() {
@@ -207,9 +235,12 @@ public class DownloadService extends IntentService {
         // Queue have been cleared while downloading the current file
         sLock.lock();
         try {
-            if (getSize() > 0) {
-                sQueue.removeFirst();
+            List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+            if (episodes != null && episodes.size() > 0) {
+                episodes.remove(0);
             }
+            sLiveQueue.postValue(episodes);
         } finally {
             sLock.unlock();
         }
@@ -227,10 +258,13 @@ public class DownloadService extends IntentService {
      public static IEpisode getDownloadingItem() {
          sLock.lock();
          try {
-             if (sQueue.size() == 0)
+             List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+             if (episodes == null || episodes.size() == 0)
                  return null;
 
-             QueueEpisode downloadingItem = sQueue.getFirst();
+             QueueEpisode downloadingItem = episodes.get(0);
+
              if (downloadingItem == null) {
                  return null;
              }
@@ -242,14 +276,27 @@ public class DownloadService extends IntentService {
      }
 
     public static void clearQueue() {
-        sQueue.clear();
+        sLock.lock();
+        try {
+            List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+            if (episodes != null) {
+                episodes.clear();
+                sLiveQueue.postValue(episodes);
+            }
+        } finally {
+            sLock.unlock();
+        }
     }
 
     public static void removeFromQueue(int argPosition) {
         sLock.lock();
         try {
-            if (sQueue.size() > argPosition)
-                sQueue.remove(argPosition);
+            List<QueueEpisode> episodes = sLiveQueue.getValue();
+            if (episodes != null && episodes.size() > argPosition) {
+                episodes.remove(argPosition);
+                sLiveQueue.postValue(episodes);
+            }
         } finally {
             sLock.unlock();
         }
@@ -258,8 +305,13 @@ public class DownloadService extends IntentService {
     public static void move(int fromPosition, int toPosition) {
         sLock.lock();
         try {
-            QueueEpisode episode = sQueue.get(fromPosition);
-            sQueue.add(toPosition, episode);
+            List<QueueEpisode> episodes = sLiveQueue.getValue();
+
+            if (episodes != null) {
+                QueueEpisode episode = episodes.get(fromPosition);
+                episodes.add(toPosition, episode);
+                sLiveQueue.postValue(episodes);
+            }
         } finally {
             sLock.unlock();
         }

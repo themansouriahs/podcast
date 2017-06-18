@@ -1,28 +1,39 @@
 package org.bottiger.podcast.activities.downloadmanager;
 
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.service.DownloadService;
 import org.bottiger.podcast.views.NpaLinearLayoutManager;
+
+import java.util.List;
 
 /**
  * Created by aplb on 04-10-2015.
  */
-public class DownloadManagerActivity extends AppCompatActivity {
+public class DownloadManagerActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
-    private static final String TAG = "DownloadManagerActivity";
+    private static final String TAG = DownloadManagerActivity.class.getSimpleName();
+
+    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
     private RecyclerView mRecyclerView;
     private DownloadManagerAdapter mAdapter;
@@ -31,6 +42,17 @@ public class DownloadManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manager);
+
+        DownloadManagerViewModel viewModel = ViewModelProviders.of(this).get(DownloadManagerViewModel.class);
+        viewModel.getData().observe(this, new Observer<List<QueueEpisode>>() {
+            @Override
+            public void onChanged(@Nullable List<QueueEpisode> queueEpisodes) {
+                String queueSize = queueEpisodes != null ? Integer.toString(queueEpisodes.size()) : "null";
+                Log.i(TAG, "Livedata changed. Size: " + queueSize);
+
+                mAdapter.setData(queueEpisodes);
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.download_manager_toolbar);
         if (toolbar != null) {
@@ -116,5 +138,10 @@ public class DownloadManagerActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
     }
 }
