@@ -32,6 +32,7 @@ import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.receiver.DownloadManagerReceiver;
 import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
+import org.bottiger.podcast.utils.UIUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -179,18 +180,29 @@ public class ShortcutManagerUtil {
         Bitmap bitmap = null;
         Icon icon = null;
 
-        try {
-            bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, argArtwork)
-                    .into(200, 200) // Width and height
-                    .get();
+        if (argArtwork != null) {
+            try {
+                int size = (int) UIUtils.convertDpToPixel(102, argContext); // I recall the icon size should be 102 dp
+                bitmap = ImageLoaderUtils.getGlide(argContext, argArtwork)
+                        .submit(size, size) // Width and height
+                        .get();
 
-            bitmap = getCroppedBitmap(bitmap);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            ErrorUtils.handleException(e, TAG);
+                bitmap = getCroppedBitmap(bitmap);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                ErrorUtils.handleException(e, TAG);
+            }
         }
 
-        icon = bitmap != null ? Icon.createWithBitmap(bitmap) : Icon.createWithResource(argContext, R.drawable.generic_podcast);
+        if (bitmap != null) {
+            if (Build.VERSION.SDK_INT >= 26) {
+                icon = Icon.createWithAdaptiveBitmap(bitmap);
+            } else {
+                icon = Icon.createWithBitmap(bitmap);
+            }
+        } else {
+            icon = Icon.createWithResource(argContext, R.drawable.generic_podcast);
+        }
 
         ShortcutInfo.Builder shortcutBuilder = new ShortcutInfo.Builder(argContext, "id"+argId)
                 .setShortLabel(argShortTitle) // 10 characters
