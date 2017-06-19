@@ -21,14 +21,19 @@
         android:elevation="10dp">
 
         <!--
-        <include layout="@layout/list_episode_base"
-            bind:episode="@{episode}"/>
+        <org.bottiger.podcast.views.ImageViewTinted
+            android:id="@+id/download_episode_image"
+            android:layout_width="@dimen/playlist_image_size_small"
+            android:layout_height="@dimen/playlist_image_size_small"
+            android:layout_alignParentLeft="true"
+            />
             -->
         <org.bottiger.podcast.views.ImageViewTinted
             android:id="@+id/download_episode_image"
             android:layout_width="@dimen/playlist_image_size_small"
             android:layout_height="@dimen/playlist_image_size_small"
             android:layout_alignParentLeft="true"
+            app:imageUrl="@{viewModel.imageUrl}"
             />
 
         <ImageButton
@@ -50,8 +55,7 @@
             android:text="@{viewModel.title}"
             android:hint="Episode Title"
             android:layout_marginRight="72dp"
-            android:maxLines="1"
-            android:ellipsize="middle"
+            android:singleLine="true"
             android:layout_toRightOf="@id/download_episode_image"
             style="@style/SoundWavesListTitleStyle"
             />

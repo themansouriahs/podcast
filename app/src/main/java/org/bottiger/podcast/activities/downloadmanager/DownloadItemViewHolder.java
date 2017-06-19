@@ -17,13 +17,9 @@ public class DownloadItemViewHolder extends RecyclerView.ViewHolder {
     private ViewDataBinding binding;
     private IEpisode mEpisode;
 
-    @Deprecated
-    public ImageViewTinted mImageView;
-
     public DownloadItemViewHolder(View rowView) {
         super(rowView);
         binding = DataBindingUtil.bind(rowView);
-        mImageView = (ImageViewTinted) rowView.findViewById(R.id.download_episode_image);
     }
 
     public void setEpisode(IEpisode argEpisode) {

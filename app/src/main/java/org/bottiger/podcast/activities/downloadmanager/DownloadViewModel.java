@@ -3,18 +3,26 @@ package org.bottiger.podcast.activities.downloadmanager;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.Resources;
+import android.databinding.BindingAdapter;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.DownloadProgress;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.service.DownloadStatus;
+import org.bottiger.podcast.utils.ImageLoaderUtils;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -95,6 +103,25 @@ public class DownloadViewModel {
 
     public String getTitle() {
         return mEpisode.getTitle();
+    }
+
+    public String getImageUrl() {
+        return mEpisode.getArtwork(mContext);
+    }
+
+    @BindingAdapter("app:imageUrl")
+    public static void loadImage(ImageView argImageView, String argImageUrl) {
+        if (!TextUtils.isEmpty(argImageUrl)) {
+            Context context = argImageView.getContext();
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
+            options.centerCrop();
+            options.placeholder(R.drawable.generic_podcast);
+
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, argImageUrl);
+            builder.apply(options);
+            builder.into(argImageView);
+
+        }
     }
 
     private String makeSubtitle() {

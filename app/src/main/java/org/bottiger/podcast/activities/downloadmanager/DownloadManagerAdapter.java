@@ -1,6 +1,7 @@
 package org.bottiger.podcast.activities.downloadmanager;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.bottiger.podcast.BR;
@@ -34,7 +36,6 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
 
     @NonNull
     private Context mContext;
-    private SoundWavesDownloadManager mDownloadManager;
     private List<QueueEpisode> queueEpisodes = new LinkedList<>();
 
     private TextView mEmptyTextView;
@@ -43,8 +44,6 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
         super();
         mContext = argContext;
         mEmptyTextView = argEmptyTextView;
-
-        mDownloadManager = SoundWaves.getAppContext(mContext).getDownloadManager();
 
         setEmptyTextViewVisibility();
     }
@@ -57,6 +56,7 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
         }
 
         queueEpisodes = argQueueEpisodes;
+        setEmptyTextViewVisibility();
         notifyDataSetChanged();
     }
 
@@ -79,21 +79,12 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
 
         DownloadViewModel viewModel = new DownloadViewModel(mContext, this, (FeedItem)episode, position); // FIXME no type casting
         viewModel.subscribe();
-        //queueEpisodes.add(viewModel);
         holder.getBinding().setVariable(BR.viewModel, viewModel);
-
-        String artWork = episode.getArtwork(mContext);
-        if (!TextUtils.isEmpty(artWork)) {
-            RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
-            options.centerCrop();
-            options.placeholder(R.drawable.generic_podcast);
-            ImageLoaderUtils.loadImageInto(holder.mImageView, artWork, ImageLoaderUtils.DEFAULT, options);
-        }
     }
 
     @Override
     public int getItemCount() {
-        return mDownloadManager.getQueueSize();
+        return queueEpisodes.size();
     }
 
     public void removed(int argPosition) {
@@ -101,22 +92,6 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
         setEmptyTextViewVisibility();
         super.notifyItemRemoved(argPosition);
     }
-
-    /*
-    public void downloadComplete(@NonNull IEpisode argEpisode) {
-        Log.d("here", "er go");
-    }
-
-    public void updateProgress(@NonNull IEpisode argEpisode, int argProgress) {
-        for (int i = 0; i < queueEpisodes.size(); i++) {
-            DownloadViewModel viewModel = queueEpisodes.get(i);
-            IEpisode episode = viewModel.getEpisode();
-            if (argEpisode.equals(episode)) {
-                viewModel.updateProgress(argProgress);
-            }
-        }
-    }
-    */
 
     boolean onItemMove(int fromPosition, int toPosition) {
         DownloadService.move(fromPosition, toPosition);
