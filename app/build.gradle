@@ -157,7 +157,7 @@ repositories {
 
 //dependencies
 ext.espressoVersion = '2.2.2'
-ext.supportLibraryVersion = '25.4.0'
+ext.supportLibraryVersion = '26.0.0-beta2'
 ext.playServicesVersion = '11.0.1'
 ext.architectureComponentsVersion = '1.0.0-alpha3'
 
