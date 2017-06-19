@@ -108,8 +108,5 @@
         android:layout_height="1px"
         android:paddingTop="10dp"
         android:layout_alignParentBottom="true"/>
-    <!--
-    android:background="?attr/themeTextColorPrimary"
-    -->
 
 </RelativeLayout>

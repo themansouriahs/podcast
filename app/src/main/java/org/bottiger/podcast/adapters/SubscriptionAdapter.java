@@ -72,10 +72,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     private int numberOfColumns = 2;
     private int position = -1;
 
-    private int[] stolenSize;
-    private int prefetchWidth = -1;
-    private int prefetchHeight = -1;
-
     @Nullable private ActionMode mActionMode = null;
     private MultiSelector mMultiSelector = new MultiSelector();
     private SubscriptionSelectorCallback mActionModeCallback;
@@ -279,7 +275,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                     argHolder.image.setImageDrawable(circularBitmapDrawable);
                 }
             });
-            //Glide.with(mActivity).load("").placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription)).into(argHolder.image);
         }
 
         if (argHolder.text_container != null) {

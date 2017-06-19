@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/feed_scrollviewChild"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,7 +10,11 @@
     <View
         android:id="@+id/empty_start_column"
         android:layout_width="0dp"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
     <org.bottiger.podcast.views.FeedRecyclerView
@@ -20,27 +25,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:overScrollMode="never"
-        />
+        app:layout_constraintTop_toTopOf="@+id/empty_start_column"
+        app:layout_constraintStart_toStartOf="@+id/empty_start_column" />
 
     <LinearLayout
         android:id="@+id/feed_recycler_view_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/feed_recycler_view_empty_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_episodes_in_the_feed"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:layout_marginTop="40dp"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="10dp"
-        android:textColor="?attr/themeTextColorPrimary" />
+        <TextView
+            android:id="@+id/feed_recycler_view_empty_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_episodes_in_the_feed"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="10dp"
+            android:textColor="?attr/themeTextColorPrimary" />
 
         <TextView
             android:id="@+id/feed_recycler_view_empty_body"
@@ -57,6 +67,10 @@
     <View
         android:id="@+id/empty_end_column"
         android:layout_width="0dp"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>
