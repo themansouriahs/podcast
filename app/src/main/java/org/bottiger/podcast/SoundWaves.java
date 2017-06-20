@@ -3,6 +3,7 @@ package org.bottiger.podcast;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.RemoteException;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -312,19 +313,34 @@ public class SoundWaves extends MultiDexApplication {
 
     private void enableStrictMode() {
         if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+
+            StrictMode.ThreadPolicy.Builder policy = new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
                     .detectDiskWrites()
                     .detectNetwork()   // or .detectAll() for all detectable problems
                     .penaltyLog()
-                    .penaltyFlashScreen()
+                    .penaltyFlashScreen();
                     //.penaltyDeath() // also penaltyLog()
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                policy.detectUnbufferedIo();
+            }
+
+            StrictMode.setThreadPolicy(policy
                     .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+
+            StrictMode.VmPolicy.Builder vmpolicy = new StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     //.detectLeakedClosableObjects() // problem with okhttp
-                    .penaltyLog()
+                    .penaltyLog();
                     //.penaltyDeath()
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vmpolicy.detectContentUriWithoutPermission()
+                        .detectUntaggedSockets();
+            }
+
+            StrictMode.setVmPolicy(vmpolicy
                     .build());
         }
     }
