@@ -27,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class EpisodeViewHolder extends RecyclerView.ViewHolder {
 
-    private static final String TAG = "EpisodeViewHolder";
+    private static final String TAG = EpisodeViewHolder.class.getSimpleName();
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({EXPANDED, COLLAPSED, COLLAPSED_WITH_DESCRIPTION, COLLAPSED_LISTENED})
@@ -74,7 +74,8 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
         mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
         mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
 
-        mPlayPauseButton.setIconColor(Color.WHITE);
+        if (mPlayPauseButton != null)
+            mPlayPauseButton.setIconColor(Color.WHITE);
     }
 
 

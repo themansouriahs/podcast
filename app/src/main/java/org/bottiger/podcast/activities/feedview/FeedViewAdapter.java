@@ -48,6 +48,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     public static final int RECENT_FIRST = 0;
     public static final int OLDEST_FIRST = 1;
 
+    private static final int EPISODE_TYPE   = 1;
+    private static final int FOOTER_TYPE    = 2;
+
+    private static final boolean includeFooter = true;
+
     protected ISubscription mSubscription;
     private EpisodeList<IEpisode> mEpisodeList;
     private LinkedList<IEpisode> mFilteredEpisodeList = new LinkedList<>();
@@ -104,13 +109,25 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public EpisodeViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = mInflater.inflate(R.layout.feed_view_list_episode, viewGroup, false);
-        return new EpisodeViewHolder(view);
+    public EpisodeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View view;
+        if (viewType == EPISODE_TYPE) {
+            view = mInflater.inflate(R.layout.feed_view_list_episode, parent, false);
+            return new EpisodeViewHolder(view);
+        } else if (viewType == FOOTER_TYPE) {
+            view = mInflater.inflate(R.layout.feed_view_list_footer, parent, false);
+            return new FooterViewHolder(view);
+        }
+        throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly");
     }
 
     @Override
     public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
+
+        if (viewHolder instanceof FooterViewHolder) {
+            return;
+        }
 
         final int dataPosition = viewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
@@ -205,11 +222,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         viewHolder.mQueueButton.unsetEpisodeId();
     }
 
-    @Override
-    public int getItemCount() {
-        return mFilteredEpisodeList.size();
-    }
-
     public void setExpanded(boolean expanded) {
         mIsExpanded = expanded;
         notifyDataSetChanged();
@@ -227,6 +239,25 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             return argPosition;
 
         return getItemCount() - argPosition -1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (isPositionFooter(position))
+            return FOOTER_TYPE;
+
+        return EPISODE_TYPE;
+    }
+
+    @Override
+    public int getItemCount() {
+        int count = mFilteredEpisodeList.size();
+        int addition = includeFooter ? 1 : 0;
+        return count + addition;
+    }
+
+    private boolean isPositionFooter(int position) {
+        return position == getItemCount() - 1;
     }
 
     public void setPalette(@NonNull ColorExtractor argExtractor) {
