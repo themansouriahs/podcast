@@ -332,6 +332,8 @@
     <string name="about_tmp_dir_title">Cache dir</string>
     <string name="about_podcast_dir_title">Podcast location</string>
     <string name="about_app_settings_into">Device setup</string>
+    <string name="channel_name_player">Player controls</string>
+    <string name="channel_description_player" />
 
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>

@@ -59,7 +59,6 @@ public class NotificationPlayer extends BroadcastReceiver {
 	private IEpisode item;
 
     private Notification mNotification;
-    private NotificationManager mNotificationManager = null;
 	private NotificationManagerCompat mNotificationManagerCompat = null;
 
     private PlaybackStateCompat mPlaybackState;
@@ -321,8 +320,7 @@ public class NotificationPlayer extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getActivity(mPlayerService.getApplicationContext(), 0, intent, 0);
         mBuilder.setContentIntent(pendingIntent);
 
-        mNotificationManager =
-                (android.app.NotificationManager) mPlayerService.getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilder.setChannelId(NotificationChannels.CHANNEL_ID_PLAYER);
 
         return mBuilder;
     }
@@ -348,8 +346,8 @@ public class NotificationPlayer extends BroadcastReceiver {
         mStarted = false;
         mController.unregisterCallback(mCb);
 
-        if (mNotificationManager != null)
-            mNotificationManager.cancel(NOTIFICATION_PLAYER_ID);
+        if (mNotificationManagerCompat != null)
+            mNotificationManagerCompat.cancel(NOTIFICATION_PLAYER_ID);
 
         mPlayerService.stopForeground(true);
     }
@@ -371,7 +369,7 @@ public class NotificationPlayer extends BroadcastReceiver {
         if (isPlaying) {
             mPlayerService.startForeground(getNotificationId(), mNotification);
         }
-        mNotificationManager.notify(NOTIFICATION_PLAYER_ID, mNotification);
+        mNotificationManagerCompat.notify(NOTIFICATION_PLAYER_ID, mNotification);
 
         mStarted = true;
     }
