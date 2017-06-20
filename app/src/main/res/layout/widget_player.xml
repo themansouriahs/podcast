@@ -67,6 +67,31 @@
         android:textColor="?android:attr/textColorPrimary"
         android:id="@+id/widget_duration_total" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_logo"
+        android:layout_alignLeft="@+id/widget_logo"
+        android:layout_alignStart="@+id/widget_logo"
+        android:id="@+id/progressBar"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:max="100" />
+
+    <TextView
+        android:id="@+id/widget_description"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_below="@+id/progressBar"
+        android:layout_above="@+id/linearLayout"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:ellipsize="end"
+        android:visibility="visible" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -113,19 +138,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/widget_description"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textColor="?android:attr/textColorPrimary"
-        android:layout_below="@+id/widget_logo"
-        android:layout_above="@+id/linearLayout"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:ellipsize="end"
-        android:visibility="visible" />
-
 
     <ImageButton
         android:src="@drawable/ic_skip_next_black"
@@ -137,17 +149,5 @@
         android:background="@null"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/linearLayout"
-        android:layout_alignLeft="@+id/widget_logo"
-        android:layout_alignStart="@+id/widget_logo"
-        android:id="@+id/progressBar"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:max="100" />
 
 </RelativeLayout>
