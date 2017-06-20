@@ -305,6 +305,8 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+        <!-- WIDGETS -->
         <receiver android:name=".widgets.SoundWavesWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -317,15 +319,17 @@
                 android:resource="@xml/soundwaves_appwidget_info" />
         </receiver>
 
-        <!--
-        <activity
-            android:name=".widgets.SoundWavesWidgetConfigure">
+        <receiver android:name=".widgets.SoundWavesWidgetProviderDark">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS" />
+                <action android:name="android.appwidget.action.ACTION_APPWIDGET_OPTIONS_CHANGED" />
             </intent-filter>
-        </activity>
-        -->
 
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/soundwaves_appwidget_info_dark" />
+        </receiver>
 
         <!--         Don't be a dick :) -->
         <meta-data

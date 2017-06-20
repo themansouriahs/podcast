@@ -41,9 +41,9 @@ import static org.bottiger.podcast.notification.NotificationPlayer.REQUEST_CODE;
 /**
  * Created by aplb on 26-05-2016.
  */
-public class SoundWavesWidgetProvider extends SoundWavesWidgetProviderBase {
+public class SoundWavesWidgetProviderDark extends SoundWavesWidgetProvider {
 
-    private static final int LAYOUT = R.layout.widget_default;
+    private static final int LAYOUT = R.layout.widget_default_dark;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         final int N = appWidgetIds.length;
@@ -85,5 +85,4 @@ public class SoundWavesWidgetProvider extends SoundWavesWidgetProviderBase {
         boolean showDescription = doShowDescription(newOptions);
         updateAppWidget(context, appWidgetId, showDescription, LAYOUT);
     }
-
 }

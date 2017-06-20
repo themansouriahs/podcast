@@ -19,7 +19,8 @@ import java.util.ArrayList;
  */
 
 public class SoundWavesWidgetConfigure extends Activity {
-    static final String TAG = "SoundWavesWidgetConfigure";
+
+    static final String TAG = "SoundWavesWidgetCfg";
 
     private static final String PREFS_NAME = "SWWidgetConfig";
     private static final String PREF_PREFIX_KEY = "prefix_";
@@ -75,7 +76,7 @@ public class SoundWavesWidgetConfigure extends Activity {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             //SoundWavesWidgetProvider.updateAppWidget(context, appWidgetManager,
             //        mAppWidgetId, titlePrefix);
-            SoundWavesWidgetProvider.updateAppWidget(context, mAppWidgetId, false);
+            //SoundWavesWidgetProvider.updateAppWidget(context, mAppWidgetId, false);
 
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();

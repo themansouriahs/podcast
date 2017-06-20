@@ -4,9 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="250dp"
     android:minHeight="120dp"
-    android:previewImage="@drawable/widget_screenshot"
+    android:previewImage="@drawable/widget_screenshot_dark"
     android:updatePeriodMillis="100000"
-    android:initialLayout="@layout/widget_default"
+    android:initialLayout="@layout/widget_default_dark"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>
