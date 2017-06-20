@@ -101,7 +101,7 @@ public class NotificationPlayer extends BroadcastReceiver {
         this.mPlayerService = service;
         this.item = item;
 
-        NotificationChannels.INSTANCE.createChannels(service);
+        NotificationChannels.INSTANCE.createPlayerChannel(service);
         updateSessionToken();
 
         mNotificationManagerCompat = NotificationManagerCompat.from(service);

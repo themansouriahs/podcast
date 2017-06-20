@@ -37,6 +37,8 @@ public class NewEpisodesNotification {
     public static final String notificationDeleteAction = ApplicationConfiguration.packageName + ".NOTIFICATION_DELETED";
     public static final String notificationOpenSubscriptionsAction = ApplicationConfiguration.packageName + ".NOTIFICATION_OPEN_SUBSCRIPTIONS";
 
+    private static final long TIMEOUT = 86_400_000; // 24 h in ms
+
     private static final int sProgressNotificationId = 643;
     private static final int MAX_DISPLAYED_EPISODES = 5;
     private static final String GROUP_KEY_NEW_EPISODES = "group_new_episodes";
@@ -45,6 +47,8 @@ public class NewEpisodesNotification {
     private List<ISubscription> mSubscriptions = new LinkedList<>();
 
     public synchronized void show(@NonNull Context argContext, @NonNull List<? extends IEpisode> argEpisodes) {
+
+        NotificationChannels.INSTANCE.getSubscriptionUpdatedChannel(argContext);
 
         IEpisode episode = null;
         boolean addedEpisode = false;
@@ -86,7 +90,7 @@ public class NewEpisodesNotification {
 
         Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_sw);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(argContext)
+                new NotificationCompat.Builder(argContext, NotificationChannels.CHANNEL_ID_SUBSCRIPTION)
                         .setContentTitle(title)
                         .setSmallIcon(R.drawable.soundwaves)
                         .setLargeIcon(bitmap)
@@ -94,6 +98,7 @@ public class NewEpisodesNotification {
                         .setAutoCancel(true)
                         .setGroup(GROUP_KEY_NEW_EPISODES)
                         .setGroupSummary(true)
+                        .setTimeoutAfter(TIMEOUT)
                         .setStyle(inboxStyle);
 
 

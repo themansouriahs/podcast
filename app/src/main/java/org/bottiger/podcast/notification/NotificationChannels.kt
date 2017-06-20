@@ -43,6 +43,8 @@ object NotificationChannels {
         val importance = NotificationManagerCompat.IMPORTANCE_MIN
         val mChannel = NotificationChannel(CHANNEL_ID_SUBSCRIPTION, name, importance)
 
+        mChannel.setShowBadge(true)
+
         val notificationManager = argContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(mChannel);
     }
