@@ -196,7 +196,7 @@ public class ShortcutManagerUtil {
 
         if (bitmap != null) {
             if (Build.VERSION.SDK_INT >= 26) {
-                icon = Icon.createWithAdaptiveBitmap(bitmap);
+                icon = Icon.createWithBitmap(bitmap); //icon = Icon.createWithAdaptiveBitmap(bitmap);
             } else {
                 icon = Icon.createWithBitmap(bitmap);
             }
