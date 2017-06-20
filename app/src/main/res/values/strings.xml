@@ -149,6 +149,7 @@
     <string name="playlist_empty_mode_one_desc">The playlist will only contain episodes you have queued manually</string>
     <string name="playlist_empty_mode_two_desc">The playlist will populate itself and always contain the most recent episodes. You can still queue selected episodes manually</string>
     <string name="playlist_episode_dismissed">Episode removed</string>
+    <string name="playlist_episode_marked_as_listened">Episode marked as listened</string>
     <string name="playlist_episode_dismissed_undo">Undo</string>
     <string name="playlist_context_menu_playnext">Play next</string>
     <string name="download_aborted_snackbar">Could not download: %s</string>

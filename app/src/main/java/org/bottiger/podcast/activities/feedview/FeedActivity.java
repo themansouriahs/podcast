@@ -8,9 +8,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,11 +22,13 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -37,15 +41,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.ApplicationConfiguration;
+import org.bottiger.podcast.PlaylistFragment;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
@@ -54,6 +55,8 @@ import org.bottiger.podcast.activities.discovery.DiscoveryFeedActivity;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
+import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
@@ -72,6 +75,7 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.FeedViewTopImage;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
+import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
@@ -101,7 +105,7 @@ public class FeedActivity extends TopActivity {
     private static final int DEFAULT_SCRIM_ALPHA = 0xC8;
     private static final int SCRIM_COLOR = Color.argb(DEFAULT_SCRIM_ALPHA, 0, 0, 0);
 
-    private int mStatusBarColor;
+    private @ColorInt int mStatusBarColor;
     private int mExtraMode = MODE_FULLY_EXPANDED;
     private boolean mHasAlreadyBeenOpened;
 
@@ -135,6 +139,10 @@ public class FeedActivity extends TopActivity {
     protected ISubscription mSubscription = null;
     protected ProgressDialog mProgress;
 
+    private Paint mSwipePaint = new Paint();
+    private Paint mSwipeIconPaint = new Paint();
+    private Bitmap mSwipeIcon;
+
     final MultiShrinkScroller.MultiShrinkScrollerListener mMultiShrinkScrollerListener = getMultiShrinkScrollerListener();
     SearchView.OnQueryTextListener mOnQueryTextListener = getOnQueryTextListener();
 
@@ -155,6 +163,8 @@ public class FeedActivity extends TopActivity {
             VendorCrashReporter.report("FeedActivity", "Subscription can not be null");
             return;
         }
+
+        mSwipeIcon = BitmapFactory.decodeResource(getResources(), PlaylistFragment.sSwipeHearingIconID);
 
         Log.d(TAG, "Showing: " + mSubscription);
 
@@ -234,6 +244,10 @@ public class FeedActivity extends TopActivity {
         mRecyclerView.setBackgroundColor(ColorUtils.getBackgroundColor(this));
 
         mRecyclerView.setAdapter(mAdapter);
+
+        // init swipe to dismiss logic
+        ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(mMultiShrinkScroller);
+        swipeToDismissTouchHelper.attachToRecyclerView(mRecyclerView);
 
         if (mAdapter.getItemCount() == 0) {
             setNoEpisodesTextViewViewState(mSubscription);
@@ -725,5 +739,97 @@ public class FeedActivity extends TopActivity {
         Intent intent = getIntent(argActivity, argSubscription);
         argActivity.startActivityForResult(intent, FEED_ACTIVITY_CANCELED);
         argActivity.overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_bottom);
+    }
+
+    @NonNull
+    private ItemTouchHelper getItemTouchHelper(@NonNull final View argView) {
+        return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public void onChildDraw(Canvas c,
+                                    RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder,
+                                    float dX,
+                                    float dY,
+                                    int actionState,
+                                    boolean isCurrentlyActive) {
+
+                if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
+                    return;
+
+                if (!(viewHolder instanceof EpisodeViewHolder)) {
+                    Log.wtf(TAG, "viewHolder is not an instanceof EpisodeViewHolder"); // NoI18N
+                    return;
+                }
+
+                EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
+
+                // http://stackoverflow.com/questions/30820806/adding-a-colored-background-with-text-icon-under-swiped-row-when-using-androids
+                View itemView = episodeViewHolder.itemView;
+
+                mSwipePaint.setColor(mStatusBarColor);
+
+                boolean swipingRight = dX >= 0;
+                float leftEdge = swipingRight ? itemView.getLeft() : itemView.getWidth() + dX;
+                float rightEdge = swipingRight ? dX : itemView.getRight();
+                float topEdge = (float) itemView.getTop();
+                float bottomEdge = (float) itemView.getBottom();
+                c.drawRect(leftEdge, topEdge, rightEdge, bottomEdge, mSwipePaint);
+
+                int height2 = mSwipeIcon.getHeight()/2;
+                int heightView = itemView.getHeight();
+                int bitmapTopPos = heightView/2-height2+itemView.getTop();
+
+                int bitmapLeftPos = (int)UIUtils.convertDpToPixel(25, FeedActivity.this);
+                bitmapLeftPos = swipingRight ? bitmapLeftPos : itemView.getWidth() - bitmapLeftPos - mSwipeIcon.getWidth();
+
+                c.drawBitmap(mSwipeIcon, bitmapLeftPos, bitmapTopPos, mSwipeIconPaint);
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // callback for drag-n-drop, false to skip this feature
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                // callback for swipe to dismiss, removing item from data and adapter
+                if (!(viewHolder instanceof EpisodeViewHolder)) {
+                    Log.wtf(TAG, "playlistViewHolder should never be null"); // NoI18N
+                    return;
+                }
+
+                EpisodeViewHolder episodeViewHolder = (EpisodeViewHolder) viewHolder;
+
+                final int itemPosition = episodeViewHolder.getAdapterPosition();
+                final IEpisode episode = mAdapter.getItemForPosition(itemPosition);
+
+                if (episode instanceof FeedItem) {
+                    FeedItem item = (FeedItem) episode;
+                    item.markAsListened();
+                }
+
+                UIUtils.disPlayBottomSnackBar(argView, R.string.playlist_episode_marked_as_listened, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mAdapter.notifyItemChanged(itemPosition);
+
+                        if (episode instanceof FeedItem) {
+                            FeedItem item = (FeedItem) episode;
+                            item.markAsListened(0);
+                        }
+
+                        SoundWaves.getAppContext(FeedActivity.this).getLibraryInstance().updateEpisode(episode);
+                    }
+                }, false);
+
+                mAdapter.notifyItemChanged(itemPosition);
+            }
+        });
     }
 }

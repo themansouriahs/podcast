@@ -82,7 +82,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     private Paint mSwipeIconPaint = new Paint();
     private Bitmap mSwipeIcon;
     private int mSwipeBgColor = R.color.colorBgPrimaryDark;
-    private int mSwipeIconID = R.drawable.ic_hearing_white;
+    public static int sSwipeHearingIconID = R.drawable.ic_hearing_white;
 
     private Playlist mPlaylist;
     private Context mContext;
@@ -97,7 +97,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     public void onCreate(Bundle savedInstanceState) {
         int color = ContextCompat.getColor(getContext(), mSwipeBgColor);
         mSwipePaint.setColor(color);
-        mSwipeIcon = BitmapFactory.decodeResource(getResources(), mSwipeIconID);
+        mSwipeIcon = BitmapFactory.decodeResource(getResources(), sSwipeHearingIconID);
 
         mRxPlaylistSubscription = getPlaylistChangedSubscription();
 
