@@ -334,6 +334,7 @@
     <string name="about_app_settings_into">Device setup</string>
     <string name="channel_name_player">Player controls</string>
     <string name="channel_description_player" />
+    <string name="channel_name_subscriptions">New episodes</string>
 
     <plurals name="notification_new_episodes_title">
         <item quantity="one">%d new episode</item>

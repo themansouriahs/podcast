@@ -3,6 +3,7 @@ package org.bottiger.podcast.notification
 import android.annotation.TargetApi
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.content.res.Resources
 import android.support.v4.app.NotificationManagerCompat
 
@@ -17,28 +18,33 @@ object NotificationChannels {
     const val CHANNEL_ID_PLAYER         = "player_channel"
     const val CHANNEL_ID_SUBSCRIPTION   = "subscription_channel"
 
-    @TargetApi(26)
-    fun createPlayerChannel(argResources: Resources, argNotificationManager: NotificationManager) {
-        // The user-visible name of the channel.
-        val name = argResources.getString(R.string.channel_name_player)
-        // The user-visible description of the channel.
-        val description = argResources.getString(R.string.channel_description_player)
-        val importance = NotificationManagerCompat.IMPORTANCE_MAX
-        val mChannel = NotificationChannel(CHANNEL_ID_PLAYER, name, importance)
-
-        argNotificationManager.createNotificationChannel(mChannel);
+    fun createChannels(argContext: Context) {
+        createChannels(argContext)
+        createPlayerChannel(argContext)
     }
 
     @TargetApi(26)
-    fun getSubscriptionUpdatedChannel(argResources: Resources, argSubscription: ISubscription): NotificationChannel {
+    fun createPlayerChannel(argContext: Context) {
         // The user-visible name of the channel.
-        val name = argSubscription.title; //argResources.getString(R.string.channel_name_player)
-        // The user-visible description of the channel.
-        val description = argResources.getString(R.string.channel_description_player)
+        val resources = argContext.resources;
+        val name = resources.getString(R.string.channel_name_player)
+        val importance = NotificationManagerCompat.IMPORTANCE_MAX
+        val mChannel = NotificationChannel(CHANNEL_ID_PLAYER, name, importance)
+
+        val notificationManager = argContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(mChannel);
+    }
+
+    @TargetApi(26)
+    fun getSubscriptionUpdatedChannel(argContext: Context) {
+        // The user-visible name of the channel.
+        val resources = argContext.resources;
+        val name = resources.getString(R.string.channel_name_subscriptions)
         val importance = NotificationManagerCompat.IMPORTANCE_MIN
         val mChannel = NotificationChannel(CHANNEL_ID_SUBSCRIPTION, name, importance)
 
-        return mChannel
+        val notificationManager = argContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(mChannel);
     }
 
 }

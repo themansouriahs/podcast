@@ -100,6 +100,8 @@ public class NotificationPlayer extends BroadcastReceiver {
     public NotificationPlayer(@NonNull PlayerService service , @NonNull IEpisode item) throws RemoteException {
         this.mPlayerService = service;
         this.item = item;
+
+        NotificationChannels.INSTANCE.createChannels(service);
         updateSessionToken();
 
         mNotificationManagerCompat = NotificationManagerCompat.from(service);
