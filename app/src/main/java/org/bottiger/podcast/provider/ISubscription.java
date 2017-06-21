@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.ColorInt;
@@ -14,6 +15,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
+import java.util.List;
 
 import io.reactivex.Single;
 
@@ -50,6 +52,9 @@ public interface ISubscription extends PaletteListener, IDbItem {
 
     @NonNull
     EpisodeList<IEpisode> getEpisodes();
+
+    @NonNull
+    LiveData<EpisodeList<IEpisode>> getLiveEpisodes();
 
     void setImageURL(@Nullable String argUrl);
     void setTitle(@Nullable String argTitle);

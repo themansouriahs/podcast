@@ -1,6 +1,7 @@
 package org.bottiger.podcast.provider.base;
 
 import android.Manifest;
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * Created by aplb on 02-11-2015.
  */
-public abstract class BaseEpisode implements IEpisode {
+public abstract class BaseEpisode extends LiveData<IEpisode> implements IEpisode {
 
     private List<Chapter> mChapters;
     private double mProgress = -1;

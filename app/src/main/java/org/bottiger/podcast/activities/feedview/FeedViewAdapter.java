@@ -33,6 +33,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_IDLE;
 import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
@@ -54,6 +55,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private static final boolean includeFooter = true;
 
     protected ISubscription mSubscription;
+    //private EpisodeList<IEpisode> mEpisodeList;
     private EpisodeList<IEpisode> mEpisodeList;
     private LinkedList<IEpisode> mFilteredEpisodeList = new LinkedList<>();
 
@@ -81,14 +83,22 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     public void setDataset(@NonNull ISubscription argSubscription) {
         mSubscription = argSubscription;
-        notifyEpisodesChanged();
+        //notifyEpisodesChanged();
     }
 
+    public void setEpisodes(@NonNull EpisodeList<IEpisode> argEpisodes) {
+        mEpisodeList = argEpisodes;
+        mFilteredEpisodeList = mEpisodeList.getFilteredList();
+        notifyDataSetChanged();
+    }
+
+    /*
     public void notifyEpisodesChanged() {
         mEpisodeList = mSubscription.getEpisodes();
         mFilteredEpisodeList = mEpisodeList.getFilteredList();
         notifyDataSetChanged();
     }
+    */
 
     public @Order int getOrder() {
         return mSortOrder;

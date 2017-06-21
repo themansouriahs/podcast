@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.dependencyinjector.SoundWavesModule;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
@@ -22,4 +23,5 @@ public interface SoundWavesComponent {
     void inject(@NonNull SoundWaves argApp);
     void inject(@NonNull PlayerService argPlayerservice);
     void inject(@NonNull DialogPlaylistFilters argPlaylistFilters);
+    void inject(@NonNull FeedActivity argFeedActivity);
 }

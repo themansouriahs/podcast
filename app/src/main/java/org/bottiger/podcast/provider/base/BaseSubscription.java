@@ -1,6 +1,7 @@
 package org.bottiger.podcast.provider.base;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.ColumnInfo;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,6 +30,7 @@ import org.bottiger.podcast.utils.StrUtils;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
@@ -85,7 +87,7 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
     private Single<ColorExtractor> mColorObservable;
 
     @NonNull
-    protected EpisodeList mEpisodes;
+    protected MutableLiveData<EpisodeList<IEpisode>> mEpisodes = new MutableLiveData<>();
     protected SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
 
         @Override
@@ -141,12 +143,23 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
         }
     };
 
+    public EpisodeList<IEpisode> initEpisodeList() {
+        return new EpisodeList(IEpisode.class, mEpisodesListCallback);
+    }
+
     protected void init() {
+        mEpisodes.setValue(initEpisodeList());
     }
 
     @NonNull
     @Override
     public EpisodeList<IEpisode> getEpisodes() {
+        return mEpisodes.getValue();
+    }
+
+    @NonNull
+    @Override
+    public LiveData<EpisodeList<IEpisode>> getLiveEpisodes() {
         return mEpisodes;
     }
 

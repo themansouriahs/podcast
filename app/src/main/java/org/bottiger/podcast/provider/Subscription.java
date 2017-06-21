@@ -122,7 +122,7 @@ public class Subscription extends BasePodcastSubscription {
 	@Override
 	protected void init() {
 		super.init();
-		mEpisodes = new EpisodeList(IEpisode.class, mEpisodesListCallback);
+		mEpisodes.setValue(initEpisodeList());
 		setIsRefreshing(true);
 	}
 
@@ -143,7 +143,9 @@ public class Subscription extends BasePodcastSubscription {
 			return false;
 		}
 
-		mEpisodes.add(argEpisode);
+		EpisodeList<IEpisode> episodes = mEpisodes.getValue();
+		episodes.add(argEpisode);
+		mEpisodes.setValue(episodes);
 		
 		if (!argSilent)
 			notifyEpisodeAdded(true);
@@ -441,7 +443,7 @@ public class Subscription extends BasePodcastSubscription {
 
 	public int getEpisodeCount() {
 		if (mIsLoaded)
-			return mEpisodes.size();
+			return 0; //mEpisodes.getValue().size();
 
 		return episode_count_cache;
 	}

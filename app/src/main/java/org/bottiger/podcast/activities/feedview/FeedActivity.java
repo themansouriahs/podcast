@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -56,7 +57,11 @@ import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.DiscoveryFeedActivity;
 import org.bottiger.podcast.activities.downloadmanager.DownloadManagerViewModel;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.LiveSubscription;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
@@ -86,6 +91,8 @@ import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 import rx.android.schedulers.AndroidSchedulers;
@@ -101,6 +108,8 @@ public class FeedActivity extends TopActivity {
     public static final int MODE_FULLY_EXPANDED = 4;
 
     private static final String TAG = FeedActivity.class.getSimpleName();
+
+    @Inject Library mLibrary;
 
     private Toolbar mToolbar;
 
@@ -156,6 +165,7 @@ public class FeedActivity extends TopActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        DependencyInjector.applicationComponent().inject(this);
         mSubscription = null;
 
         super.onCreate(savedInstanceState);
@@ -250,8 +260,21 @@ public class FeedActivity extends TopActivity {
 
         mRecyclerView.setAdapter(mAdapter);
 
+        LiveData<ISubscription> subscription = mLibrary.getLiveSubscription(mSubscription.getURLString());
         FeedActivityViewModel viewModel = ViewModelProviders.of(this).get(FeedActivityViewModel.class);
-        viewModel.setLiveSubscription(SoundWaves.getAppContext(this).getLibraryInstance().getLiveSubscription(mSubscription.getURLString()));
+        if (subscription != null) {
+            viewModel.setLiveSubscription(subscription);
+        }
+
+        viewModel.getLiveEpisodes().observe(this, new Observer<EpisodeList<IEpisode>>() {
+            @Override
+            public void onChanged(@Nullable EpisodeList<IEpisode> iEpisodes) {
+                Log.i(TAG, "Livedata changed: " + iEpisodes);
+                if (iEpisodes != null) {
+                    mAdapter.setEpisodes(iEpisodes);
+                }
+            }
+        });
 
         viewModel.getLiveSubscription().observe(this, new Observer<ISubscription>() {
             @Override
@@ -499,25 +522,6 @@ public class FeedActivity extends TopActivity {
         mAdapter.setPalette(argExtractor);
     }
 
-    /**
-     * Examine how many white pixels are in the bitmap in order to determine whether or not
-     * we need gradient overlays on top of the image.
-     */
-    private void analyzeWhitenessOfPhotoAsynchronously(@NonNull final Bitmap argBitmap) {
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                return WhitenessUtils.isBitmapWhiteAtTopOrBottom(argBitmap);
-            }
-
-            @Override
-            protected void onPostExecute(Boolean isWhite) {
-                super.onPostExecute(isWhite);
-                mMultiShrinkScroller.setUseGradient(isWhite);
-            }
-        }.execute();
-    }
-
     private void setViewState(@Nullable ISubscription argSubscription) {
         mRecyclerView.setVisibility(!isEmpty(argSubscription) ? View.VISIBLE : View.GONE);
     }
@@ -565,7 +569,7 @@ public class FeedActivity extends TopActivity {
 
                         if (doNotify) {
                             setViewState(argSubscription);
-                            argAdapter.notifyEpisodesChanged();
+                            //argAdapter.notifyEpisodesChanged();
                         }
                     }
                 }, new Action1<Throwable>() {
