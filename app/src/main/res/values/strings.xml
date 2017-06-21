@@ -333,7 +333,10 @@
     <string name="about_podcast_dir_title">Podcast location</string>
     <string name="about_app_settings_into">Device setup</string>
     <string name="channel_name_player">Player controls</string>
+    <string name="channel_name_episodes">New episodes</string>
     <string name="channel_description_player" />
+
+    <!-- Shown in the "app notification settings" on Android O. The string is the category name for which subscriptions the app will notify about new episodes for -->
     <string name="channel_name_subscriptions">New episodes</string>
 
     <plurals name="notification_new_episodes_title">

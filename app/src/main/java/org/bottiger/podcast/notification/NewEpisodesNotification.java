@@ -48,7 +48,7 @@ public class NewEpisodesNotification {
 
     public synchronized void show(@NonNull Context argContext, @NonNull List<? extends IEpisode> argEpisodes) {
 
-        NotificationChannels.INSTANCE.getSubscriptionUpdatedChannel(argContext);
+        NotificationChannels.INSTANCE.createEpisodesChannel(argContext);
 
         IEpisode episode = null;
         boolean addedEpisode = false;
@@ -59,6 +59,10 @@ public class NewEpisodesNotification {
                 ISubscription subscription = episode.getSubscription(argContext);
                 if (!mSubscriptions.contains(subscription)) {
                     mSubscriptions.add(subscription);
+
+                    if (subscription instanceof Subscription) {
+                        NotificationChannels.INSTANCE.getSubscriptionUpdatedChannel(argContext, (Subscription)subscription);
+                    }
                 }
                 addedEpisode = true;
             }
@@ -90,7 +94,7 @@ public class NewEpisodesNotification {
 
         Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_sw);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(argContext, NotificationChannels.CHANNEL_ID_SUBSCRIPTION)
+                new NotificationCompat.Builder(argContext, NotificationChannels.CHANNEL_ID_ALL_EPISODES)
                         .setContentTitle(title)
                         .setSmallIcon(R.drawable.soundwaves)
                         .setLargeIcon(bitmap)
