@@ -1,5 +1,6 @@
 //apply plugin: 'idea'
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
 
@@ -53,6 +54,7 @@ android {
     // and there will be a point later where keeping control over this is important
     sourceSets.main {
         jni.srcDirs = ["src/main/jni"];
+        java.srcDirs += 'src/main/kotlin'
     }
     lintOptions {
         checkReleaseBuilds false
@@ -164,6 +166,8 @@ ext.architectureComponentsVersion = '1.0.0-alpha3'
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:multidex:1.0.1'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
     compile "com.android.support:support-v4:$supportLibraryVersion"
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
