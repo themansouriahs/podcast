@@ -119,7 +119,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             view = mInflater.inflate(R.layout.feed_view_list_footer, parent, false);
             return new FooterViewHolder(view);
         }
-        throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly");
+        throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly"); // NoI18N
     }
 
     @Override
@@ -133,7 +133,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         final IEpisode item = getItemForPosition(dataPosition);
 
         if (item == null) {
-            VendorCrashReporter.report("FeedViewAdapter", "item is null for: " + mSubscription);
+            VendorCrashReporter.report("FeedViewAdapter", "item is null for: " + mSubscription);  // NoI18N
             return;
         }
 

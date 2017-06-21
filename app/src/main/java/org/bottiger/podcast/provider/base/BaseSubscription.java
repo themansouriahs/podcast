@@ -1,5 +1,6 @@
 package org.bottiger.podcast.provider.base;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.ColumnInfo;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -46,7 +47,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by aplb on 08-06-2016.
  */
 
-public abstract class BaseSubscription implements ISubscription {
+public abstract class BaseSubscription extends LiveData<ISubscription> implements ISubscription {
 
     private static final String TAG = BaseSubscription.class.getSimpleName();
 

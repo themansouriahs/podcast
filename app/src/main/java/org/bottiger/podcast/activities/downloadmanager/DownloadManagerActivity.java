@@ -54,7 +54,7 @@ public class DownloadManagerActivity extends AppCompatActivity implements Lifecy
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.download_manager_toolbar);
+        Toolbar toolbar = findViewById(R.id.download_manager_toolbar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.download_manager_toolbar_title);
             setSupportActionBar(toolbar);

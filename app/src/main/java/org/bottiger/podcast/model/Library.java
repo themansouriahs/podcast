@@ -1,5 +1,7 @@
 package org.bottiger.podcast.model;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -63,7 +65,7 @@ import rx.subjects.PublishSubject;
  */
 public class Library {
 
-    private static final String TAG = "Library";
+    private static final String TAG = Library.class.getSimpleName();
     private static final int BACKPREASURE_BUFFER_SIZE = 10000;
 
     @Retention(RetentionPolicy.SOURCE)
@@ -102,6 +104,8 @@ public class Library {
 
     @NonNull
     private final SortedList<Subscription> mActiveSubscriptions;
+    @NonNull
+    private final ArrayMap<String, Subscription> mLiveSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
     private final ArrayMap<String, Subscription> mSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
@@ -405,6 +409,7 @@ public class Library {
             if (mSubscriptionIdLUT.containsKey(argSubscription.getId()))
                 return;
 
+            mLiveSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
             mSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
             mSubscriptionIdLUT.put(argSubscription.getId(), argSubscription);
 
@@ -485,6 +490,11 @@ public class Library {
     @Nullable
     public Subscription getSubscription(@NonNull String argUrl) {
         return mSubscriptionUrlLUT.get(argUrl);
+    }
+
+    @Nullable
+    public LiveData<ISubscription> getLiveSubscription(@NonNull String argUrl) {
+        return getSubscription(argUrl);
     }
 
     @Nullable

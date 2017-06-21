@@ -1,6 +1,8 @@
 package org.bottiger.podcast;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -38,7 +40,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class TopActivity extends AppCompatActivity {
+public class TopActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
     private static final String TAG = "TopActivity";
 
@@ -52,6 +54,8 @@ public class TopActivity extends AppCompatActivity {
 	
 	private static SharedPreferences prefs;
     private Menu mMenu;
+
+    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -260,6 +264,11 @@ public class TopActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(argActivity,
                         new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_TO_DOWNLOAD);
         }
+    }
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
     }
 
 }

@@ -5,6 +5,9 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -52,12 +55,14 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.DiscoveryFeedActivity;
+import org.bottiger.podcast.activities.downloadmanager.DownloadManagerViewModel;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
@@ -78,6 +83,8 @@ import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
 import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
+
+import java.util.List;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
@@ -130,11 +137,11 @@ public class FeedActivity extends TopActivity {
     private ColorDrawable mWindowScrim;
     private boolean mIsEntranceAnimationFinished;
 
-    public static final String FEED_ACTIVITY_EXTRA = "FeedActivityExtra";
-    public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";
-    public static final String SUBSCRIPTION_URL_KEY = "url";
-    public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";
-    public static final String EPISODES_SLIM_KEY = "SlimEpisodes";
+    public static final String FEED_ACTIVITY_EXTRA = "FeedActivityExtra";   // NoI18N
+    public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";      // NoI18N
+    public static final String SUBSCRIPTION_URL_KEY = "url";                // NoI18N
+    public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";  // NoI18N
+    public static final String EPISODES_SLIM_KEY = "SlimEpisodes";          // NoI18N
 
     protected ISubscription mSubscription = null;
     protected ProgressDialog mProgress;
@@ -160,13 +167,13 @@ public class FeedActivity extends TopActivity {
         processIntent();
 
         if (mSubscription == null) {
-            VendorCrashReporter.report("FeedActivity", "Subscription can not be null");
+            VendorCrashReporter.report("FeedActivity", "Subscription can not be null"); // NoI18N
             return;
         }
 
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), PlaylistFragment.sSwipeHearingIconID);
 
-        Log.d(TAG, "Showing: " + mSubscription);
+        Log.d(TAG, "Showing: " + mSubscription); // NoI18N
 
         setContentView(R.layout.feed_activity);
 
@@ -174,13 +181,14 @@ public class FeedActivity extends TopActivity {
 
         mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
 
-        mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
-        mNoEpisodesView = (LinearLayout) findViewById(R.id.feed_recycler_view_empty);
-        mNoEpisodesReason = (TextView) findViewById(R.id.feed_recycler_view_empty_body);
-        mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
-        mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
-        mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
-        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
+        mPhotoView              = findViewById(R.id.photo);
+        mNoEpisodesView         = findViewById(R.id.feed_recycler_view_empty);
+        mNoEpisodesReason       = findViewById(R.id.feed_recycler_view_empty_body);
+        mMultiShrinkScroller    = findViewById(R.id.multiscroller);
+        mFloatingButton         = findViewById(R.id.feedview_fap_button);
+        mRevealLayout           = findViewById(R.id.feed_activity_settings_container);
+        mRecyclerView           = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
+        mToolbar                = findViewById(R.id.feed_view_toolbar);
 
         setViewState(mSubscription);
 
@@ -220,8 +228,6 @@ public class FeedActivity extends TopActivity {
             });
         }
 
-        mToolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
-
         mToolbar.setTitle(mSubscription.getTitle());
         setSupportActionBar(mToolbar);
 
@@ -237,13 +243,25 @@ public class FeedActivity extends TopActivity {
         mWindowScrim.setAlpha(0);
         getWindow().setBackgroundDrawable(mWindowScrim);
 
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setBackgroundColor(ColorUtils.getBackgroundColor(this));
 
         mRecyclerView.setAdapter(mAdapter);
+
+        FeedActivityViewModel viewModel = ViewModelProviders.of(this).get(FeedActivityViewModel.class);
+        viewModel.setLiveSubscription(SoundWaves.getAppContext(this).getLibraryInstance().getLiveSubscription(mSubscription.getURLString()));
+
+        viewModel.getLiveSubscription().observe(this, new Observer<ISubscription>() {
+            @Override
+            public void onChanged(@Nullable ISubscription argSubscription) {
+                Log.i(TAG, "Livedata changed: " + argSubscription);
+                if (argSubscription != null) {
+                    mAdapter.setDataset(argSubscription);
+                }
+            }
+        });
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(mMultiShrinkScroller);
