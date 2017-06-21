@@ -15,10 +15,11 @@ public class SoundWavesGlideModule extends AppGlideModule {
     @Override
     public void applyOptions(Context context, GlideBuilder builder) {
         // Apply options to the builder here.
+        super.applyOptions(context, builder);
     }
 
     @Override
     public void registerComponents(Context context, Registry registry) {
-
+        super.registerComponents(context, registry);
     }
 }

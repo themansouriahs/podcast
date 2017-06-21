@@ -107,7 +107,7 @@ public class PreferenceHelper implements SharedPreferences.OnSharedPreferenceCha
     public static String getStringPreferenceValue(@NonNull Context argContext,
                                                   @StringRes int argKeyId,
                                                   @StringRes int argDefaultId) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(argContext.getApplicationContext());
         String key = argContext.getResources().getString(argKeyId);
         String defaultValue = argContext.getResources().getString(argDefaultId);
 

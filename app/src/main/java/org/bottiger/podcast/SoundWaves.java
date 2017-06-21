@@ -100,8 +100,8 @@ public class SoundWaves extends MultiDexApplication {
 
         UIUtils.setTheme(getApplicationContext());
 
-        if (BuildConfig.VERSION_CODE % 2 == 1)
-            PodcastLog.initFileLog();
+        //if (BuildConfig.VERSION_CODE % 2 == 1)
+        //    PodcastLog.initFileLog();
 
         Log.v(TAG, "time: " + System.currentTimeMillis());
 

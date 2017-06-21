@@ -335,9 +335,12 @@
         <meta-data
             android:name="com.bugsnag.android.API_KEY"
             android:value="cb1654e5ce7afda81ad5c189540d5ecc" />
+
+        <!--
         <meta-data
             android:name="org.bottiger.podcast.images.SoundWavesGlideModule"
             android:value="GlideModule" />
+            -->
 
         <activity
             android:name=".WebScannerActivity"

@@ -210,6 +210,7 @@ dependencies {
     // Glide
     compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
     compile 'com.github.bumptech.glide:okhttp3-integration:4.0.0-RC0'
+    compile 'com.github.bumptech.glide:annotations:4.0.0-RC0'
     //compile 'com.github.bumptech.glide:compiler:4.0.0-RC0'
     //compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC0"
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
