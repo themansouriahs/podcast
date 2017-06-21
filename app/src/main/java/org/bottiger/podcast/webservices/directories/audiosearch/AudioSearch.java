@@ -44,6 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static org.bottiger.podcast.ApplicationConfiguration.AUDIOSEARCH_APP_ID;
 import static org.bottiger.podcast.ApplicationConfiguration.AUDIOSEARCH_SECRET;
+import static org.bottiger.podcast.utils.okhttp.UserAgentInterceptor.AUDIOSEARCH;
 
 /**
  * Created by aplb on 12-12-2016.
@@ -237,7 +238,7 @@ public class AudioSearch extends GenericDirectory {
     @Override
     protected OkHttpClient createOkHttpClient() {
         return HttpUtils
-                .getNewDefaultOkHttpClientBuilder(getContext())
+                .getNewDefaultOkHttpClientBuilder(getContext(), AUDIOSEARCH)
                 .addInterceptor(new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {

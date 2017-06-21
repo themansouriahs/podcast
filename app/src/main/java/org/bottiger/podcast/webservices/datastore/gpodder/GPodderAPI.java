@@ -58,6 +58,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static org.bottiger.podcast.utils.HttpUtils.getBackgroundOkHttpClientBuilder;
+import static org.bottiger.podcast.utils.okhttp.UserAgentInterceptor.GPODDER;
 
 /**
  * Created by Arvid on 8/23/2015.
@@ -105,8 +106,7 @@ public class GPodderAPI implements IWebservice {
 
         mUsername = argUsername;
 
-        OkHttpClient.Builder client = getBackgroundOkHttpClientBuilder(argContext);
-        client.interceptors().add(new UserAgentInterceptor(SoundWaves.getAppContext(argContext)));
+        OkHttpClient.Builder client = getBackgroundOkHttpClientBuilder(argContext, GPODDER);
         client.interceptors().add(new ApiRequestInterceptor(argUsername, argPassword));
 
         api = new Retrofit.Builder()

@@ -27,6 +27,7 @@ import org.bottiger.podcast.utils.JSonUtils;
 import org.bottiger.podcast.utils.StorageUtils;
 import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
 import org.bottiger.podcast.utils.okhttp.AuthenticationInterceptor;
+import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class SubscriptionRefreshManager {
         mContext = argContext;
         mainHandler = new Handler(argContext.getMainLooper());
         mOkClient = HttpUtils
-                .getNewDefaultOkHttpClientBuilder(argContext)
+                .getNewDefaultOkHttpClientBuilder(argContext, UserAgentInterceptor.SUBSCRIPTION_REFRESH)
                 .addInterceptor(sAuthenticationInterceptor)
                 .build();
 

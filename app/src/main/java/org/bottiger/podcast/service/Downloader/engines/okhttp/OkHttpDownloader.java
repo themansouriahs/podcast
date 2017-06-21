@@ -19,6 +19,7 @@ import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.FileUtils;
 import org.bottiger.podcast.utils.HttpUtils;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.okhttp.UserAgentInterceptor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,6 +40,8 @@ import okio.BufferedSource;
 import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
+
+import static org.bottiger.podcast.utils.okhttp.UserAgentInterceptor.DOWNLOAD_EPISODE;
 
 /**
  * Created by apl on 17-09-2014.
@@ -78,6 +81,7 @@ public class OkHttpDownloader extends DownloadEngineBase {
         };
 
         mOkHttpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new UserAgentInterceptor(argContext, DOWNLOAD_EPISODE))
                 .addNetworkInterceptor(new Interceptor() {
                     @Override public Response intercept(Interceptor.Chain chain) throws IOException {
                         Response originalResponse = chain.proceed(chain.request());

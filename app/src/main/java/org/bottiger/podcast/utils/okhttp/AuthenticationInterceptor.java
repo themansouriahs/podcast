@@ -18,7 +18,7 @@ import okhttp3.Response;
 
 public class AuthenticationInterceptor implements Interceptor {
 
-    public static final String AUTHENTICATION_HEADER = "Authorization";
+    public static final String AUTHENTICATION_HEADER = "Authorization"; //NoI18N
     private String mCredential ;
 
     public void setCredenticals(@Nullable String argCredential) {

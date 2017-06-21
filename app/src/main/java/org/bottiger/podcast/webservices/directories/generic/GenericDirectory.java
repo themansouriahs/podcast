@@ -13,6 +13,8 @@ import org.bottiger.podcast.webservices.directories.ISearchResult;
 
 import okhttp3.OkHttpClient;
 
+import static org.bottiger.podcast.utils.okhttp.UserAgentInterceptor.GENERIC_SEARCH;
+
 /**
  * Created by apl on 13-04-2015.
  */
@@ -63,7 +65,7 @@ public abstract class GenericDirectory implements IDirectoryProvider {
     protected abstract AsyncTask<String, Void, ISearchResult> getAsyncTask();
 
     protected OkHttpClient createOkHttpClient() {
-        return HttpUtils.getNewDefaultOkHttpClientBuilder(mContext).build();
+        return HttpUtils.getNewDefaultOkHttpClientBuilder(mContext, GENERIC_SEARCH).build();
     }
 
     public OkHttpClient getOkHttpClient() {
