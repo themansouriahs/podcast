@@ -47,6 +47,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -528,11 +529,15 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         setDynamicColors(iSubscription, argEpisode);
 
-        Log.v("MissingImage", "Setting image");
-        RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
-        options.placeholder(R.drawable.generic_podcast);
-        options.override(512, 512).fitCenter();
-        ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, ImageLoaderUtils.DEFAULT, options);
+        if (!TextUtils.isEmpty(artworkURL) && mPhoto != null) {
+            Log.v("MissingImage", "Setting image");
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
+            options.error(R.drawable.generic_podcast);
+            options.override(512, 512).fitCenter();
+            //ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, ImageLoaderUtils.DEFAULT, options);
+            RequestBuilder requestBuilder = ImageLoaderUtils.getGlide(getContext(), artworkURL, options);
+            requestBuilder.into(mPhoto);
+        }
 
         float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
         setPlaybackSpeedView(speed);
