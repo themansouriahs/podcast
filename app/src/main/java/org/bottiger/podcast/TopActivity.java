@@ -42,7 +42,7 @@ import rx.schedulers.Schedulers;
 
 public class TopActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
-    private static final String TAG = "TopActivity";
+    private static final String TAG = TopActivity.class.getSimpleName();
 
     // Filesystem Permisssion
     @Retention(RetentionPolicy.SOURCE)

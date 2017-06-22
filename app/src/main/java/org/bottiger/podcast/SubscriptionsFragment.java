@@ -2,16 +2,21 @@ package org.bottiger.podcast;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -30,19 +35,28 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.bottiger.podcast.activities.feedview.FeedActivityViewModel;
 import org.bottiger.podcast.activities.main.PreloadGridLayoutManager;
 import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
+import org.bottiger.podcast.fragments.subscription.SubscriptionsViewModel;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
+import org.bottiger.podcast.provider.IEpisode;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -51,9 +65,9 @@ import rx.schedulers.Schedulers;
 
 import static android.support.annotation.RestrictTo.Scope.TESTS;
 
-public class SubscriptionsFragment extends Fragment {
+public class SubscriptionsFragment extends Fragment implements LifecycleRegistryOwner {
 
-    private static final String TAG = "SubscriptionsFragment";
+    private static final String TAG = SubscriptionsFragment.class.getSimpleName();
 
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
@@ -80,7 +94,10 @@ public class SubscriptionsFragment extends Fragment {
 
     private RecyclerView mGridView;
 
-    private Library mLibrary;
+    @Inject Library mLibrary;
+    @Inject SharedPreferences mSharedPreferences;
+
+    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
@@ -94,17 +111,16 @@ public class SubscriptionsFragment extends Fragment {
     private rx.Subscription mRxSubscription;
     private rx.Subscription mRxSubscriptionChanged;
 
-    private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
     public File file;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DependencyInjector.applicationComponent().inject(this);
+
         mActivity = getActivity();
-        mLibrary = SoundWaves.getAppContext(getContext()).getLibraryInstance();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
-        shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
     }
 
     @Override
@@ -117,22 +133,42 @@ public class SubscriptionsFragment extends Fragment {
         mContainerView = (FrameLayout) inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
-        mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
-        mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
-
-        mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
+        mEmptySubscrptionList                   = mContainerView.findViewById(R.id.subscription_empty);
+        mEmptySubscrptionImportOPMLButton       = mContainerView.findViewById(R.id.import_opml_button);
+        mGridContainerView                      = mContainerView.findViewById(R.id.subscription_grid_container);
+        mGridView                               = mContainerView.findViewById(R.id.gridview);
 
         //RecyclerView
         mAdapter = createAdapter();
         setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
-        mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
-
-
         mGridLayoutmanager = new PreloadGridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
+
+        LiveData<List<Subscription>> subscriptions = null; //mLibrary.getLiveSubscription(mSubscription.getURLString());
+        SubscriptionsViewModel viewModel = ViewModelProviders.of(this).get(SubscriptionsViewModel.class);
+
+        if (subscriptions != null) {
+            viewModel.setLiveSubscription(subscriptions);
+        }
+
+
+        viewModel.getLiveSubscription().observe(this, new Observer<List<Subscription>>() {
+            @Override
+            public void onChanged(@Nullable List<Subscription> argSubscription) {
+                Log.i(TAG, "Livedata changed: " + argSubscription);
+                if (argSubscription != null) {
+                    //setViewState(argSubscription);
+                    //mAdapter.setDataset(argSubscription);
+                }
+            }
+        });
+
+        //mAdapter.setDataset((ISubscription) subscription);
+
+
 
         mRxSubscription = mLibrary.mSubscriptionsChangeObservable
                 .onBackpressureLatest()
@@ -344,7 +380,7 @@ public class SubscriptionsFragment extends Fragment {
     }
 
     private int numberOfColumns() {
-        String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "5");
+        String number = mSharedPreferences.getString(PREF_SUBSCRIPTION_COLUMNS, "5");
         int intVal = Integer.parseInt(number);
         int numColumns = -1;
 
@@ -453,6 +489,11 @@ public class SubscriptionsFragment extends Fragment {
                 Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_clipboard_toast), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
     }
 
     @RestrictTo(TESTS)
