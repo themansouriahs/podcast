@@ -105,6 +105,8 @@ public class Library {
     @NonNull
     private final SortedList<Subscription> mActiveSubscriptions;
     @NonNull
+    private final MutableLiveData<SortedList<Subscription>> mActiveLiveSubscriptions = new MutableLiveData<SortedList<Subscription>>();
+    @NonNull
     private final ArrayMap<String, Subscription> mLiveSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
     private final ArrayMap<String, Subscription> mSubscriptionUrlLUT = new ArrayMap<>();
@@ -179,6 +181,7 @@ public class Library {
         mLibraryPersistency = new LibraryPersistency(argContext, this);
 
         mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
+        mActiveLiveSubscriptions.setValue(mActiveSubscriptions);
 
         mSubscriptionSortOrder = PreferenceHelper.getIntegerPreferenceValue(
                 mContext,
@@ -211,7 +214,6 @@ public class Library {
                         Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                     }
                 });
-
     }
 
     private void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
@@ -232,6 +234,7 @@ public class Library {
                 mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
                     Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag());
                     mActiveSubscriptions.remove(subscription);
+                    mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
                     mSubscriptionsChangeObservable.onNext(subscription);
             }
         } finally {
@@ -416,6 +419,7 @@ public class Library {
             if (mActiveSubscriptions.indexOf(argSubscription) == SortedList.INVALID_POSITION &&
                     argSubscription.IsSubscribed()) {
                 mActiveSubscriptions.add(argSubscription);
+                mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
             }
 
             if (!argSilent)
@@ -458,6 +462,7 @@ public class Library {
             mSubscriptionIdLUT.remove(argSubscription.getId());
             mSubscriptionUrlLUT.remove(argSubscription.getUrl());
             mActiveSubscriptions.remove(argSubscription);
+            mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
         } finally {
             mSubscriptionLock.unlock();
         }
@@ -471,6 +476,7 @@ public class Library {
             mActiveSubscriptions.clear();
             mSubscriptionUrlLUT.clear();
             mSubscriptionIdLUT.clear();
+            mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
         } finally {
             mSubscriptionLock.unlock();
         }
@@ -483,8 +489,13 @@ public class Library {
         return subscription;
     }
 
+    @Deprecated
     public SortedList<Subscription> getSubscriptions() {
         return mActiveSubscriptions;
+    }
+
+    public LiveData<SortedList<Subscription>> getLiveSubscriptions() {
+        return mActiveLiveSubscriptions;
     }
 
     @Nullable
@@ -912,6 +923,7 @@ public class Library {
                             mSubscriptionUrlLUT.put(key, subscription);
                             mSubscriptionIdLUT.put(subscription.getId(), subscription);
                             mActiveSubscriptions.add(subscription);
+                            mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
                         } finally {
                             mSubscriptionLock.unlock();
                         }
@@ -1091,6 +1103,7 @@ public class Library {
         }
 
         mActiveSubscriptions.endBatchedUpdates();
+        mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
     }
 
     /**

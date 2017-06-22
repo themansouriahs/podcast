@@ -147,7 +147,7 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
 
-        LiveData<List<Subscription>> subscriptions = null; //mLibrary.getLiveSubscription(mSubscription.getURLString());
+        LiveData<SortedList<Subscription>> subscriptions = mLibrary.getLiveSubscriptions(); //mLibrary.getLiveSubscription(mSubscription.getURLString());
         SubscriptionsViewModel viewModel = ViewModelProviders.of(this).get(SubscriptionsViewModel.class);
 
         if (subscriptions != null) {
@@ -155,13 +155,13 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
         }
 
 
-        viewModel.getLiveSubscription().observe(this, new Observer<List<Subscription>>() {
+        viewModel.getLiveSubscription().observe(this, new Observer<SortedList<Subscription>>() {
             @Override
-            public void onChanged(@Nullable List<Subscription> argSubscription) {
+            public void onChanged(@Nullable SortedList<Subscription> argSubscription) {
                 Log.i(TAG, "Livedata changed: " + argSubscription);
                 if (argSubscription != null) {
                     //setViewState(argSubscription);
-                    //mAdapter.setDataset(argSubscription);
+                    mAdapter.setDataset(argSubscription);
                 }
             }
         });
@@ -169,7 +169,7 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
         //mAdapter.setDataset((ISubscription) subscription);
 
 
-
+/*
         mRxSubscription = mLibrary.mSubscriptionsChangeObservable
                 .onBackpressureLatest()
                 .ofType(Subscription.class)
@@ -196,6 +196,7 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
                         Log.d(TAG, "error: " + throwable.toString());
                     }
                 });
+
 
 
         mRxSubscriptionChanged = SoundWaves.getRxBus()
@@ -236,6 +237,7 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
                         Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                     }
                 });
+                */
 
         return mContainerView;
 

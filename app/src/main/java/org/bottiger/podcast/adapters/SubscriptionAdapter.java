@@ -366,6 +366,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
 
     public void setDataset(@NonNull SortedList<Subscription> argSubscriptions) {
         mSubscriptions = argSubscriptions;
+        notifyDataSetChanged();
     }
 
     @Nullable
