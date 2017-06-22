@@ -87,7 +87,8 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
     private Single<ColorExtractor> mColorObservable;
 
     @NonNull
-    protected MutableLiveData<EpisodeList<IEpisode>> mEpisodes = new MutableLiveData<>();
+    protected EpisodeList<IEpisode> mEpisodes;
+    protected MutableLiveData<EpisodeList<IEpisode>> mLiveEpisodes = new MutableLiveData<>();
     protected SortedList.Callback<IEpisode> mEpisodesListCallback = new SortedList.Callback<IEpisode>() {
 
         @Override
@@ -148,19 +149,26 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
     }
 
     protected void init() {
-        mEpisodes.setValue(initEpisodeList());
+        mEpisodes = initEpisodeList();
+        mLiveEpisodes.postValue(mEpisodes);
+    }
+
+    public boolean addEpisode(@NonNull IEpisode argEpisode) {
+        mEpisodes.add(argEpisode);
+        mLiveEpisodes.postValue(mEpisodes);
+        return true;
     }
 
     @NonNull
     @Override
     public EpisodeList<IEpisode> getEpisodes() {
-        return mEpisodes.getValue();
+        return mEpisodes;
     }
 
     @NonNull
     @Override
     public LiveData<EpisodeList<IEpisode>> getLiveEpisodes() {
-        return mEpisodes;
+        return mLiveEpisodes;
     }
 
     @NonNull

@@ -13,6 +13,6 @@ import org.bottiger.podcast.provider.ISubscription
  */
 class FeedActivityViewModel(application : Application) : AndroidViewModel(application) {
 
-    val liveEpisodes:       MutableLiveData<EpisodeList<IEpisode>>     = MutableLiveData()
+    var liveEpisodes:       LiveData<EpisodeList<IEpisode>>     = MutableLiveData()
     var liveSubscription:   LiveData<ISubscription>             = MutableLiveData()
 }

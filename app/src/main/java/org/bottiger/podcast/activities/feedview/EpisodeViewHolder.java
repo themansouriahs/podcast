@@ -66,13 +66,13 @@ public class EpisodeViewHolder extends RecyclerView.ViewHolder {
     public EpisodeViewHolder(View view) {
         super(view);
 
-        mContainer = (ViewGroup) view.findViewById(R.id.group);
-        mTitle = (TextView) view.findViewById(R.id.title);
-        mTextSecondary = (TextView) view.findViewById(R.id.subtitle);
-        mDescription = (TextView) view.findViewById(R.id.episode_description);
-        mPlayPauseButton = (PlayPauseButton) view.findViewById(R.id.play_pause_button);
-        mQueueButton = (FeedViewQueueButton) view.findViewById(R.id.queue_button);
-        mDownloadButton = (DownloadButtonView) view.findViewById(R.id.feedview_download_button);
+        mContainer          = view.findViewById(R.id.group);
+        mTitle              = view.findViewById(R.id.title);
+        mTextSecondary      = view.findViewById(R.id.subtitle);
+        mDescription        = view.findViewById(R.id.episode_description);
+        mPlayPauseButton    = view.findViewById(R.id.play_pause_button);
+        mQueueButton        = view.findViewById(R.id.queue_button);
+        mDownloadButton     = view.findViewById(R.id.feedview_download_button);
 
         if (mPlayPauseButton != null)
             mPlayPauseButton.setIconColor(Color.WHITE);

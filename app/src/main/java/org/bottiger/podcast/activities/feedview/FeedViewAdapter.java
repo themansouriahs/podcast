@@ -55,7 +55,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private static final boolean includeFooter = true;
 
     protected ISubscription mSubscription;
-    //private EpisodeList<IEpisode> mEpisodeList;
     private EpisodeList<IEpisode> mEpisodeList;
     private LinkedList<IEpisode> mFilteredEpisodeList = new LinkedList<>();
 
@@ -83,7 +82,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
     public void setDataset(@NonNull ISubscription argSubscription) {
         mSubscription = argSubscription;
-        //notifyEpisodesChanged();
+        setEpisodes(argSubscription.getEpisodes());
     }
 
     public void setEpisodes(@NonNull EpisodeList<IEpisode> argEpisodes) {
@@ -91,14 +90,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         mFilteredEpisodeList = mEpisodeList.getFilteredList();
         notifyDataSetChanged();
     }
-
-    /*
-    public void notifyEpisodesChanged() {
-        mEpisodeList = mSubscription.getEpisodes();
-        mFilteredEpisodeList = mEpisodeList.getFilteredList();
-        notifyDataSetChanged();
-    }
-    */
 
     public @Order int getOrder() {
         return mSortOrder;
@@ -221,7 +212,9 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     @Override
     public void onViewDetachedFromWindow(EpisodeViewHolder holder) {
         SoundWaves.getAppContext(mActivity).getPlayer().removeListener(holder.mPlayPauseButton);
-        holder.mDownloadButton.enabledProgressListener(false);
+        if (holder.mDownloadButton != null) {
+            holder.mDownloadButton.enabledProgressListener(false);
+        }
         super.onViewDetachedFromWindow(holder);
     }
 
@@ -248,7 +241,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         if (mSortOrder == RECENT_FIRST)
             return argPosition;
 
-        return getItemCount() - argPosition -1;
+        int footerOffset = includeFooter ? 1 : 0;
+        return getItemCount() - argPosition -1 - footerOffset;
     }
 
     @Override

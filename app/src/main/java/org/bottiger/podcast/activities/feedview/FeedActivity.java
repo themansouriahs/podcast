@@ -135,8 +135,6 @@ public class FeedActivity extends TopActivity {
     private FeedViewAdapter mAdapter;
     private String mUrl;
 
-    private rx.Subscription mRxSubscription;
-
     /**
      *  This scrim's opacity is controlled in two different ways. 1) Before the initial entrance
      *  animation finishes, the opacity is animated by a value animator. This is designed to
@@ -188,8 +186,6 @@ public class FeedActivity extends TopActivity {
         setContentView(R.layout.feed_activity);
 
         mAdapter = getAdapter();
-
-        mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
 
         mPhotoView              = findViewById(R.id.photo);
         mNoEpisodesView         = findViewById(R.id.feed_recycler_view_empty);
@@ -264,6 +260,7 @@ public class FeedActivity extends TopActivity {
         FeedActivityViewModel viewModel = ViewModelProviders.of(this).get(FeedActivityViewModel.class);
         if (subscription != null) {
             viewModel.setLiveSubscription(subscription);
+            //viewModel.setLiveEpisodes(subscription.getValue().getLiveEpisodes());
         }
 
         viewModel.getLiveEpisodes().observe(this, new Observer<EpisodeList<IEpisode>>() {
@@ -281,10 +278,13 @@ public class FeedActivity extends TopActivity {
             public void onChanged(@Nullable ISubscription argSubscription) {
                 Log.i(TAG, "Livedata changed: " + argSubscription);
                 if (argSubscription != null) {
+                    setViewState(argSubscription);
                     mAdapter.setDataset(argSubscription);
                 }
             }
         });
+
+        mAdapter.setDataset((ISubscription) subscription);
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(mMultiShrinkScroller);
@@ -362,11 +362,6 @@ public class FeedActivity extends TopActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mRxSubscription == null)
-            return;
-
-        if (mRxSubscription.isUnsubscribed())
-            mRxSubscription.unsubscribe();
     }
 
     @Override
@@ -549,36 +544,6 @@ public class FeedActivity extends TopActivity {
 
     private static boolean isEmpty(@Nullable ISubscription argSubscription) {
         return argSubscription == null || argSubscription.getEpisodes().size() == 0;
-    }
-
-    private rx.Subscription subscribeToChanges(@NonNull final ISubscription argSubscription,
-                                               @NonNull final FeedViewAdapter argAdapter) {
-        return SoundWaves.getRxBus()
-                .toObserverable()
-                .ofType(SubscriptionChanged.class)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<SubscriptionChanged>() {
-                    @Override
-                    public void call(SubscriptionChanged subscriptionChanged) {
-                        @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
-                        boolean doNotify = action ==
-                                SubscriptionChanged.ADDED ||
-                                action == SubscriptionChanged.REMOVED ||
-                                action == SubscriptionChanged.LOADED;
-
-                        if (doNotify) {
-                            setViewState(argSubscription);
-                            //argAdapter.notifyEpisodesChanged();
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d("FeedViewAdapter", "error: " + throwable.toString());
-                    }
-                });
     }
 
     protected void setFABDrawable(@DrawableRes int argRes) {

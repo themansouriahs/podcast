@@ -1,5 +1,6 @@
 package org.bottiger.podcast.views;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -28,7 +29,7 @@ import java.lang.ref.WeakReference;
 /**
  * TODO: document your custom view class.
  */
-public class PlayerButtonView extends ImageButton  {
+public class PlayerButtonView extends android.support.v7.widget.AppCompatImageButton  {
 
     private static final String TAG = PlayerButtonView.class.getSimpleName();
 

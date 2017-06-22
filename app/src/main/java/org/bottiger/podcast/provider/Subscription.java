@@ -29,7 +29,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.requery.android.database.sqlite.SQLiteDatabase;
+import rx.Observable;
+import rx.Observer;
 
 public class Subscription extends BasePodcastSubscription {
 
@@ -122,7 +126,6 @@ public class Subscription extends BasePodcastSubscription {
 	@Override
 	protected void init() {
 		super.init();
-		mEpisodes.setValue(initEpisodeList());
 		setIsRefreshing(true);
 	}
 
@@ -143,9 +146,7 @@ public class Subscription extends BasePodcastSubscription {
 			return false;
 		}
 
-		EpisodeList<IEpisode> episodes = mEpisodes.getValue();
-		episodes.add(argEpisode);
-		mEpisodes.setValue(episodes);
+		super.addEpisode(argEpisode);
 		
 		if (!argSilent)
 			notifyEpisodeAdded(true);

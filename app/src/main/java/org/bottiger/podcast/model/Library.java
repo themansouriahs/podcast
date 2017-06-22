@@ -772,6 +772,8 @@ public class Library {
                     subscription = null;
                 }
             }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
         } finally {
             if (subscription != null)
                 mSubscriptionsChangeObservable.onNext(subscription);

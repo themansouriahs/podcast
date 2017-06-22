@@ -62,7 +62,7 @@ public interface ISubscription extends PaletteListener, IDbItem {
     void setURL(@Nullable String argUrl);
 
     void setLink(@Nullable String argLink);
-    boolean addEpisode(@Nullable IEpisode episode);
+    boolean addEpisode(@NonNull IEpisode episode);
 
     boolean contains(@NonNull IEpisode argEpisode);
 
