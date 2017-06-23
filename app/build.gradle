@@ -277,16 +277,4 @@ dependencies {
     compile project(':soundwavescommon')
 }
 
-/*
-task assembleNonFreeRelease << {
-    apply plugin: 'com.google.gms.google-services'
-}
-
-tasks.whenTaskAdded { task ->
-        task.dependsOn assembleNonFreeRelease
-}*/
-//preBuild.dependsOn assembleNonFreeRelease
-
-
-
 apply plugin: 'com.google.gms.google-services'

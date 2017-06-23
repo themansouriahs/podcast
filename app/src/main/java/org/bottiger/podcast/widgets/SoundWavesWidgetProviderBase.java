@@ -26,6 +26,7 @@ import com.bumptech.glide.request.target.AppWidgetTarget;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.PlayerStateManager;
@@ -49,22 +50,21 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
     @PlaybackStateCompat.State static int sState;
 
     static void updateAppWidget(Context context, int appWidgetId, boolean showDescription, int argLWidgetLayout) {
-
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
+        Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
+
+        int textVisibility = doShowCompactControls(options) ? View.VISIBLE : View.GONE;
         if (AndroidUtil.SDK_INT >= 16) {
-            Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
             showDescription = doShowDescription(options);
         }
 
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
         Library library = SoundWaves.getAppContext(context).getLibraryInstance();
 
-        boolean wasEmpty = false;
         if (playlist.isEmpty()) {
             library.loadPlaylistSync(playlist);
             playlist.populatePlaylistIfEmpty();
-            wasEmpty = true;
         }
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
@@ -93,8 +93,6 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
             CharSequence podcast_title = "No title";
             podcast_title = episode.getSubscription(context).getTitle();
 
-            //podcast_title =   (wasEmpty ? "Loaded" : "Memory") + podcast_title;
-
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
             Long elapsedTimeMs = episode.getOffset();
@@ -121,8 +119,14 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
             int descriptionVisibility = showDescription ? View.VISIBLE : View.GONE;
             views.setViewVisibility(R.id.widget_description, descriptionVisibility);
 
+            // in case we are using the compact (one line) layout
+            views.setViewVisibility(R.id.widget_title, textVisibility);
+            views.setViewVisibility(R.id.widget_episode_title, textVisibility);
+            views.setViewVisibility(R.id.widget_duration, textVisibility);
+            views.setViewVisibility(R.id.widget_duration_total, textVisibility);
+
             if (Build.VERSION.SDK_INT >= 23) {
-                views.setViewVisibility(R.id.widget_mute, View.VISIBLE);
+                views.setViewVisibility(R.id.widget_mute, textVisibility);
 
                 AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                 boolean isMuted = audioManager.isStreamMute(PlayerStateManager.AUDIO_STREAM);
@@ -140,11 +144,11 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
                 int imageSizeDp = (int) context.getResources().getDimension(R.dimen.widget_logo_size);
                 //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
 
-                RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
-                options.override(imageSizeDp, imageSizeDp);
+                RequestOptions glideOptions = ImageLoaderUtils.getRequestOptions(context);
+                glideOptions.override(imageSizeDp, imageSizeDp);
 
                 RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, imageUrl);
-                builder.apply(options);
+                builder.apply(glideOptions);
                 builder.into(appWidgetTarget);
             }
         }
@@ -153,6 +157,13 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
         // Tell the widget manager
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    static boolean doShowCompactControls(@NonNull Bundle newOptions) {
+        int maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT); // portrait
+
+        // 180 dp = 3 blocks: https://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy
+        return maxHeight > 100;
     }
 
     @TargetApi(16)
