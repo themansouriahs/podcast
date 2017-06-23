@@ -12,7 +12,12 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RawRes;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -54,9 +59,10 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
         Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
 
-        int textVisibility = doShowCompactControls(options) ? View.VISIBLE : View.GONE;
+        boolean isCompact = doShowCompactControls(options);
+        int textVisibility = !isCompact ? View.VISIBLE : View.GONE;
         if (AndroidUtil.SDK_INT >= 16) {
-            showDescription = doShowDescription(options);
+            showDescription = !isCompact;
         }
 
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
@@ -78,9 +84,11 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
         boolean playlistEmpty = playlist.size() == 0;
         int emptyTextVisibility = playlistEmpty ? View.VISIBLE : View.GONE;
-        int playerVisibility = !playlistEmpty ? View.VISIBLE : View.GONE;
+        int playerVisibility = !playlistEmpty && !isCompact ? View.VISIBLE : View.GONE;
+        int playerSmallVisibility = !playlistEmpty && isCompact ? View.VISIBLE : View.GONE;
 
         views.setViewVisibility(R.id.widget_player, playerVisibility);
+        views.setViewVisibility(R.id.widget_player_small, playerSmallVisibility);
 
         Log.wtf(TAG, "pre");
 
@@ -108,8 +116,12 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
             String chronometerFormat = "%s"; //episode.getOffset() + " / " + StrUtils.formatTime(durationMs);
 
-            int playPauseIcon = !(isPlaying || isBuffering) ? R.drawable.ic_play_arrow_black : R.drawable.ic_pause_black;
+            @DrawableRes int playIcon = !isCompact ? R.drawable.ic_play_arrow_black : R.drawable.ic_play_arrow_widget;
+            @DrawableRes int pauseIcon = !isCompact ? R.drawable.ic_pause_black : R.drawable.ic_pause_widget;
+            @DrawableRes int playPauseIcon = !(isPlaying || isBuffering) ? playIcon : pauseIcon;
+
             views.setImageViewResource(R.id.widget_play, playPauseIcon);
+            views.setImageViewResource(R.id.widget_play_small, playPauseIcon);
 
             views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - elapsedTimeMs, chronometerFormat, isPlaying);
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
@@ -137,20 +149,9 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
             }
 
             String imageUrl = episode.getArtwork(context);
-            if (imageUrl != null) {
-                AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.widget_logo, views, appWidgetId);
+            bindImage(context, imageUrl, appWidgetId, R.id.widget_logo, views);
+            bindImage(context, imageUrl, appWidgetId, R.id.widget_logo_small, views);
 
-                // image size
-                int imageSizeDp = (int) context.getResources().getDimension(R.dimen.widget_logo_size);
-                //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
-
-                RequestOptions glideOptions = ImageLoaderUtils.getRequestOptions(context);
-                glideOptions.override(imageSizeDp, imageSizeDp);
-
-                RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, imageUrl);
-                builder.apply(glideOptions);
-                builder.into(appWidgetTarget);
-            }
         }
 
         attachButtonListeners(context, views);
@@ -159,11 +160,28 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
+    private static void bindImage(@NonNull Context argContext, @Nullable String argImageUrl, int argAppWidgetId, @IdRes int view, RemoteViews views) {
+        if (argImageUrl != null) {
+            AppWidgetTarget appWidgetTarget = new AppWidgetTarget(argContext, view, views, argAppWidgetId);
+
+            // image size
+            int imageSizeDp = (int) argContext.getResources().getDimension(R.dimen.widget_logo_size);
+            //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
+
+            RequestOptions glideOptions = ImageLoaderUtils.getRequestOptions(argContext);
+            glideOptions.override(imageSizeDp, imageSizeDp);
+
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(argContext, argImageUrl);
+            builder.apply(glideOptions);
+            builder.into(appWidgetTarget);
+        }
+    }
+
     static boolean doShowCompactControls(@NonNull Bundle newOptions) {
         int maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT); // portrait
 
         // 180 dp = 3 blocks: https://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy
-        return maxHeight > 100;
+        return maxHeight < 100;
     }
 
     @TargetApi(16)
