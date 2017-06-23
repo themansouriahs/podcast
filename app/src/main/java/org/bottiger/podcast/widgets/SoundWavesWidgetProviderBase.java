@@ -118,10 +118,12 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
             @DrawableRes int playIcon = !isCompact ? R.drawable.ic_play_arrow_black : R.drawable.ic_play_arrow_widget;
             @DrawableRes int pauseIcon = !isCompact ? R.drawable.ic_pause_black : R.drawable.ic_pause_widget;
+            @DrawableRes int skipNextIcon = !isCompact ? R.drawable.ic_skip_next_black : R.drawable.ic_skip_next_widget;
             @DrawableRes int playPauseIcon = !(isPlaying || isBuffering) ? playIcon : pauseIcon;
 
             views.setImageViewResource(R.id.widget_play, playPauseIcon);
             views.setImageViewResource(R.id.widget_play_small, playPauseIcon);
+            views.setImageViewResource(R.id.widget_skip_next_small, skipNextIcon);
 
             views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - elapsedTimeMs, chronometerFormat, isPlaying);
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
