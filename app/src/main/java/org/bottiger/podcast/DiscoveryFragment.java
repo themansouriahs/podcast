@@ -55,11 +55,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 import static org.bottiger.podcast.webservices.directories.IDirectoryProvider.BY_AUTHOR;
 import static org.bottiger.podcast.webservices.directories.IDirectoryProvider.POPULAR;
@@ -106,7 +110,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     private String mDiscoveryEngineKey;
 
-    private Subscription mRxSubscription = null;
+    private Disposable mRxSubscription = null;
 
     private IDirectoryProvider mDirectoryProvider = null;
     private IDirectoryProvider.Callback mSearchResultCallback = new IDirectoryProvider.Callback() {
@@ -249,20 +253,20 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         mRxSubscription = SoundWaves
                 .getAppContext(getContext())
                 .getLibraryInstance()
-                .mSubscriptionsChangeObservable
-                .onBackpressureLatest()
+                .mSubscriptionsChangePublisher
+                .toFlowable(BackpressureStrategy.LATEST)
                 .ofType(org.bottiger.podcast.provider.Subscription.class)
                 .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<org.bottiger.podcast.provider.Subscription>() {
+                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<org.bottiger.podcast.provider.Subscription>() {
                     @Override
-                    public void call(org.bottiger.podcast.provider.Subscription argSubscription) {
+                    public void accept(org.bottiger.podcast.provider.Subscription argSubscription) throws Exception {
                         mResultsAdapter.populateSubscribedUrls();
                         mResultsAdapter.notifyDataSetChanged();
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(Throwable throwable) throws Exception {
                         VendorCrashReporter.report("subscribeError" , throwable.toString());
                         Log.d(TAG, "error: " + throwable.toString());
                     }
@@ -272,8 +276,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     @Override
     public void onDestroyView () {
         super.onDestroyView();
-        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
-            mRxSubscription.unsubscribe();
+        if (mRxSubscription != null && !mRxSubscription.isDisposed()) {
+            mRxSubscription.dispose();
         }
     }
 

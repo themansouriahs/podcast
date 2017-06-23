@@ -744,8 +744,9 @@ public class Subscription extends BasePodcastSubscription {
 	}
 
 	public void notifyEpisodeAdded(boolean argSilent) {
-		if (!mIsRefreshing || !argSilent)
-			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED, null));
+		if (!mIsRefreshing || !argSilent) {
+			SoundWaves.getRxBus2().send(new SubscriptionChanged(getId(), SubscriptionChanged.ADDED, null));
+		}
 	}
 
 	protected void notifyPropertyChanged(@SubscriptionChanged.Action int event, @android.support.annotation.Nullable String argTag) {
@@ -753,7 +754,7 @@ public class Subscription extends BasePodcastSubscription {
 			argTag = "NoTag";
 
 		if (!mIsRefreshing) {
-			SoundWaves.getRxBus().send(new SubscriptionChanged(getId(), event, argTag));
+			SoundWaves.getRxBus2().send(new SubscriptionChanged(getId(), event, argTag));
 		} else if (mIsLoaded) {
 			mIsDirty = true;
 		}

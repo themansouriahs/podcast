@@ -12,8 +12,10 @@ import io.reactivex.schedulers.Schedulers;
 public final class RxBus2 {
     private final PublishProcessor<Object> mBus = PublishProcessor.create();
 
-    public void send(final Object event) {
-        this.mBus.onNext(event);
+    public synchronized void send(final Object event) {
+        if (mBus.hasSubscribers()) {
+            this.mBus.onNext(event);
+        }
     }
 
     public Observable<Object> toObservable() {

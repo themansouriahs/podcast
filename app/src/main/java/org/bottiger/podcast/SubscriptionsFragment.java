@@ -43,6 +43,7 @@ import org.bottiger.podcast.adapters.SubscriptionAdapter;
 import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.fragments.subscription.SubscriptionsViewModel;
+import org.bottiger.podcast.fragments.subscription.SubscriptionsViewModelFactory;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
@@ -108,9 +109,6 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
     private Activity mActivity;
     private FrameLayout mContainerView;
 
-    private rx.Subscription mRxSubscription;
-    private rx.Subscription mRxSubscriptionChanged;
-
     private static String PREF_SUBSCRIPTION_COLUMNS;
     public File file;
 
@@ -147,116 +145,57 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
 
-        LiveData<SortedList<Subscription>> subscriptions = mLibrary.getLiveSubscriptions(); //mLibrary.getLiveSubscription(mSubscription.getURLString());
-        SubscriptionsViewModel viewModel = ViewModelProviders.of(this).get(SubscriptionsViewModel.class);
+        SubscriptionsViewModelFactory factory = new SubscriptionsViewModelFactory(this.getActivity().getApplication(), mLibrary);
+        SubscriptionsViewModel viewModel = ViewModelProviders.of(this, factory).get(SubscriptionsViewModel.class);
 
-        if (subscriptions != null) {
-            viewModel.setLiveSubscription(subscriptions);
-        }
-
-
-        viewModel.getLiveSubscription().observe(this, new Observer<SortedList<Subscription>>() {
+        viewModel.getLiveSubscription().observe(this, new Observer<Subscription>() {
             @Override
-            public void onChanged(@Nullable SortedList<Subscription> argSubscription) {
+            public void onChanged(@Nullable Subscription argSubscription) {
                 Log.i(TAG, "Livedata changed: " + argSubscription);
                 if (argSubscription != null) {
-                    //setViewState(argSubscription);
-                    mAdapter.setDataset(argSubscription);
+                    Log.v(TAG, "Recieved Subscription event: " + argSubscription.getId());
+                    SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
+                    setSubscriptionFragmentLayout(subscriptions.size());
+
+                    mGridLayoutmanager.setSpanCount(numberOfColumns());
+                    mAdapter.setDataset(subscriptions);
+
+                    if (!mGridView.isComputingLayout()) {
+                        mAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         });
 
-        //mAdapter.setDataset((ISubscription) subscription);
+        viewModel.getLiveSubscriptionChanged().observe(this, new Observer<SubscriptionChanged>() {
+            @Override
+            public void onChanged(@Nullable SubscriptionChanged itemChangedEvent) {
+                try {
+                    Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
+                    // Update the subscription fragment when a image is updated in an subscription
+                    SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
+                    Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
 
-
-/*
-        mRxSubscription = mLibrary.mSubscriptionsChangeObservable
-                .onBackpressureLatest()
-                .ofType(Subscription.class)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Subscription>() {
-                    @Override
-                    public void call(Subscription argSubscription) {
-                        Log.v(TAG, "Recieved Subscription event: " + argSubscription.getId());
-                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
-                        setSubscriptionFragmentLayout(subscriptions.size());
-
-                        mGridLayoutmanager.setSpanCount(numberOfColumns());
-                        mAdapter.setDataset(subscriptions);
-
-                        if (!mGridView.isComputingLayout()) {
-                            mAdapter.notifyDataSetChanged();
+                    int index = subscriptions.indexOf(subscription); // doesn't work
+                    for (int i = 0; i < subscriptions.size(); i++) {
+                        Subscription currentSubscription = subscriptions.get(i);
+                        if (subscription != null && subscription.equals(currentSubscription)) {
+                            index = i;
+                            break;
                         }
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError", throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
+
+                    if (!mGridView.isComputingLayout()) {
+                        mAdapter.notifyItemChanged(index);
                     }
-                });
-
-
-
-        mRxSubscriptionChanged = SoundWaves.getRxBus()
-                .toObserverable()
-                .onBackpressureBuffer(10000)
-                .ofType(SubscriptionChanged.class)
-                .filter(new Func1<SubscriptionChanged, Boolean>() {
-                    @Override
-                    public Boolean call(SubscriptionChanged subscriptionChanged) {
-                        return subscriptionChanged.getAction() == SubscriptionChanged.CHANGED;
-                    }
-                })
-                .subscribe(new Action1<SubscriptionChanged>() {
-                    @Override
-                    public void call(SubscriptionChanged itemChangedEvent) {
-                        Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
-                        // Update the subscription fragment when a image is updated in an subscription
-                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
-                        Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
-
-                        int index = subscriptions.indexOf(subscription); // doesn't work
-                        for (int i = 0; i < subscriptions.size(); i++) {
-                            Subscription currentSubscription = subscriptions.get(i);
-                            if (subscription != null && subscription.equals(currentSubscription)) {
-                                index = i;
-                                break;
-                            }
-                        }
-
-                        if (!mGridView.isComputingLayout()) {
-                            mAdapter.notifyItemChanged(index);
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.handleException(throwable);
-                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
-                    }
-                });
-                */
+                } catch (Exception e) {
+                    Log.wtf(TAG, e.toString());
+                }
+            }
+        });
 
         return mContainerView;
 
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
-            mRxSubscription.unsubscribe();
-        }
-        if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isUnsubscribed()) {
-            mRxSubscriptionChanged.unsubscribe();
-        }
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -275,12 +214,10 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
             }
         });
 
-        mAdapter.setDataset(mLibrary.getSubscriptions());
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
+        SortedList<Subscription> subscriptions = mLibrary.getLiveSubscriptions().getValue();
+        if (subscriptions != null) {
+            mAdapter.setDataset(subscriptions);
+        }
     }
 
     @Override

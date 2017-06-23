@@ -100,12 +100,16 @@ public class Library {
     private final ArrayMap<Long, FeedItem> mEpisodesIdLUT = new ArrayMap<>();
 
     @NonNull
+    @Deprecated
     public PublishSubject<Subscription> mSubscriptionsChangeObservable = PublishSubject.create();
+
+    @NonNull
+    public io.reactivex.subjects.PublishSubject<Subscription> mSubscriptionsChangePublisher = io.reactivex.subjects.PublishSubject.create();
 
     @NonNull
     private final SortedList<Subscription> mActiveSubscriptions;
     @NonNull
-    private final MutableLiveData<SortedList<Subscription>> mActiveLiveSubscriptions = new MutableLiveData<SortedList<Subscription>>();
+    private final MutableLiveData<SortedList<Subscription>> mActiveLiveSubscriptions = new MutableLiveData<>();
     @NonNull
     private final ArrayMap<String, Subscription> mLiveSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
@@ -235,7 +239,7 @@ public class Library {
                     Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag());
                     mActiveSubscriptions.remove(subscription);
                     mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
-                    mSubscriptionsChangeObservable.onNext(subscription);
+                    mSubscriptionsChangePublisher.onNext(subscription);
             }
         } finally {
             mSubscriptionLock.unlock();
@@ -423,8 +427,7 @@ public class Library {
             }
 
             if (!argSilent)
-                mSubscriptionsChangeObservable.onNext(argSubscription);
-
+                mSubscriptionsChangePublisher.onNext(argSubscription);
         } finally {
             mSubscriptionLock.unlock();
         }
@@ -467,7 +470,7 @@ public class Library {
             mSubscriptionLock.unlock();
         }
 
-        mSubscriptionsChangeObservable.onNext(argSubscription);
+        mSubscriptionsChangePublisher.onNext(argSubscription);
     }
 
     private void clearSubscriptions() {
@@ -494,6 +497,7 @@ public class Library {
         return mActiveSubscriptions;
     }
 
+    @NonNull
     public LiveData<SortedList<Subscription>> getLiveSubscriptions() {
         return mActiveLiveSubscriptions;
     }
@@ -787,7 +791,7 @@ public class Library {
             Log.e(TAG, e.toString());
         } finally {
             if (subscription != null)
-                mSubscriptionsChangeObservable.onNext(subscription);
+                mSubscriptionsChangePublisher.onNext(subscription);
             if(cursor != null)
                 cursor.close();
 
@@ -929,7 +933,7 @@ public class Library {
                         }
 
                         EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argSubscription.getURLString(), null);
-                        mSubscriptionsChangeObservable.onNext(subscription);
+                        mSubscriptionsChangePublisher.onNext(subscription);
 
                         SoundWaves.getAppContext(mContext).getRefreshManager().refresh(subscription, null);
 
@@ -1064,7 +1068,7 @@ public class Library {
         if (TextUtils.isEmpty(argTag))
             argTag = "NoTag";
 
-        SoundWaves.getRxBus().send(new SubscriptionChanged(argId, argAction, argTag));
+        SoundWaves.getRxBus2().send(new SubscriptionChanged(argId, argAction, argTag));
     }
 
     private static String getKey(@NonNull ISubscription argSubscription) {
