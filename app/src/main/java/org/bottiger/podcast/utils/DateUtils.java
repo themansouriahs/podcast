@@ -111,20 +111,26 @@ public class DateUtils {
 
         SimpleDateFormat simpleDateFormat = sSimpleDateFormatCache;
 
-        try {
-            // This is a hack to deal with time zones not known to Java
-            Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
-            }
+        dateString = fixUnsupportedTimeZones(dateString);
 
+        try {
             simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
             return simpleDateFormat.parse(dateString);
         } catch (ParseException pe) {
             ParseException pe2 = pe;
             return simpleDateFormat.parse(dateString);
         }
+    }
+
+    private static String fixUnsupportedTimeZones(@NonNull String dateString) {
+        String result = dateString;
+        // This is a hack to deal with time zones not known to Java
+        Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            result = result.replace(pair.getKey().toString(), pair.getValue().toString());
+        }
+        return result;
     }
 
     // Validators ---------------------------------------------------------------------------------
