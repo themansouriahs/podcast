@@ -108,10 +108,27 @@ public class DateUtils {
      */
     public static synchronized Date parse(@NonNull String dateString, @NonNull String dateFormat) throws ParseException {
 
+        Locale[] locales = {
+                Locale.getDefault(),
+                Locale.US, // Fallback locale for English day/month names (EEE/MMM)
+        };
         dateString = fixUnsupportedTimeZones(dateString);
 
-        SimpleDateFormat simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
-        return simpleDateFormat.parse(dateString);
+        for (int i = 0; i < locales.length; i++) {
+            Locale locale = locales[i];
+            boolean last = i == locales.length - 1;
+            try {
+                SimpleDateFormat simpleDateFormat = getSimpleDateFormat(dateFormat, locale);
+                return simpleDateFormat.parse(dateString);
+            } catch (ParseException e) {
+                if (last) {
+                    throw e;
+                }
+            }
+        }
+
+        // Will never be executed, only to satisfy code analysis
+        return null;
     }
 
     private static String fixUnsupportedTimeZones(@NonNull String dateString) {
