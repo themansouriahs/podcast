@@ -68,7 +68,6 @@ public class DateUtils {
 
     private static final Map<String, SimpleDateFormat> SIMPLE_DATE_FORMATS_LUT = new HashMap<>(DATE_FORMAT_REGEXPS.size());
     private static Pattern[] sDateFormatKeys = null;
-    private static SimpleDateFormat sSimpleDateFormatCache = null;
 
     public interface Hint {
         Pattern get();
@@ -109,12 +108,10 @@ public class DateUtils {
      */
     public static synchronized Date parse(@NonNull String dateString, @NonNull String dateFormat) throws ParseException {
 
-        SimpleDateFormat simpleDateFormat = sSimpleDateFormatCache;
-
         dateString = fixUnsupportedTimeZones(dateString);
 
         try {
-            simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
+            SimpleDateFormat simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
             return simpleDateFormat.parse(dateString);
         } catch (ParseException pe) {
             ParseException pe2 = pe;
