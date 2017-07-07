@@ -119,7 +119,7 @@ public class DateUtils {
                 dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
             }
 
-            simpleDateFormat = getSimpleDateFormat(dateFormat);
+            simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
             return simpleDateFormat.parse(dateString);
         } catch (ParseException pe) {
             ParseException pe2 = pe;
@@ -230,15 +230,16 @@ public class DateUtils {
         return sDateFormatKeys;
     }
 
-    private static SimpleDateFormat getSimpleDateFormat(@NonNull String argDateFormat) {
-        SimpleDateFormat simpleDateFormat = SIMPLE_DATE_FORMATS_LUT.get(argDateFormat);
+    private static SimpleDateFormat getSimpleDateFormat(@NonNull String argDateFormat, Locale locale) {
+        String lutKey = argDateFormat + locale.toString();
+        SimpleDateFormat simpleDateFormat = SIMPLE_DATE_FORMATS_LUT.get(lutKey);
 
         if (simpleDateFormat == null) {
             synchronized (SIMPLE_DATE_FORMATS_LUT) {
-                simpleDateFormat = new SimpleDateFormat(argDateFormat, Locale.getDefault());
+                simpleDateFormat = new SimpleDateFormat(argDateFormat, locale);
                 simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
 
-                SIMPLE_DATE_FORMATS_LUT.put(argDateFormat, simpleDateFormat);
+                SIMPLE_DATE_FORMATS_LUT.put(lutKey, simpleDateFormat);
             }
         }
 
