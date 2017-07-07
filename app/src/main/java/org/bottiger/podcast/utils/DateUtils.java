@@ -110,13 +110,8 @@ public class DateUtils {
 
         dateString = fixUnsupportedTimeZones(dateString);
 
-        try {
-            SimpleDateFormat simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
-            return simpleDateFormat.parse(dateString);
-        } catch (ParseException pe) {
-            ParseException pe2 = pe;
-            return simpleDateFormat.parse(dateString);
-        }
+        SimpleDateFormat simpleDateFormat = getSimpleDateFormat(dateFormat, Locale.getDefault());
+        return simpleDateFormat.parse(dateString);
     }
 
     private static String fixUnsupportedTimeZones(@NonNull String dateString) {
