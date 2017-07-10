@@ -15,12 +15,12 @@ public class EpisodeList<T> extends SortedList<T> {
 
     private EpisodeFilter mFilter = new EpisodeFilter();
 
-    public EpisodeList(Class<T> klass, Callback<T> callback) {
-        super(klass, callback);
+    public EpisodeList(Class<T> listItemClass, Callback<T> callback) {
+        super(listItemClass, callback);
     }
 
-    public EpisodeList(Class<T> klass, Callback<T> callback, int initialCapacity) {
-        super(klass, callback, initialCapacity);
+    public EpisodeList(Class<T> listItemClass, Callback<T> callback, int initialCapacity) {
+        super(listItemClass, callback, initialCapacity);
     }
 
     @NonNull
