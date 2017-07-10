@@ -547,7 +547,7 @@ public class FeedActivity extends TopActivity {
 
                         if (doNotify) {
                             setViewState(argSubscription);
-                            argAdapter.notifyEpisodesChanged();
+                            argAdapter.updateEpisoedsAndNotifyChanged();
                         }
                     }
                 }, new Action1<Throwable>() {
