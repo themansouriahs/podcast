@@ -29,8 +29,8 @@ public class MediaRouterPlaybackActivity extends ToolbarActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         mMediaRouteCast.onPause();
+        super.onPause();
     }
 
     @Override

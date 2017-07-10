@@ -65,9 +65,9 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 
     @Override
     protected void onPause() {
-        super.onPause();
         // Unregister the listener whenever a key changes
         getPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
     }
 
     @Override

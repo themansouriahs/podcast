@@ -107,9 +107,9 @@ public class TopActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         if (SoundWaves.sAnalytics != null)
             SoundWaves.sAnalytics.activityPause();
+        super.onPause();
     }
 
     @Override
