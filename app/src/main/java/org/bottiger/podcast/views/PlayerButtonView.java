@@ -200,7 +200,7 @@ public class PlayerButtonView extends ImageButton  {
         void FileDeleted();
     }
 
-    public void addDownloadCompletedCallback(DownloadStatus argCallback) {
+    public void setDownloadCompletedCallback(DownloadStatus argCallback) {
         mDownloadCompletedCallback = argCallback;
     }
 

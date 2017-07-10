@@ -86,7 +86,7 @@ public class DownloadButtonView extends PlayerButtonView implements View.OnClick
             addState(PlayerButtonView.STATE_QUEUE, queued_icon);
         }
 
-        addDownloadCompletedCallback(new PlayerButtonView.DownloadStatus() {
+        setDownloadCompletedCallback(new PlayerButtonView.DownloadStatus() {
             @Override
             public void FileComplete() {
                 setState(PlayerButtonView.STATE_DELETE);
