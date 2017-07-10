@@ -318,12 +318,13 @@ public class FeedActivity extends TopActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mRxSubscription == null)
             return;
 
         if (mRxSubscription.isUnsubscribed())
             mRxSubscription.unsubscribe();
+
+        super.onDestroy();
     }
 
     @Override

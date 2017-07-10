@@ -68,8 +68,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *     }
  *       
  *     public void onDestroy() {
- *         super.onDestroy();
  *         ViewServer.get(this).removeWindow(this);
+ *         super.onDestroy();
  *     }
  *   
  *     public void onResume() {
@@ -93,9 +93,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *     }
  *
  *     public void onDestroy() {
- *         super.onDestroy();
  *         View decorView = getWindow().getWindow().getDecorView();
  *         ViewServer.get(this).removeWindow(decorView);
+ *         super.onDestroy();
  *     }
  *
  *     public void onStartInput(EditorInfo attribute, boolean restarting) {

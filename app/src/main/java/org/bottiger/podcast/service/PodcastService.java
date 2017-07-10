@@ -128,9 +128,9 @@ public class PodcastService extends IntentService {
 	 */
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		mWakeLock.release();
 		log.debug("onDestroy()");
+		super.onDestroy();
 	}
 
 	/**
