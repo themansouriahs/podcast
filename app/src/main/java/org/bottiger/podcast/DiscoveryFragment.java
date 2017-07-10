@@ -271,10 +271,10 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     @Override
     public void onDestroyView () {
-        super.onDestroyView();
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
         }
+        super.onDestroyView();
     }
 
     private void performSearch(@NonNull String argQuery) {
