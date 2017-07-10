@@ -538,12 +538,12 @@ public class FeedActivity extends TopActivity {
                     @Override
                     public void call(SubscriptionChanged subscriptionChanged) {
                         @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
-                        boolean doNotify =
+                        boolean doUpdate =
                                 action == SubscriptionChanged.ADDED ||
                                 action == SubscriptionChanged.REMOVED ||
                                 action == SubscriptionChanged.LOADED;
 
-                        if (doNotify) {
+                        if (doUpdate) {
                             setViewState(argSubscription);
                             argAdapter.updateEpisoedsAndNotifyChanged();
                         }
