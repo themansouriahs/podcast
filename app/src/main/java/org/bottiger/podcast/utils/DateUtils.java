@@ -59,11 +59,13 @@ public class DateUtils {
     }};
 
     private static final Map<String, String> UNSUPPORTED_TIME_ZONE = new HashMap<String, String>() {{
-        put("BST", "GMT+0100");
-        put("PST", "GMT-0800");
-        put("PDT", "GMT-0700");
-        put("EST", "GMT-0500");
-        put("EDT", "GMT-0400");
+        // There MUST be a colon between hours and minutes,
+        // see http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html for details.
+        put("BST", "GMT+01:00");
+        put("PST", "GMT-08:00");
+        put("PDT", "GMT-07:00");
+        put("EST", "GMT-05:00");
+        put("EDT", "GMT-04:00");
     }};
 
     private static final Map<String, SimpleDateFormat> SIMPLE_DATE_FORMATS_LUT = new HashMap<>(DATE_FORMAT_REGEXPS.size());
