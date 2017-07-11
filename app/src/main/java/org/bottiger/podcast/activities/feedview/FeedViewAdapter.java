@@ -122,14 +122,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly");
     }
 
-    @Override
-    public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
-
-        if (viewHolder instanceof FooterViewHolder) {
-            return;
-        }
-
-        final int dataPosition = viewHolder.getAdapterPosition();
+    private void onBindEpisodeViewHolder(EpisodeViewHolder episodeViewHolder, int position) {
+        final int dataPosition = episodeViewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
 
         if (item == null) {
@@ -137,9 +131,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             return;
         }
 
-        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, dataPosition == getItemCount()-1);
+        SharedAdapterUtils.AddPaddingToLastElement(episodeViewHolder.mContainer, 0, dataPosition == getItemCount()-1);
 
-        final EpisodeViewHolder episodeViewHolder = viewHolder;
         final boolean canDownload = item.canDownload();
         @SoundWavesPlayerBase.PlayerState int playerStatus = STATE_IDLE;
 
@@ -170,10 +163,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
         episodeViewHolder.setState(state, canDownload);
 
+        final EpisodeViewHolder finalEpisodeViewHolder = episodeViewHolder;
         episodeViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FeedViewAdapter.this.onClick(episodeViewHolder, dataPosition, canDownload);
+                FeedViewAdapter.this.onClick(finalEpisodeViewHolder, dataPosition, canDownload);
             }
         });
 
@@ -188,10 +182,29 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
-        getPalette(viewHolder);
+        getPalette(episodeViewHolder);
 
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
+    }
 
+    private void onBindFooterViewHolder(FooterViewHolder footerViewHolder, int position) {
+    }
+
+    @Override
+    public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
+
+        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
+        if (viewHolder instanceof FooterViewHolder) {
+            onBindFooterViewHolder((FooterViewHolder) viewHolder, position);
+            return;
+        }
+
+        if (viewHolder instanceof EpisodeViewHolder) {
+            onBindEpisodeViewHolder(viewHolder, position);
+            return;
+        }
+
+        throw new RuntimeException("Missing viewHolder instanceof check");
     }
 
     public void onClick(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
