@@ -208,11 +208,31 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         super.onViewAttachedToWindow(holder);
     }
 
+    private void onEpisodeViewDetachedFromWindow(EpisodeViewHolder episodeViewHolder) {
+        SoundWaves.getAppContext(mActivity).getPlayer().removeListener(episodeViewHolder.mPlayPauseButton);
+        episodeViewHolder.mDownloadButton.enabledProgressListener(false);
+    }
+
+    private void onFooterViewDetachedFromWindow(FooterViewHolder footerViewHolder) {
+    }
+
     @Override
-    public void onViewDetachedFromWindow(EpisodeViewHolder holder) {
-        SoundWaves.getAppContext(mActivity).getPlayer().removeListener(holder.mPlayPauseButton);
-        holder.mDownloadButton.enabledProgressListener(false);
-        super.onViewDetachedFromWindow(holder);
+    public void onViewDetachedFromWindow(EpisodeViewHolder viewHolder) {
+
+        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
+        if (viewHolder instanceof FooterViewHolder) {
+            onFooterViewDetachedFromWindow((FooterViewHolder) viewHolder);
+            super.onViewDetachedFromWindow(viewHolder);
+            return;
+        }
+
+        if (viewHolder instanceof EpisodeViewHolder) {
+            onEpisodeViewDetachedFromWindow(viewHolder);
+            super.onViewDetachedFromWindow(viewHolder);
+            return;
+        }
+
+        throw new RuntimeException("Missing viewHolder instanceof check");
     }
 
     @Override
