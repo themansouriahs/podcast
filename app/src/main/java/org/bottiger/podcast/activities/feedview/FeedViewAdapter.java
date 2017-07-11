@@ -40,7 +40,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 02-09-2014.
  */
-public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
+public class FeedViewAdapter extends FeedViewAdapterBase {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({RECENT_FIRST, OLDEST_FIRST})
@@ -122,7 +122,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
         throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly");
     }
 
-    private void onBindEpisodeViewHolder(EpisodeViewHolder episodeViewHolder, int position) {
+    @Override
+    protected void onBindViewHolderEpisode(EpisodeViewHolder episodeViewHolder, int position) {
         final int dataPosition = episodeViewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
 
@@ -187,26 +188,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
     }
 
-    private void onBindFooterViewHolder(FooterViewHolder footerViewHolder, int position) {
-    }
-
     @Override
-    public void onBindViewHolder(FeedViewHolder feedViewHolder, int position) {
-
-        if (feedViewHolder instanceof FooterViewHolder) {
-            onBindFooterViewHolder((FooterViewHolder) feedViewHolder, position);
-            return;
-        }
-
-        if (feedViewHolder instanceof EpisodeViewHolder) {
-            onBindEpisodeViewHolder((EpisodeViewHolder) feedViewHolder, position);
-            return;
-        }
-
-        throw new RuntimeException("Missing feedViewHolder instanceof check");
-    }
-
-    private void onClickEpisode(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
+    protected void onClickEpisode(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
         @EpisodeViewHolder.DisplayState int newState = episodeViewHolder.toggleState(argCanDownload);
         if (newState == EpisodeViewHolder.EXPANDED) {
             mExpanededItems.add(dataPosition);
@@ -215,78 +198,22 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
         }
     }
 
-    private void onClickFooter(FooterViewHolder footerViewHolder, int dataPosition, boolean argCanDownload) {
-    }
 
-    public void onClick(FeedViewHolder feedViewHolder, int dataPosition, boolean argCanDownload) {
-
-        if (feedViewHolder instanceof FooterViewHolder) {
-            onClickFooter((FooterViewHolder) feedViewHolder, dataPosition, argCanDownload);
-            return;
-        }
-
-        if (feedViewHolder instanceof EpisodeViewHolder) {
-            onClickEpisode((EpisodeViewHolder) feedViewHolder, dataPosition, argCanDownload);
-            return;
-        }
-
-        throw new RuntimeException("Missing feedViewHolder instanceof check");
+    @Override
+    protected void onViewAttachedToWindowEpisode(EpisodeViewHolder episodeViewHolder) {
     }
 
     @Override
-    public void onViewAttachedToWindow (FeedViewHolder holder) {
-        super.onViewAttachedToWindow(holder);
-    }
-
-    private void onEpisodeViewDetachedFromWindow(EpisodeViewHolder episodeViewHolder) {
+    protected void onViewDetachedFromWindowEpisode(EpisodeViewHolder episodeViewHolder) {
         SoundWaves.getAppContext(mActivity).getPlayer().removeListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(false);
     }
 
-    private void onFooterViewDetachedFromWindow(FooterViewHolder footerViewHolder) {
-    }
-
     @Override
-    public void onViewDetachedFromWindow(FeedViewHolder feedViewHolder) {
-
-        if (feedViewHolder instanceof FooterViewHolder) {
-            onFooterViewDetachedFromWindow((FooterViewHolder) feedViewHolder);
-            super.onViewDetachedFromWindow(feedViewHolder);
-            return;
-        }
-
-        if (feedViewHolder instanceof EpisodeViewHolder) {
-            onEpisodeViewDetachedFromWindow((EpisodeViewHolder) feedViewHolder);
-            super.onViewDetachedFromWindow(feedViewHolder);
-            return;
-        }
-
-        throw new RuntimeException("Missing feedViewHolder instanceof check");
-    }
-
-    private void onEpisodeViewRecycled(EpisodeViewHolder episodeViewHolder) {
+    protected void onViewRecycledEpisode(EpisodeViewHolder episodeViewHolder) {
         episodeViewHolder.mDownloadButton.unsetEpisodeId();
         episodeViewHolder.mPlayPauseButton.unsetEpisodeId();
         episodeViewHolder.mQueueButton.unsetEpisodeId();
-    }
-
-    private void onFooterViewRecycled(FooterViewHolder footerViewHolder) {
-    }
-
-    @Override
-    public void onViewRecycled(FeedViewHolder feedViewHolder) {
-
-        if (feedViewHolder instanceof FooterViewHolder) {
-            onFooterViewRecycled((FooterViewHolder) feedViewHolder);
-            return;
-        }
-
-        if (feedViewHolder instanceof EpisodeViewHolder) {
-            onEpisodeViewRecycled((EpisodeViewHolder) feedViewHolder);
-            return;
-        }
-
-        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     public void setExpanded(boolean expanded) {
@@ -357,7 +284,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
         return mStringBuilder.toString();
     }
 
-    private void getPaletteEpisode(@NonNull final EpisodeViewHolder episodeViewHolder) {
+    @Override
+    protected void getPaletteEpisode(@NonNull final EpisodeViewHolder episodeViewHolder) {
         mSubscription.getColors(mActivity)
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
                 .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
@@ -370,24 +298,6 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
                         episodeViewHolder.mDownloadButton.onPaletteFound(value);
                     }
                 });
-    }
-
-    private void getPaletteFooter(@NonNull final FooterViewHolder footerViewHolder) {
-    }
-
-    protected void getPalette(@NonNull final FeedViewHolder feedViewHolder) {
-
-        if (feedViewHolder instanceof FooterViewHolder) {
-            getPaletteFooter((FooterViewHolder) feedViewHolder);
-            return;
-        }
-
-        if (feedViewHolder instanceof EpisodeViewHolder) {
-            getPaletteEpisode((EpisodeViewHolder) feedViewHolder);
-            return;
-        }
-
-        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     public @Order int calcOrder() {
