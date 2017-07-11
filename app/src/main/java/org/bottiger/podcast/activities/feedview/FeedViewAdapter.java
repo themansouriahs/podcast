@@ -207,13 +207,32 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         throw new RuntimeException("Missing viewHolder instanceof check");
     }
 
-    public void onClick(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
+    private void onClickEpisode(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
         @EpisodeViewHolder.DisplayState int newState = episodeViewHolder.toggleState(argCanDownload);
         if (newState == EpisodeViewHolder.EXPANDED) {
             mExpanededItems.add(dataPosition);
         } else {
             mExpanededItems.remove(Integer.valueOf(dataPosition));
         }
+    }
+
+    private void onClickFooter(FooterViewHolder footerViewHolder, int dataPosition, boolean argCanDownload) {
+    }
+
+    public void onClick(EpisodeViewHolder viewHolder, int dataPosition, boolean argCanDownload) {
+
+        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
+        if (viewHolder instanceof FooterViewHolder) {
+            onClickFooter((FooterViewHolder) viewHolder, dataPosition, argCanDownload);
+            return;
+        }
+
+        if (viewHolder instanceof EpisodeViewHolder) {
+            onClickEpisode(viewHolder, dataPosition, argCanDownload);
+            return;
+        }
+
+        throw new RuntimeException("Missing viewHolder instanceof check");
     }
 
     @Override
