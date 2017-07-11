@@ -40,7 +40,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 02-09-2014.
  */
-public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
+public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewHolder> {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({RECENT_FIRST, OLDEST_FIRST})
@@ -109,7 +109,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public EpisodeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FeedViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view;
         if (viewType == EPISODE_TYPE) {
@@ -191,20 +191,19 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
+    public void onBindViewHolder(FeedViewHolder feedViewHolder, int position) {
 
-        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
-        if (viewHolder instanceof FooterViewHolder) {
-            onBindFooterViewHolder((FooterViewHolder) viewHolder, position);
+        if (feedViewHolder instanceof FooterViewHolder) {
+            onBindFooterViewHolder((FooterViewHolder) feedViewHolder, position);
             return;
         }
 
-        if (viewHolder instanceof EpisodeViewHolder) {
-            onBindEpisodeViewHolder(viewHolder, position);
+        if (feedViewHolder instanceof EpisodeViewHolder) {
+            onBindEpisodeViewHolder((EpisodeViewHolder) feedViewHolder, position);
             return;
         }
 
-        throw new RuntimeException("Missing viewHolder instanceof check");
+        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     private void onClickEpisode(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
@@ -219,24 +218,23 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private void onClickFooter(FooterViewHolder footerViewHolder, int dataPosition, boolean argCanDownload) {
     }
 
-    public void onClick(EpisodeViewHolder viewHolder, int dataPosition, boolean argCanDownload) {
+    public void onClick(FeedViewHolder feedViewHolder, int dataPosition, boolean argCanDownload) {
 
-        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
-        if (viewHolder instanceof FooterViewHolder) {
-            onClickFooter((FooterViewHolder) viewHolder, dataPosition, argCanDownload);
+        if (feedViewHolder instanceof FooterViewHolder) {
+            onClickFooter((FooterViewHolder) feedViewHolder, dataPosition, argCanDownload);
             return;
         }
 
-        if (viewHolder instanceof EpisodeViewHolder) {
-            onClickEpisode(viewHolder, dataPosition, argCanDownload);
+        if (feedViewHolder instanceof EpisodeViewHolder) {
+            onClickEpisode((EpisodeViewHolder) feedViewHolder, dataPosition, argCanDownload);
             return;
         }
 
-        throw new RuntimeException("Missing viewHolder instanceof check");
+        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     @Override
-    public void onViewAttachedToWindow (EpisodeViewHolder holder) {
+    public void onViewAttachedToWindow (FeedViewHolder holder) {
         super.onViewAttachedToWindow(holder);
     }
 
@@ -249,22 +247,21 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public void onViewDetachedFromWindow(EpisodeViewHolder viewHolder) {
+    public void onViewDetachedFromWindow(FeedViewHolder feedViewHolder) {
 
-        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
-        if (viewHolder instanceof FooterViewHolder) {
-            onFooterViewDetachedFromWindow((FooterViewHolder) viewHolder);
-            super.onViewDetachedFromWindow(viewHolder);
+        if (feedViewHolder instanceof FooterViewHolder) {
+            onFooterViewDetachedFromWindow((FooterViewHolder) feedViewHolder);
+            super.onViewDetachedFromWindow(feedViewHolder);
             return;
         }
 
-        if (viewHolder instanceof EpisodeViewHolder) {
-            onEpisodeViewDetachedFromWindow(viewHolder);
-            super.onViewDetachedFromWindow(viewHolder);
+        if (feedViewHolder instanceof EpisodeViewHolder) {
+            onEpisodeViewDetachedFromWindow((EpisodeViewHolder) feedViewHolder);
+            super.onViewDetachedFromWindow(feedViewHolder);
             return;
         }
 
-        throw new RuntimeException("Missing viewHolder instanceof check");
+        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     private void onEpisodeViewRecycled(EpisodeViewHolder episodeViewHolder) {
@@ -277,20 +274,19 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public void onViewRecycled(EpisodeViewHolder viewHolder) {
+    public void onViewRecycled(FeedViewHolder feedViewHolder) {
 
-        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
-        if (viewHolder instanceof FooterViewHolder) {
-            onFooterViewRecycled((FooterViewHolder) viewHolder);
+        if (feedViewHolder instanceof FooterViewHolder) {
+            onFooterViewRecycled((FooterViewHolder) feedViewHolder);
             return;
         }
 
-        if (viewHolder instanceof EpisodeViewHolder) {
-            onEpisodeViewRecycled(viewHolder);
+        if (feedViewHolder instanceof EpisodeViewHolder) {
+            onEpisodeViewRecycled((EpisodeViewHolder) feedViewHolder);
             return;
         }
 
-        throw new RuntimeException("Missing viewHolder instanceof check");
+        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     public void setExpanded(boolean expanded) {
@@ -379,20 +375,19 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     private void getPaletteFooter(@NonNull final FooterViewHolder footerViewHolder) {
     }
 
-    protected void getPalette(@NonNull final EpisodeViewHolder viewHolder) {
+    protected void getPalette(@NonNull final FeedViewHolder feedViewHolder) {
 
-        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
-        if (viewHolder instanceof FooterViewHolder) {
-            getPaletteFooter((FooterViewHolder) viewHolder);
+        if (feedViewHolder instanceof FooterViewHolder) {
+            getPaletteFooter((FooterViewHolder) feedViewHolder);
             return;
         }
 
-        if (viewHolder instanceof EpisodeViewHolder) {
-            getPaletteEpisode(viewHolder);
+        if (feedViewHolder instanceof EpisodeViewHolder) {
+            getPaletteEpisode((EpisodeViewHolder) feedViewHolder);
             return;
         }
 
-        throw new RuntimeException("Missing viewHolder instanceof check");
+        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 
     public @Order int calcOrder() {
