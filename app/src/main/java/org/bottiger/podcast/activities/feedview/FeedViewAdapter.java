@@ -329,7 +329,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         return mStringBuilder.toString();
     }
 
-    protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
+    private void getPaletteEpisode(@NonNull final EpisodeViewHolder episodeViewHolder) {
         mSubscription.getColors(mActivity)
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
                 .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
@@ -342,6 +342,25 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
                         episodeViewHolder.mDownloadButton.onPaletteFound(value);
                     }
                 });
+    }
+
+    private void getPaletteFooter(@NonNull final FooterViewHolder footerViewHolder) {
+    }
+
+    protected void getPalette(@NonNull final EpisodeViewHolder viewHolder) {
+
+        // Since FooterViewHolder is a subclass of EpisodeViewHolder this test must be first.
+        if (viewHolder instanceof FooterViewHolder) {
+            getPaletteFooter((FooterViewHolder) viewHolder);
+            return;
+        }
+
+        if (viewHolder instanceof EpisodeViewHolder) {
+            getPaletteEpisode(viewHolder);
+            return;
+        }
+
+        throw new RuntimeException("Missing viewHolder instanceof check");
     }
 
     public @Order int calcOrder() {
