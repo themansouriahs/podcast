@@ -9,6 +9,8 @@ import android.widget.RelativeLayout;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.feedview.EpisodeViewHolder;
 import org.bottiger.podcast.activities.feedview.FeedViewAdapter;
+import org.bottiger.podcast.activities.feedview.FeedViewHolder;
+import org.bottiger.podcast.activities.feedview.FooterViewHolder;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.views.PlayPauseButton;
@@ -25,8 +27,8 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     }
 
     @Override
-    public EpisodeViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        EpisodeViewHolder viewHolder = super.onCreateViewHolder(viewGroup, i);
+    public FeedViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        FeedViewHolder viewHolder = super.onCreateViewHolder(viewGroup, i);
 
         //ViewGroup.LayoutParams params = viewHolder.mPlayPauseButton.getLayoutParams();
         //params.width = (int)mActivity.getResources().getDimension(R.dimen.playpause_button_size_small);
@@ -44,9 +46,7 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
         return mSubscription.getEpisodes().get(argPosition);
     }
 
-    @Override
-    public void onBindViewHolder(EpisodeViewHolder episodeViewHolder, final int position) {
-        super.onBindViewHolder(episodeViewHolder, position);
+    public void onBindEpisodeViewHolder(EpisodeViewHolder episodeViewHolder, final int position) {
         int dataPosition = getDatasetPosition(position);
         final IEpisode argEpisode = getItemForPosition(dataPosition);
 
@@ -66,5 +66,25 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
         episodeViewHolder.mPlayPauseButton.setStatus(STATE_IDLE);
 
         getPalette(episodeViewHolder);
+    }
+
+    public void onBindFooterViewHolder(FooterViewHolder footerViewHolder, final int position) {
+    }
+
+    @Override
+    public void onBindViewHolder(FeedViewHolder feedViewHolder, final int position) {
+        super.onBindViewHolder(feedViewHolder, position);
+
+        if (feedViewHolder instanceof FooterViewHolder) {
+            onBindFooterViewHolder((FooterViewHolder) feedViewHolder, position);
+            return;
+        }
+
+        if (feedViewHolder instanceof EpisodeViewHolder) {
+            onBindEpisodeViewHolder((EpisodeViewHolder) feedViewHolder, position);
+            return;
+        }
+
+        throw new RuntimeException("Missing feedViewHolder instanceof check");
     }
 }

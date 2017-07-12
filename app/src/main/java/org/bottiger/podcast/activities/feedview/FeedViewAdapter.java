@@ -40,7 +40,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
 /**
  * Created by apl on 02-09-2014.
  */
-public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
+public class FeedViewAdapter extends FeedViewAdapterBase {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({RECENT_FIRST, OLDEST_FIRST})
@@ -109,7 +109,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public EpisodeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FeedViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view;
         if (viewType == EPISODE_TYPE) {
@@ -123,13 +123,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(EpisodeViewHolder viewHolder, int position) {
-
-        if (viewHolder instanceof FooterViewHolder) {
-            return;
-        }
-
-        final int dataPosition = viewHolder.getAdapterPosition();
+    protected void onBindViewHolderEpisode(EpisodeViewHolder episodeViewHolder, int position) {
+        final int dataPosition = episodeViewHolder.getAdapterPosition();
         final IEpisode item = getItemForPosition(dataPosition);
 
         if (item == null) {
@@ -137,9 +132,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
             return;
         }
 
-        SharedAdapterUtils.AddPaddingToLastElement((viewHolder).mContainer, 0, dataPosition == getItemCount()-1);
+        SharedAdapterUtils.AddPaddingToLastElement(episodeViewHolder.mContainer, 0, dataPosition == getItemCount()-1);
 
-        final EpisodeViewHolder episodeViewHolder = viewHolder;
         final boolean canDownload = item.canDownload();
         @SoundWavesPlayerBase.PlayerState int playerStatus = STATE_IDLE;
 
@@ -170,10 +164,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
 
         episodeViewHolder.setState(state, canDownload);
 
+        final EpisodeViewHolder finalEpisodeViewHolder = episodeViewHolder;
         episodeViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FeedViewAdapter.this.onClick(episodeViewHolder, dataPosition, canDownload);
+                FeedViewAdapter.this.onClick(finalEpisodeViewHolder, dataPosition, canDownload);
             }
         });
 
@@ -188,13 +183,13 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         SoundWaves.getAppContext(mActivity).getPlayer().addListener(episodeViewHolder.mPlayPauseButton);
         episodeViewHolder.mDownloadButton.enabledProgressListener(true);
 
-        getPalette(viewHolder);
+        getPalette(episodeViewHolder);
 
         episodeViewHolder.mPlayPauseButton.setStatus(playerStatus);
-
     }
 
-    public void onClick(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
+    @Override
+    protected void onClickEpisode(EpisodeViewHolder episodeViewHolder, int dataPosition, boolean argCanDownload) {
         @EpisodeViewHolder.DisplayState int newState = episodeViewHolder.toggleState(argCanDownload);
         if (newState == EpisodeViewHolder.EXPANDED) {
             mExpanededItems.add(dataPosition);
@@ -203,23 +198,22 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         }
     }
 
+
     @Override
-    public void onViewAttachedToWindow (EpisodeViewHolder holder) {
-        super.onViewAttachedToWindow(holder);
+    protected void onViewAttachedToWindowEpisode(EpisodeViewHolder episodeViewHolder) {
     }
 
     @Override
-    public void onViewDetachedFromWindow(EpisodeViewHolder holder) {
-        SoundWaves.getAppContext(mActivity).getPlayer().removeListener(holder.mPlayPauseButton);
-        holder.mDownloadButton.enabledProgressListener(false);
-        super.onViewDetachedFromWindow(holder);
+    protected void onViewDetachedFromWindowEpisode(EpisodeViewHolder episodeViewHolder) {
+        SoundWaves.getAppContext(mActivity).getPlayer().removeListener(episodeViewHolder.mPlayPauseButton);
+        episodeViewHolder.mDownloadButton.enabledProgressListener(false);
     }
 
     @Override
-    public void onViewRecycled(EpisodeViewHolder viewHolder) {
-        viewHolder.mDownloadButton.unsetEpisodeId();
-        viewHolder.mPlayPauseButton.unsetEpisodeId();
-        viewHolder.mQueueButton.unsetEpisodeId();
+    protected void onViewRecycledEpisode(EpisodeViewHolder episodeViewHolder) {
+        episodeViewHolder.mDownloadButton.unsetEpisodeId();
+        episodeViewHolder.mPlayPauseButton.unsetEpisodeId();
+        episodeViewHolder.mQueueButton.unsetEpisodeId();
     }
 
     public void setExpanded(boolean expanded) {
@@ -290,7 +284,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<EpisodeViewHolder> {
         return mStringBuilder.toString();
     }
 
-    protected void getPalette(@NonNull final EpisodeViewHolder episodeViewHolder) {
+    @Override
+    protected void getPaletteEpisode(@NonNull final EpisodeViewHolder episodeViewHolder) {
         mSubscription.getColors(mActivity)
                 .subscribeOn(io.reactivex.schedulers.Schedulers.io())
                 .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
