@@ -288,7 +288,7 @@
         </receiver>
 
         <receiver
-            android:name=".PodcastUpdateManager"
+            android:name=".receiver.PodcastUpdateReceiver"
             android:process=":remote"></receiver>
         <receiver android:name=".receiver.AutoStart">
             <intent-filter>

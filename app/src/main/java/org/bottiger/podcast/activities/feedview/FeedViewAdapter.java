@@ -81,10 +81,10 @@ public class FeedViewAdapter extends FeedViewAdapterBase {
 
     public void setDataset(@NonNull ISubscription argSubscription) {
         mSubscription = argSubscription;
-        notifyEpisodesChanged();
+        updateEpisoedsAndNotifyChanged();
     }
 
-    public void notifyEpisodesChanged() {
+    public void updateEpisoedsAndNotifyChanged() {
         mEpisodeList = mSubscription.getEpisodes();
         mFilteredEpisodeList = mEpisodeList.getFilteredList();
         notifyDataSetChanged();

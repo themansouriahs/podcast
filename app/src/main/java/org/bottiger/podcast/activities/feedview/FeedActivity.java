@@ -22,7 +22,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -75,7 +74,6 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.FeedViewTopImage;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
-import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
 
@@ -320,12 +318,13 @@ public class FeedActivity extends TopActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (mRxSubscription == null)
             return;
 
         if (mRxSubscription.isUnsubscribed())
             mRxSubscription.unsubscribe();
+
+        super.onDestroy();
     }
 
     @Override
@@ -540,14 +539,14 @@ public class FeedActivity extends TopActivity {
                     @Override
                     public void call(SubscriptionChanged subscriptionChanged) {
                         @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
-                        boolean doNotify = action ==
-                                SubscriptionChanged.ADDED ||
+                        boolean doUpdate =
+                                action == SubscriptionChanged.ADDED ||
                                 action == SubscriptionChanged.REMOVED ||
                                 action == SubscriptionChanged.LOADED;
 
-                        if (doNotify) {
+                        if (doUpdate) {
                             setViewState(argSubscription);
-                            argAdapter.notifyEpisodesChanged();
+                            argAdapter.updateEpisoedsAndNotifyChanged();
                         }
                     }
                 }, new Action1<Throwable>() {

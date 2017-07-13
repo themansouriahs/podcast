@@ -115,8 +115,8 @@ public class DownloadManagerActivity extends AppCompatActivity implements Lifecy
 
     @Override
     public void onPause() {
-        super.onPause();
         mAdapter.onDetachedFromRecyclerView(mRecyclerView);
+        super.onPause();
     }
 
     @Override

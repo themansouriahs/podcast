@@ -231,10 +231,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@Override
 	public void onDestroy() {
 		sInstance = null;
-        super.onDestroy();
 		if (mPlayer != null) {
 			mPlayer.release();
 		}
+		super.onDestroy();
 	}
 
 	@Override

@@ -207,13 +207,13 @@ public class SubscriptionsFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
             mRxSubscription.unsubscribe();
         }
         if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isUnsubscribed()) {
             mRxSubscriptionChanged.unsubscribe();
         }
+        super.onDestroyView();
     }
 
     @Override
