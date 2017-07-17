@@ -87,6 +87,7 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
         int playerVisibility = !playlistEmpty && !isCompact ? View.VISIBLE : View.GONE;
         int playerSmallVisibility = !playlistEmpty && isCompact ? View.VISIBLE : View.GONE;
 
+        views.setViewVisibility(R.id.widget_playlist_empty_text, emptyTextVisibility);
         views.setViewVisibility(R.id.widget_player, playerVisibility);
         views.setViewVisibility(R.id.widget_player_small, playerSmallVisibility);
 
@@ -151,8 +152,10 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
             }
 
             String imageUrl = episode.getArtwork(context);
-            bindImage(context, imageUrl, appWidgetId, R.id.widget_logo, views);
-            bindImage(context, imageUrl, appWidgetId, R.id.widget_logo_small, views);
+            if (imageUrl != null) {
+                bindImage(context, imageUrl, appWidgetId, R.id.widget_logo, views);
+                bindImage(context, imageUrl, appWidgetId, R.id.widget_logo_small, views);
+            }
 
         }
 
@@ -162,21 +165,19 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    private static void bindImage(@NonNull Context argContext, @Nullable String argImageUrl, int argAppWidgetId, @IdRes int view, RemoteViews views) {
-        if (argImageUrl != null) {
-            AppWidgetTarget appWidgetTarget = new AppWidgetTarget(argContext, view, views, argAppWidgetId);
+    private static void bindImage(@NonNull Context argContext, @NonNull String argImageUrl, int argAppWidgetId, @IdRes int view, RemoteViews views) {
+        AppWidgetTarget appWidgetTarget = new AppWidgetTarget(argContext, view, views, argAppWidgetId);
 
-            // image size
-            int imageSizeDp = (int) argContext.getResources().getDimension(R.dimen.widget_logo_size);
-            //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
+        // image size
+        int imageSizeDp = (int) argContext.getResources().getDimension(R.dimen.widget_logo_size);
+        //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
 
-            RequestOptions glideOptions = ImageLoaderUtils.getRequestOptions(argContext);
-            glideOptions.override(imageSizeDp, imageSizeDp);
+        RequestOptions glideOptions = ImageLoaderUtils.getRequestOptions(argContext);
+        glideOptions.override(imageSizeDp, imageSizeDp);
 
-            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(argContext, argImageUrl);
-            builder.apply(glideOptions);
-            builder.into(appWidgetTarget);
-        }
+        RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(argContext, argImageUrl);
+        builder.apply(glideOptions);
+        builder.into(appWidgetTarget);
     }
 
     static boolean doShowCompactControls(@NonNull Bundle newOptions) {
