@@ -232,7 +232,8 @@ public class FeedViewAdapter extends FeedViewAdapterBase {
         if (mSortOrder == RECENT_FIRST)
             return argPosition;
 
-        return getItemCount() - argPosition -1;
+        int footerCorrection = includeFooter ? -1 : 0;
+        return getItemCount() - argPosition - 1 + footerCorrection;
     }
 
     @Override
