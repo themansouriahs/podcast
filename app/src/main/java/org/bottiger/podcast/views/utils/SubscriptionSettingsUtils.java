@@ -34,6 +34,8 @@ public class SubscriptionSettingsUtils {
     SwitchCompat mNotifyOnNew;
     @NonNull
     SwitchCompat mSkipIntro;
+    @NonNull
+    SwitchCompat mHideListened;
 
     @Nullable OnSettingsChangedListener mShowDescriptionListener;
     @Nullable OnSettingsChangedListener mAddNewToPlaylistListener;
@@ -42,6 +44,7 @@ public class SubscriptionSettingsUtils {
     @Nullable OnSettingsChangedListener mListOldestFirstListener;
     @Nullable OnSettingsChangedListener mNotifyOnNewListener;
     @Nullable OnSettingsChangedListener mSkipIntroListener;
+    @Nullable OnSettingsChangedListener mHideListenedListener;
 
 
     public interface OnSettingsChangedListener {
@@ -56,9 +59,10 @@ public class SubscriptionSettingsUtils {
         mAddNewToPlaylist = (SwitchCompat) mLayout.findViewById(R.id.feed_add_to_playlist_switch);
         mAutoDownload = (SwitchCompat)mLayout.findViewById(R.id.feed_auto_download_switch);
         mDeleteAfterPlayback = (SwitchCompat) mLayout.findViewById(R.id.feed_auto_delete_switch);
-        mListOldestFirst = (SwitchCompat) mLayout.findViewById(R.id.feed_oldest_first_switch);
+        //mListOldestFirst = (SwitchCompat) mLayout.findViewById(R.id.feed_oldest_first_switch);
         mNotifyOnNew = (SwitchCompat) mLayout.findViewById(R.id.feed_notify_on_new_switch);
         mSkipIntro = (SwitchCompat) mLayout.findViewById(R.id.feed_skip_intro_switch);
+        mHideListened = (SwitchCompat) mLayout.findViewById(R.id.feed_hide_listened_switch);
 
         final Context context = mLayout.getContext();
         final ContentResolver contentResolver = context.getContentResolver();
@@ -71,8 +75,9 @@ public class SubscriptionSettingsUtils {
         mAddNewToPlaylist.setChecked(mSubscription.isAddNewToPlaylist());
         mAutoDownload.setChecked(mSubscription.doDownloadNew(defaultValue));
         mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened(context.getResources()));
-        mListOldestFirst.setChecked(mSubscription.isListOldestFirst(context.getResources()));
+        //mListOldestFirst.setChecked(mSubscription.isListOldestFirst(context.getResources()));
         mSkipIntro.setChecked(mSubscription.doSkipIntro());
+        mHideListened.setChecked(mSubscription.doShowListened());
         mNotifyOnNew.setChecked(mSubscription.doNotifyOnNew(context));
 
         mShowDescription.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -107,13 +112,14 @@ public class SubscriptionSettingsUtils {
             }
         });
 
+        /*
         mListOldestFirst.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSubscription.setListOldestFirst(isChecked);
                 OnSwitchChangedHandler(isChecked, contentResolver, mListOldestFirstListener);
             }
-        });
+        })*/
 
         mSkipIntro.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -130,6 +136,14 @@ public class SubscriptionSettingsUtils {
                 OnSwitchChangedHandler(isChecked, contentResolver, mNotifyOnNewListener);
             }
         });
+
+        mHideListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSubscription.setShowListened(isChecked);
+                OnSwitchChangedHandler(isChecked, contentResolver, mHideListenedListener);
+            }
+        });
     }
 
     private void OnSwitchChangedHandler(boolean isChecked,
@@ -141,7 +155,7 @@ public class SubscriptionSettingsUtils {
     }
 
     public void setListOldestFirstListener(@Nullable OnSettingsChangedListener argListOldestFirstListener) {
-        this.mListOldestFirstListener = argListOldestFirstListener;
+        //this.mListOldestFirstListener = argListOldestFirstListener;
     }
 
     public void setDeleteAfterPlaybackListener(@Nullable OnSettingsChangedListener argDeleteAfterPlaybackListener) {
@@ -158,5 +172,9 @@ public class SubscriptionSettingsUtils {
 
     public void setShowDescriptionListener(@Nullable OnSettingsChangedListener argShowDescriptionListener) {
         this.mShowDescriptionListener = argShowDescriptionListener;
+    }
+
+    public void setHideListenedListener(@Nullable OnSettingsChangedListener argHideListenedListener) {
+        this.mHideListenedListener = argHideListenedListener;
     }
 }

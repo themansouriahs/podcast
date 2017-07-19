@@ -193,6 +193,14 @@ public class FeedActivity extends TopActivity {
                 }
             });
 
+            mSubscriptionSettingsUtils.setHideListenedListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
+                @Override
+                public void OnSettingsChanged(boolean isChecked) {
+                    mAdapter.setShowListened(!isChecked); // HIDE listened vs DO SHOW listened
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+
             @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
             mAdapter.setOrder(sortOrder);
         }

@@ -64,6 +64,7 @@ public interface ISubscription extends PaletteListener, IDbItem {
     boolean IsDirty();
 
     boolean doSkipIntro();
+    boolean doShowListened();
 
     @NonNull
     Integer getNewEpisodes();

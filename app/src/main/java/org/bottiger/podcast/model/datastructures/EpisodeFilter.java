@@ -11,6 +11,7 @@ import org.bottiger.podcast.provider.IEpisode;
 public class EpisodeFilter {
 
     private String mSearchQuery;
+    private boolean mHideListened = false;
 
     public boolean match(@Nullable IEpisode argEpisode) {
         if (argEpisode == null)
@@ -23,6 +24,12 @@ public class EpisodeFilter {
         if (matchString(title))
             return true;
 
+        if (mHideListened) {
+            if (argEpisode.isMarkedAsListened()) {
+                return false;
+            }
+        }
+
         String description = argEpisode.getDescription();
         if (matchString(description))
             return true;
@@ -32,6 +39,10 @@ public class EpisodeFilter {
 
     public void setSearchQuery(@Nullable String argQuery) {
         mSearchQuery = argQuery != null ? argQuery.toLowerCase() : null;
+    }
+
+    public void setDoHideListened(boolean argDoHide) {
+        mHideListened = argDoHide;
     }
 
     @Nullable

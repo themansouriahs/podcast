@@ -26,6 +26,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.SharedAdapterUtils;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.views.DownloadButtonView;
 import org.bottiger.podcast.views.PlayPauseButton;
 
 import java.lang.annotation.Retention;
@@ -63,6 +64,7 @@ public class FeedViewAdapter extends FeedViewAdapterBase {
     protected ColorExtractor mPalette;
 
     public static boolean mIsExpanded = false;
+    protected boolean mDoShowListened = true;
     protected @Order int mSortOrder = RECENT_FIRST;
 
     private ArrayList<Integer> mExpanededItems = new ArrayList<>();
@@ -86,6 +88,7 @@ public class FeedViewAdapter extends FeedViewAdapterBase {
 
     public void updateEpisoedsAndNotifyChanged() {
         mEpisodeList = mSubscription.getEpisodes();
+        setShowListened(mSubscription.doShowListened());
         mFilteredEpisodeList = mEpisodeList.getFilteredList();
         notifyDataSetChanged();
     }
@@ -97,6 +100,15 @@ public class FeedViewAdapter extends FeedViewAdapterBase {
     public void setOrder(@Order int argSortOrder) {
         mSortOrder = argSortOrder;
         notifyDataSetChanged();
+    }
+
+    public void setShowListened(boolean doShowListened) {
+        mDoShowListened = doShowListened;
+
+        EpisodeFilter filter = mEpisodeList.getFilter();
+        filter.setDoHideListened(!doShowListened);
+
+        mFilteredEpisodeList = mEpisodeList.getFilteredList();
     }
 
     public void search(@Nullable String argSearchQuery) {
@@ -206,7 +218,11 @@ public class FeedViewAdapter extends FeedViewAdapterBase {
     @Override
     protected void onViewDetachedFromWindowEpisode(EpisodeViewHolder episodeViewHolder) {
         SoundWaves.getAppContext(mActivity).getPlayer().removeListener(episodeViewHolder.mPlayPauseButton);
-        episodeViewHolder.mDownloadButton.enabledProgressListener(false);
+
+        DownloadButtonView downloadButton = episodeViewHolder.mDownloadButton;
+        if (downloadButton != null) {
+            downloadButton.enabledProgressListener(false);
+        }
     }
 
     @Override

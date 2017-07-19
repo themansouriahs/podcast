@@ -60,6 +60,11 @@ public class AudioBook extends BaseSubscription {
         return false;
     }
 
+    @Override
+    public boolean doShowListened() {
+        return true;
+    }
+
     @NonNull
     @Override
     public Integer getNewEpisodes() {

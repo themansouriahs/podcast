@@ -110,6 +110,11 @@ public class SlimSubscription extends BasePodcastSubscription implements Parcela
         return mIsDirty;
     }
 
+    @Override
+    public boolean doShowListened() {
+        return true;
+    }
+
     @NonNull
     @Override
     public Integer getNewEpisodes() {
