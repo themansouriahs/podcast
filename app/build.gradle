@@ -1,5 +1,6 @@
 //apply plugin: 'idea'
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
 
@@ -53,6 +54,8 @@ android {
     // and there will be a point later where keeping control over this is important
     sourceSets.main {
         jni.srcDirs = ["src/main/jni"];
+        java.srcDirs += 'src/main/kotlin'
+
     }
     lintOptions {
         checkReleaseBuilds false
@@ -157,13 +160,15 @@ repositories {
 
 //dependencies
 ext.espressoVersion = '2.2.2'
-ext.supportLibraryVersion = '26.0.0-beta2'
-ext.playServicesVersion = '11.0.1'
-ext.architectureComponentsVersion = '1.0.0-alpha3'
+ext.supportLibraryVersion = '26.0.0'
+ext.playServicesVersion = '11.0.2'
+ext.architectureComponentsVersion = '1.0.0-alpha6'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support:multidex:1.0.2'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
     compile "com.android.support:support-v4:$supportLibraryVersion"
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
@@ -176,6 +181,7 @@ dependencies {
 
     compile "android.arch.lifecycle:runtime:$architectureComponentsVersion"
     compile "android.arch.lifecycle:extensions:$architectureComponentsVersion"
+    compile "android.arch.lifecycle:reactivestreams:$architectureComponentsVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$architectureComponentsVersion"
     compile "android.arch.persistence.room:runtime:$architectureComponentsVersion"
     annotationProcessor "android.arch.persistence.room:compiler:$architectureComponentsVersion"
@@ -244,8 +250,8 @@ dependencies {
     }
     // Espresso
     // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.android.support.test:runner:1.0.0'
+    androidTestCompile 'com.android.support.test:rules:1.0.0'
     androidTestCompile 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
     androidTestCompile 'com.squareup.okhttp3:okhttp:3.7.0'
     androidTestCompile("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
