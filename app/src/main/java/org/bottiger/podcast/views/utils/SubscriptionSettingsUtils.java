@@ -77,7 +77,7 @@ public class SubscriptionSettingsUtils {
         mDeleteAfterPlayback.setChecked(mSubscription.isDeleteWhenListened(context.getResources()));
         //mListOldestFirst.setChecked(mSubscription.isListOldestFirst(context.getResources()));
         mSkipIntro.setChecked(mSubscription.doSkipIntro());
-        mHideListened.setChecked(mSubscription.doShowListened());
+        mHideListened.setChecked(!mSubscription.doShowListened());
         mNotifyOnNew.setChecked(mSubscription.doNotifyOnNew(context));
 
         mShowDescription.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -140,7 +140,7 @@ public class SubscriptionSettingsUtils {
         mHideListened.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSubscription.setShowListened(isChecked);
+                mSubscription.setShowListened(!isChecked);
                 OnSwitchChangedHandler(isChecked, contentResolver, mHideListenedListener);
             }
         });

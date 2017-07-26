@@ -17,18 +17,20 @@ public class EpisodeFilter {
         if (argEpisode == null)
             return false;
 
+        boolean isSearching = !TextUtils.isEmpty(mSearchQuery);
+
+        if (mHideListened && !isSearching) {
+            if (argEpisode.isMarkedAsListened()) {
+                return false;
+            }
+        }
+
         if (TextUtils.isEmpty(mSearchQuery))
             return true;
 
         String title = argEpisode.getTitle();
         if (matchString(title))
             return true;
-
-        if (mHideListened) {
-            if (argEpisode.isMarkedAsListened()) {
-                return false;
-            }
-        }
 
         String description = argEpisode.getDescription();
         if (matchString(description))

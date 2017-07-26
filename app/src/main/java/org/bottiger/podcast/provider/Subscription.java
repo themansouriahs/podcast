@@ -521,11 +521,11 @@ public class Subscription extends BasePodcastSubscription {
 		return IsSettingEnabled(SHOW_LISTENED);
 	}
 
-	public void setShowListened(boolean argIsPinned) {
+	public void setShowListened(boolean argDoShowListened) {
 		mSettings = mSettings < 0 ? 0 : mSettings;
 		mSettings |= SHOW_LISTENED_SET;
 
-		if (argIsPinned)
+		if (argDoShowListened)
 			mSettings |= SHOW_LISTENED;
 		else
 			mSettings &= ~SHOW_LISTENED;
