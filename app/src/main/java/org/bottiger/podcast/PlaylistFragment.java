@@ -106,8 +106,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         if (mTopPlayer != null) {
             mTopPlayer.onDestroyView();
         }
@@ -115,6 +113,8 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
         if (mRxPlaylistSubscription != null && !mRxPlaylistSubscription.isUnsubscribed()) {
             mRxPlaylistSubscription.unsubscribe();
         }
+
+        super.onDestroy();
     }
 
     @Override

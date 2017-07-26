@@ -65,10 +65,15 @@ public class SoundWavesWidgetProvider extends SoundWavesWidgetProviderBase {
     }
 
     public static void updateAllWidgets(@NonNull Context context, @PlaybackStateCompat.State int argState) {
+        updateAllWidgetsOfType(SoundWavesWidgetProvider.class, context, argState);
+        updateAllWidgetsOfType(SoundWavesWidgetProviderDark.class, context, argState);
+    }
+
+    private static void updateAllWidgetsOfType(Class argClass, @NonNull Context context, @PlaybackStateCompat.State int argState) {
         sState = argState;
 
         AppWidgetManager mgr= AppWidgetManager.getInstance(context);
-        ComponentName cn = new ComponentName(context, SoundWavesWidgetProviderBase.class);
+        ComponentName cn = new ComponentName(context, argClass);
         int[] ids = mgr.getAppWidgetIds(cn);
         for (int i = 0; i < ids.length; i++) {
             updateAppWidget(context, ids[i], false, LAYOUT);

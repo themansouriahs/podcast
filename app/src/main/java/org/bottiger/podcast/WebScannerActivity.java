@@ -87,8 +87,8 @@ public class WebScannerActivity extends MediaRouterPlaybackActivity {
 
     @Override
     public void onPause() {
-        super.onPause();
         mDecoratedBarcodeView.pause();
+        super.onPause();
     }
 
     @Override

@@ -182,6 +182,7 @@
     <string name="feed_settings_oldest_first">List oldest episodes first</string>
     <string name="feed_settings_notify_on_new">Notify on new episodes</string>
     <string name="feed_settings_skip_intro">Skip intro</string>
+    <string name="feed_settings_hide_listened">Hide listened episodes</string>
     <string name="open_video_externally_title">Open video in another player?</string>
     <string name="open_video_externally_body">This episode is a video, which is not supported by this app. You can open it in another video player, or choose to stay here for audio only.</string>
     <string name="open_video_externally_confirm">Open video player</string>
@@ -287,9 +288,9 @@
     <string name="preferences_category_import_export">Import/Export</string>
     <string name="pref_import_export_category_title"><![CDATA[Import & Export]]></string>
     <string name="pref_import_opml_title">Import OPML file</string>
-    <string name="pref_import_opml_summary">An OPML file can be exported from most podcasting applications</string>
+    <string name="pref_import_opml_summary">Import list of subscriptions from an OPML file</string>
     <string name="pref_export_opml_title">Export OPML file</string>
-    <string name="pref_export_opml_summary">Export your current list of subscriptions into a OPML file</string>
+    <string name="pref_export_opml_summary">Export list of subscriptions to an OPML file</string>
     <string name="pref_download_only_when_charging_title">Download only when charging</string>
     <string name="pref_download_only_when_charging_description">New episodes will only be downloaded when the phone is charging</string>
     <string name="pref_store_on_sdcard_title">Store podcasts on SD Card</string>

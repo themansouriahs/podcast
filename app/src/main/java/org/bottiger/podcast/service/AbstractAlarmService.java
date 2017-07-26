@@ -112,9 +112,9 @@ public abstract class AbstractAlarmService extends IntentService {
      */
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mWakeLock.release();
         log.debug("onDestroy()");
+        super.onDestroy();
     }
 	
 	/**

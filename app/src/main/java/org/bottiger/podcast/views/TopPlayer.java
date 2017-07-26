@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -529,15 +530,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         setDynamicColors(iSubscription, argEpisode);
 
-        if (!TextUtils.isEmpty(artworkURL) && mPhoto != null) {
-            Log.v("MissingImage", "Setting image");
-            RequestOptions options = ImageLoaderUtils.getRequestOptions(mContext);
-            options.error(R.drawable.generic_podcast);
-            options.override(512, 512).fitCenter();
-            //ImageLoaderUtils.loadImageInto(mPhoto, artworkURL, ImageLoaderUtils.DEFAULT, options);
-            RequestBuilder requestBuilder = ImageLoaderUtils.getGlide(getContext(), artworkURL, options);
-            requestBuilder.into(mPhoto);
-        }
+        bindImage(mContext, mPhoto, artworkURL);
 
         float speed = PlayerService.getPlaybackSpeed(getContext(), mCurrentEpisode);
         setPlaybackSpeedView(speed);
@@ -564,11 +557,20 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             bindSeekButton(mDrivingReverse, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.BACKWARDS);
             bindSeekButton(mDrivingFastForward, argEpisode, soundwaves, mOverlay, OnTouchSeekListener.FORWARD);
 
+            bindImage(mContext, mDrivingPhoto, artworkURL);
+        }
+    }
 
-            RequestOptions requestOptions = ImageLoaderUtils.getRequestOptions(getContext());
-            requestOptions.placeholder(R.drawable.generic_podcast);
-            requestOptions.override(512, 512).fitCenter();
-            ImageLoaderUtils.loadImageInto(mDrivingPhoto, artworkURL, ImageLoaderUtils.DEFAULT, requestOptions);
+    private static void bindImage(@NonNull Context argContext, @Nullable ImageView argImageView, @Nullable String url) {
+        if (argImageView != null && !TextUtils.isEmpty(url)) {
+            Log.v("MissingImage", "Setting image");
+            RequestOptions options = ImageLoaderUtils.getRequestOptions(argContext);
+            options.error(R.drawable.generic_podcast);
+            options.override(512, 512).fitCenter();
+
+            RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(argContext, url);
+            builder.apply(options);
+            builder.into(argImageView);
         }
     }
 

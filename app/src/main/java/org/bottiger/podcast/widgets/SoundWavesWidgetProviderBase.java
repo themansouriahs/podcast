@@ -12,7 +12,12 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RawRes;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -26,6 +31,7 @@ import com.bumptech.glide.request.target.AppWidgetTarget;
 import org.bottiger.podcast.MainActivity;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.PlayerStateManager;
@@ -49,22 +55,22 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
     @PlaybackStateCompat.State static int sState;
 
     static void updateAppWidget(Context context, int appWidgetId, boolean showDescription, int argLWidgetLayout) {
-
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
+        Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
+
+        boolean isCompact = doShowCompactControls(options);
+        int textVisibility = !isCompact ? View.VISIBLE : View.GONE;
         if (AndroidUtil.SDK_INT >= 16) {
-            Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
-            showDescription = doShowDescription(options);
+            showDescription = !isCompact;
         }
 
         Playlist playlist = SoundWaves.getAppContext(context).getPlaylist();
         Library library = SoundWaves.getAppContext(context).getLibraryInstance();
 
-        boolean wasEmpty = false;
         if (playlist.isEmpty()) {
             library.loadPlaylistSync(playlist);
             playlist.populatePlaylistIfEmpty();
-            wasEmpty = true;
         }
 
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
@@ -78,9 +84,12 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
         boolean playlistEmpty = playlist.size() == 0;
         int emptyTextVisibility = playlistEmpty ? View.VISIBLE : View.GONE;
-        int playerVisibility = !playlistEmpty ? View.VISIBLE : View.GONE;
+        int playerVisibility = !playlistEmpty && !isCompact ? View.VISIBLE : View.GONE;
+        int playerSmallVisibility = !playlistEmpty && isCompact ? View.VISIBLE : View.GONE;
 
+        views.setViewVisibility(R.id.widget_playlist_empty_text, emptyTextVisibility);
         views.setViewVisibility(R.id.widget_player, playerVisibility);
+        views.setViewVisibility(R.id.widget_player_small, playerSmallVisibility);
 
         Log.wtf(TAG, "pre");
 
@@ -92,8 +101,6 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
             CharSequence podcast_title = "No title";
             podcast_title = episode.getSubscription(context).getTitle();
-
-            //podcast_title =   (wasEmpty ? "Loaded" : "Memory") + podcast_title;
 
             CharSequence text = episode.getTitle();
             Long durationMs = episode.getDuration();
@@ -110,8 +117,14 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
             String chronometerFormat = "%s"; //episode.getOffset() + " / " + StrUtils.formatTime(durationMs);
 
-            int playPauseIcon = !(isPlaying || isBuffering) ? R.drawable.ic_play_arrow_black : R.drawable.ic_pause_black;
+            @DrawableRes int playIcon = !isCompact ? R.drawable.ic_play_arrow_black : R.drawable.ic_play_arrow_widget;
+            @DrawableRes int pauseIcon = !isCompact ? R.drawable.ic_pause_black : R.drawable.ic_pause_widget;
+            @DrawableRes int skipNextIcon = !isCompact ? R.drawable.ic_skip_next_black : R.drawable.ic_skip_next_widget;
+            @DrawableRes int playPauseIcon = !(isPlaying || isBuffering) ? playIcon : pauseIcon;
+
             views.setImageViewResource(R.id.widget_play, playPauseIcon);
+            views.setImageViewResource(R.id.widget_play_small, playPauseIcon);
+            views.setImageViewResource(R.id.widget_skip_next_small, skipNextIcon);
 
             views.setChronometer(R.id.widget_duration, SystemClock.elapsedRealtime() - elapsedTimeMs, chronometerFormat, isPlaying);
             views.setTextViewText(R.id.widget_duration_total, " / " + StrUtils.formatTime(durationMs));
@@ -121,8 +134,14 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
             int descriptionVisibility = showDescription ? View.VISIBLE : View.GONE;
             views.setViewVisibility(R.id.widget_description, descriptionVisibility);
 
+            // in case we are using the compact (one line) layout
+            views.setViewVisibility(R.id.widget_title, textVisibility);
+            views.setViewVisibility(R.id.widget_episode_title, textVisibility);
+            views.setViewVisibility(R.id.widget_duration, textVisibility);
+            views.setViewVisibility(R.id.widget_duration_total, textVisibility);
+
             if (Build.VERSION.SDK_INT >= 23) {
-                views.setViewVisibility(R.id.widget_mute, View.VISIBLE);
+                views.setViewVisibility(R.id.widget_mute, textVisibility);
 
                 AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                 boolean isMuted = audioManager.isStreamMute(PlayerStateManager.AUDIO_STREAM);
@@ -134,25 +153,38 @@ abstract class SoundWavesWidgetProviderBase extends AppWidgetProvider {
 
             String imageUrl = episode.getArtwork(context);
             if (imageUrl != null) {
-                AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.widget_logo, views, appWidgetId);
-
-                // image size
-                int imageSizeDp = (int) context.getResources().getDimension(R.dimen.widget_logo_size);
-                //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
-
-                RequestOptions options = ImageLoaderUtils.getRequestOptions(context);
-                options.override(imageSizeDp, imageSizeDp);
-
-                RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(context, imageUrl);
-                builder.apply(options);
-                builder.into(appWidgetTarget);
+                bindImage(context, imageUrl, appWidgetId, R.id.widget_logo, views);
+                bindImage(context, imageUrl, appWidgetId, R.id.widget_logo_small, views);
             }
+
         }
 
         attachButtonListeners(context, views);
 
         // Tell the widget manager
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    private static void bindImage(@NonNull Context argContext, @NonNull String argImageUrl, int argAppWidgetId, @IdRes int view, RemoteViews views) {
+        AppWidgetTarget appWidgetTarget = new AppWidgetTarget(argContext, view, views, argAppWidgetId);
+
+        // image size
+        int imageSizeDp = (int) argContext.getResources().getDimension(R.dimen.widget_logo_size);
+        //int imageSizePx = (int) UIUtils.convertDpToPixel(imageSizeDp, context);
+
+        RequestOptions glideOptions = ImageLoaderUtils.getRequestOptions(argContext);
+        glideOptions.override(imageSizeDp, imageSizeDp);
+
+        RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(argContext, argImageUrl);
+        builder.apply(glideOptions);
+        builder.into(appWidgetTarget);
+    }
+
+    static boolean doShowCompactControls(@NonNull Bundle newOptions) {
+        int maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT); // portrait
+
+        // 180 dp = 3 blocks: https://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy
+        return maxHeight < 100;
     }
 
     @TargetApi(16)

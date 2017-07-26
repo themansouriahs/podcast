@@ -18,5 +18,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <include layout="@layout/widget_player" />
+    <include layout="@layout/widget_player_small" />
 
 </RelativeLayout>

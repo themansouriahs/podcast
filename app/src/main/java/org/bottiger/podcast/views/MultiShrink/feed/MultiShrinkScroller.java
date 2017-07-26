@@ -69,7 +69,7 @@ import org.bottiger.podcast.views.MultiShrink.MultiShrinkScroller.AbstractMultiS
  */
 public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
 
-    protected static final String TAG = "FeedScroller";
+    protected static final String TAG = MultiShrinkScroller.class.getSimpleName();
 
     /**
      * 1000 pixels per millisecond. Ie, 1 pixel per second.
@@ -408,7 +408,7 @@ public class MultiShrinkScroller extends AbstractMultiShrinkScroller {
                 if (!mScroller.isFinished()) {
                     Log.v(TAG, "shouldStartDrag intercepts on ACTION_DOWN");
                     startDrag();
-                    return true;
+                    return false;
                 } else {
                     mReceivedDown = true;
                 }

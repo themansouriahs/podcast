@@ -5,10 +5,6 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,7 +22,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,18 +51,12 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.ToolbarActivity;
 import org.bottiger.podcast.TopActivity;
 import org.bottiger.podcast.activities.discovery.DiscoveryFeedActivity;
-import org.bottiger.podcast.activities.downloadmanager.DownloadManagerViewModel;
-import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.LiveSubscription;
-import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
-import org.bottiger.podcast.provider.QueueEpisode;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
@@ -85,13 +74,8 @@ import org.bottiger.podcast.views.FloatingActionButton;
 import org.bottiger.podcast.views.MultiShrink.feed.FeedViewTopImage;
 import org.bottiger.podcast.views.MultiShrink.feed.MultiShrinkScroller;
 import org.bottiger.podcast.views.MultiShrink.feed.SchedulingUtils;
-import org.bottiger.podcast.views.PlaylistViewHolder;
 import org.bottiger.podcast.views.dialogs.DialogBulkDownload;
 import org.bottiger.podcast.views.utils.SubscriptionSettingsUtils;
-
-import java.util.List;
-
-import javax.inject.Inject;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
@@ -108,8 +92,6 @@ public class FeedActivity extends TopActivity {
     public static final int MODE_FULLY_EXPANDED = 4;
 
     private static final String TAG = FeedActivity.class.getSimpleName();
-
-    @Inject Library mLibrary;
 
     private Toolbar mToolbar;
 
@@ -135,6 +117,8 @@ public class FeedActivity extends TopActivity {
     private FeedViewAdapter mAdapter;
     private String mUrl;
 
+    private rx.Subscription mRxSubscription;
+
     /**
      *  This scrim's opacity is controlled in two different ways. 1) Before the initial entrance
      *  animation finishes, the opacity is animated by a value animator. This is designed to
@@ -144,11 +128,11 @@ public class FeedActivity extends TopActivity {
     private ColorDrawable mWindowScrim;
     private boolean mIsEntranceAnimationFinished;
 
-    public static final String FEED_ACTIVITY_EXTRA = "FeedActivityExtra";   // NoI18N
-    public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";      // NoI18N
-    public static final String SUBSCRIPTION_URL_KEY = "url";                // NoI18N
-    public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";  // NoI18N
-    public static final String EPISODES_SLIM_KEY = "SlimEpisodes";          // NoI18N
+    public static final String FEED_ACTIVITY_EXTRA = "FeedActivityExtra";
+    public static final String FEED_ACTIVITY_IS_SLIM = "SlimActivity";
+    public static final String SUBSCRIPTION_URL_KEY = "url";
+    public static final String SUBSCRIPTION_SLIM_KEY = "SlimSubscription";
+    public static final String EPISODES_SLIM_KEY = "SlimEpisodes";
 
     protected ISubscription mSubscription = null;
     protected ProgressDialog mProgress;
@@ -163,7 +147,6 @@ public class FeedActivity extends TopActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        DependencyInjector.applicationComponent().inject(this);
         mSubscription = null;
 
         super.onCreate(savedInstanceState);
@@ -175,26 +158,27 @@ public class FeedActivity extends TopActivity {
         processIntent();
 
         if (mSubscription == null) {
-            VendorCrashReporter.report("FeedActivity", "Subscription can not be null"); // NoI18N
+            VendorCrashReporter.report("FeedActivity", "Subscription can not be null");
             return;
         }
 
         mSwipeIcon = BitmapFactory.decodeResource(getResources(), PlaylistFragment.sSwipeHearingIconID);
 
-        Log.d(TAG, "Showing: " + mSubscription); // NoI18N
+        Log.d(TAG, "Showing: " + mSubscription);
 
         setContentView(R.layout.feed_activity);
 
         mAdapter = getAdapter();
 
-        mPhotoView              = findViewById(R.id.photo);
-        mNoEpisodesView         = findViewById(R.id.feed_recycler_view_empty);
-        mNoEpisodesReason       = findViewById(R.id.feed_recycler_view_empty_body);
-        mMultiShrinkScroller    = findViewById(R.id.multiscroller);
-        mFloatingButton         = findViewById(R.id.feedview_fap_button);
-        mRevealLayout           = findViewById(R.id.feed_activity_settings_container);
-        mRecyclerView           = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
-        mToolbar                = findViewById(R.id.feed_view_toolbar);
+        mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
+
+        mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
+        mNoEpisodesView = (LinearLayout) findViewById(R.id.feed_recycler_view_empty);
+        mNoEpisodesReason = (TextView) findViewById(R.id.feed_recycler_view_empty_body);
+        mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
+        mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
+        mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
+        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
 
         setViewState(mSubscription);
 
@@ -206,6 +190,14 @@ public class FeedActivity extends TopActivity {
                 @Override
                 public void OnSettingsChanged(boolean isChecked) {
                     mAdapter.setOrder(mAdapter.calcOrder());
+                }
+            });
+
+            mSubscriptionSettingsUtils.setHideListenedListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
+                @Override
+                public void OnSettingsChanged(boolean isChecked) {
+                    mAdapter.setShowListened(!isChecked); // HIDE listened vs DO SHOW listened
+                    mAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -234,6 +226,8 @@ public class FeedActivity extends TopActivity {
             });
         }
 
+        mToolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
+
         mToolbar.setTitle(mSubscription.getTitle());
         setSupportActionBar(mToolbar);
 
@@ -249,42 +243,13 @@ public class FeedActivity extends TopActivity {
         mWindowScrim.setAlpha(0);
         getWindow().setBackgroundDrawable(mWindowScrim);
 
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setBackgroundColor(ColorUtils.getBackgroundColor(this));
 
         mRecyclerView.setAdapter(mAdapter);
-
-        LiveData<ISubscription> subscription = mLibrary.getLiveSubscription(mSubscription.getURLString());
-        FeedActivityViewModel viewModel = ViewModelProviders.of(this).get(FeedActivityViewModel.class);
-        if (subscription != null) {
-            viewModel.setLiveSubscription(subscription);
-            //viewModel.setLiveEpisodes(subscription.getValue().getLiveEpisodes());
-        }
-
-        viewModel.getLiveEpisodes().observe(this, new Observer<EpisodeList<IEpisode>>() {
-            @Override
-            public void onChanged(@Nullable EpisodeList<IEpisode> iEpisodes) {
-                Log.i(TAG, "Livedata changed: " + iEpisodes);
-                if (iEpisodes != null) {
-                    mAdapter.setEpisodes(iEpisodes);
-                }
-            }
-        });
-
-        viewModel.getLiveSubscription().observe(this, new Observer<ISubscription>() {
-            @Override
-            public void onChanged(@Nullable ISubscription argSubscription) {
-                Log.i(TAG, "Livedata changed: " + argSubscription);
-                if (argSubscription != null) {
-                    setViewState(argSubscription);
-                    mAdapter.setDataset(argSubscription);
-                }
-            }
-        });
-
-        mAdapter.setDataset((ISubscription) subscription);
 
         // init swipe to dismiss logic
         ItemTouchHelper swipeToDismissTouchHelper = getItemTouchHelper(mMultiShrinkScroller);
@@ -361,6 +326,12 @@ public class FeedActivity extends TopActivity {
 
     @Override
     protected void onDestroy() {
+        if (mRxSubscription == null)
+            return;
+
+        if (mRxSubscription.isUnsubscribed())
+            mRxSubscription.unsubscribe();
+
         super.onDestroy();
     }
 
@@ -517,6 +488,25 @@ public class FeedActivity extends TopActivity {
         mAdapter.setPalette(argExtractor);
     }
 
+    /**
+     * Examine how many white pixels are in the bitmap in order to determine whether or not
+     * we need gradient overlays on top of the image.
+     */
+    private void analyzeWhitenessOfPhotoAsynchronously(@NonNull final Bitmap argBitmap) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                return WhitenessUtils.isBitmapWhiteAtTopOrBottom(argBitmap);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean isWhite) {
+                super.onPostExecute(isWhite);
+                mMultiShrinkScroller.setUseGradient(isWhite);
+            }
+        }.execute();
+    }
+
     private void setViewState(@Nullable ISubscription argSubscription) {
         mRecyclerView.setVisibility(!isEmpty(argSubscription) ? View.VISIBLE : View.GONE);
     }
@@ -544,6 +534,36 @@ public class FeedActivity extends TopActivity {
 
     private static boolean isEmpty(@Nullable ISubscription argSubscription) {
         return argSubscription == null || argSubscription.getEpisodes().size() == 0;
+    }
+
+    private rx.Subscription subscribeToChanges(@NonNull final ISubscription argSubscription,
+                                               @NonNull final FeedViewAdapter argAdapter) {
+        return SoundWaves.getRxBus()
+                .toObserverable()
+                .ofType(SubscriptionChanged.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SubscriptionChanged>() {
+                    @Override
+                    public void call(SubscriptionChanged subscriptionChanged) {
+                        @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
+                        boolean doUpdate =
+                                action == SubscriptionChanged.ADDED ||
+                                action == SubscriptionChanged.REMOVED ||
+                                action == SubscriptionChanged.LOADED;
+
+                        if (doUpdate) {
+                            setViewState(argSubscription);
+                            argAdapter.updateEpisoedsAndNotifyChanged();
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError" , throwable.toString());
+                        Log.d("FeedViewAdapter", "error: " + throwable.toString());
+                    }
+                });
     }
 
     protected void setFABDrawable(@DrawableRes int argRes) {

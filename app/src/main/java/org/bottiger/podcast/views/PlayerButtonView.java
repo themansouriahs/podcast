@@ -33,10 +33,10 @@ public class PlayerButtonView extends android.support.v7.widget.AppCompatImageBu
 
     private static final String TAG = PlayerButtonView.class.getSimpleName();
 
-    public final static int STATE_DEFAULT = 0;
-    public final static int STATE_DOWNLOAD = 1;
-    public final static int STATE_DELETE = 2;
-    public final static int STATE_QUEUE = 3;
+    public final static @DrawableRes int STATE_DEFAULT = 0;
+    public final static @DrawableRes int STATE_DOWNLOAD = 1;
+    public final static @DrawableRes int STATE_DELETE = 2;
+    public final static @DrawableRes int STATE_QUEUE = 3;
 
     private IEpisode mEpisode;
 
@@ -201,7 +201,7 @@ public class PlayerButtonView extends android.support.v7.widget.AppCompatImageBu
         void FileDeleted();
     }
 
-    public void addDownloadCompletedCallback(DownloadStatus argCallback) {
+    public void setDownloadCompletedCallback(DownloadStatus argCallback) {
         mDownloadCompletedCallback = argCallback;
     }
 

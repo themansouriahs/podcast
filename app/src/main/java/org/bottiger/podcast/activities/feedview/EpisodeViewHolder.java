@@ -25,7 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Created by aplb on 01-10-2015.
  */
-public class EpisodeViewHolder extends RecyclerView.ViewHolder {
+public class EpisodeViewHolder extends FeedViewHolder {
 
     private static final String TAG = EpisodeViewHolder.class.getSimpleName();
 

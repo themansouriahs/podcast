@@ -2,21 +2,16 @@ package org.bottiger.podcast;
 
 import android.Manifest;
 import android.app.Activity;
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -35,29 +30,19 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import org.bottiger.podcast.activities.feedview.FeedActivityViewModel;
 import org.bottiger.podcast.activities.main.PreloadGridLayoutManager;
 import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.activities.openopml.OpenOpmlFromIntentActivity;
 import org.bottiger.podcast.adapters.SubscriptionAdapter;
-import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
-import org.bottiger.podcast.fragments.subscription.SubscriptionsViewModel;
-import org.bottiger.podcast.fragments.subscription.SubscriptionsViewModelFactory;
 import org.bottiger.podcast.model.Library;
-import org.bottiger.podcast.model.datastructures.EpisodeList;
 import org.bottiger.podcast.model.events.SubscriptionChanged;
-import org.bottiger.podcast.provider.IEpisode;
-import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.OPMLImportExport;
 import org.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -66,9 +51,9 @@ import rx.schedulers.Schedulers;
 
 import static android.support.annotation.RestrictTo.Scope.TESTS;
 
-public class SubscriptionsFragment extends Fragment implements LifecycleRegistryOwner {
+public class SubscriptionsFragment extends Fragment {
 
-    private static final String TAG = SubscriptionsFragment.class.getSimpleName();
+    private static final String TAG = "SubscriptionsFragment";
 
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
@@ -95,10 +80,7 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
 
     private RecyclerView mGridView;
 
-    @Inject Library mLibrary;
-    @Inject SharedPreferences mSharedPreferences;
-
-    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
+    private Library mLibrary;
 
     private GridLayoutManager mGridLayoutmanager;
     private RelativeLayout mEmptySubscrptionList;
@@ -109,16 +91,20 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
     private Activity mActivity;
     private FrameLayout mContainerView;
 
+    private rx.Subscription mRxSubscription;
+    private rx.Subscription mRxSubscriptionChanged;
+
+    private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
     public File file;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DependencyInjector.applicationComponent().inject(this);
-
         mActivity = getActivity();
+        mLibrary = SoundWaves.getAppContext(getContext()).getLibraryInstance();
         PREF_SUBSCRIPTION_COLUMNS = mActivity.getResources().getString(R.string.pref_subscriptions_columns_key);
+        shareprefs = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
     }
 
     @Override
@@ -131,71 +117,108 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
         mContainerView = (FrameLayout) inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
-        mEmptySubscrptionList                   = mContainerView.findViewById(R.id.subscription_empty);
-        mEmptySubscrptionImportOPMLButton       = mContainerView.findViewById(R.id.import_opml_button);
-        mGridContainerView                      = mContainerView.findViewById(R.id.subscription_grid_container);
-        mGridView                               = mContainerView.findViewById(R.id.gridview);
+        mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
+        mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
+
+        mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
 
         //RecyclerView
         mAdapter = createAdapter();
         setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
+
+        mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
+
 
         mGridLayoutmanager = new PreloadGridLayoutManager(getActivity(), numberOfColumns());
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
 
-        SubscriptionsViewModelFactory factory = new SubscriptionsViewModelFactory(this.getActivity().getApplication(), mLibrary);
-        SubscriptionsViewModel viewModel = ViewModelProviders.of(this, factory).get(SubscriptionsViewModel.class);
+        mRxSubscription = mLibrary.mSubscriptionsChangeObservable
+                .onBackpressureLatest()
+                .ofType(Subscription.class)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Subscription>() {
+                    @Override
+                    public void call(Subscription argSubscription) {
+                        Log.v(TAG, "Recieved Subscription event: " + argSubscription.getId());
+                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
+                        setSubscriptionFragmentLayout(subscriptions.size());
 
-        viewModel.getLiveSubscription().observe(this, new Observer<Subscription>() {
-            @Override
-            public void onChanged(@Nullable Subscription argSubscription) {
-                Log.i(TAG, "Livedata changed: " + argSubscription);
-                if (argSubscription != null) {
-                    Log.v(TAG, "Recieved Subscription event: " + argSubscription.getId());
-                    SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
-                    setSubscriptionFragmentLayout(subscriptions.size());
+                        mGridLayoutmanager.setSpanCount(numberOfColumns());
+                        mAdapter.setDataset(subscriptions);
 
-                    mGridLayoutmanager.setSpanCount(numberOfColumns());
-                    mAdapter.setDataset(subscriptions);
-
-                    if (!mGridView.isComputingLayout()) {
-                        mAdapter.notifyDataSetChanged();
-                    }
-                }
-            }
-        });
-
-        viewModel.getLiveSubscriptionChanged().observe(this, new Observer<SubscriptionChanged>() {
-            @Override
-            public void onChanged(@Nullable SubscriptionChanged itemChangedEvent) {
-                try {
-                    Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
-                    // Update the subscription fragment when a image is updated in an subscription
-                    SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
-                    Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
-
-                    int index = subscriptions.indexOf(subscription); // doesn't work
-                    for (int i = 0; i < subscriptions.size(); i++) {
-                        Subscription currentSubscription = subscriptions.get(i);
-                        if (subscription != null && subscription.equals(currentSubscription)) {
-                            index = i;
-                            break;
+                        if (!mGridView.isComputingLayout()) {
+                            mAdapter.notifyDataSetChanged();
                         }
                     }
-
-                    if (!mGridView.isComputingLayout()) {
-                        mAdapter.notifyItemChanged(index);
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.report("subscribeError", throwable.toString());
+                        Log.d(TAG, "error: " + throwable.toString());
                     }
-                } catch (Exception e) {
-                    Log.wtf(TAG, e.toString());
-                }
-            }
-        });
+                });
+
+
+        mRxSubscriptionChanged = SoundWaves.getRxBus()
+                .toObserverable()
+                .onBackpressureBuffer(10000)
+                .ofType(SubscriptionChanged.class)
+                .filter(new Func1<SubscriptionChanged, Boolean>() {
+                    @Override
+                    public Boolean call(SubscriptionChanged subscriptionChanged) {
+                        return subscriptionChanged.getAction() == SubscriptionChanged.CHANGED;
+                    }
+                })
+                .subscribe(new Action1<SubscriptionChanged>() {
+                    @Override
+                    public void call(SubscriptionChanged itemChangedEvent) {
+                        Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
+                        // Update the subscription fragment when a image is updated in an subscription
+                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
+                        Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
+
+                        int index = subscriptions.indexOf(subscription); // doesn't work
+                        for (int i = 0; i < subscriptions.size(); i++) {
+                            Subscription currentSubscription = subscriptions.get(i);
+                            if (subscription != null && subscription.equals(currentSubscription)) {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (!mGridView.isComputingLayout()) {
+                            mAdapter.notifyItemChanged(index);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                    }
+                });
 
         return mContainerView;
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
+            mRxSubscription.unsubscribe();
+        }
+        if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isUnsubscribed()) {
+            mRxSubscriptionChanged.unsubscribe();
+        }
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -214,10 +237,12 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
             }
         });
 
-        SortedList<Subscription> subscriptions = mLibrary.getLiveSubscriptions().getValue();
-        if (subscriptions != null) {
-            mAdapter.setDataset(subscriptions);
-        }
+        mAdapter.setDataset(mLibrary.getSubscriptions());
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
     @Override
@@ -319,7 +344,7 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
     }
 
     private int numberOfColumns() {
-        String number = mSharedPreferences.getString(PREF_SUBSCRIPTION_COLUMNS, "5");
+        String number = shareprefs.getString(PREF_SUBSCRIPTION_COLUMNS, "5");
         int intVal = Integer.parseInt(number);
         int numColumns = -1;
 
@@ -428,11 +453,6 @@ public class SubscriptionsFragment extends Fragment implements LifecycleRegistry
                 Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_clipboard_toast), Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return lifecycleRegistry;
     }
 
     @RestrictTo(TESTS)

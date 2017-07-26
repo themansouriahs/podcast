@@ -59,16 +59,17 @@ public class DateUtils {
     }};
 
     private static final Map<String, String> UNSUPPORTED_TIME_ZONE = new HashMap<String, String>() {{
-        put("BST", "GMT+0100");
-        put("PST", "GMT-0800");
-        put("PDT", "GMT-0700");
-        put("EST", "GMT-0500");
-        put("EDT", "GMT-0400");
+        // There MUST be a colon between hours and minutes,
+        // see http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html for details.
+        put("BST", "GMT+01:00");
+        put("PST", "GMT-08:00");
+        put("PDT", "GMT-07:00");
+        put("EST", "GMT-05:00");
+        put("EDT", "GMT-04:00");
     }};
 
     private static final Map<String, SimpleDateFormat> SIMPLE_DATE_FORMATS_LUT = new HashMap<>(DATE_FORMAT_REGEXPS.size());
     private static Pattern[] sDateFormatKeys = null;
-    private static SimpleDateFormat sSimpleDateFormatCache = null;
 
     public interface Hint {
         Pattern get();
@@ -109,22 +110,38 @@ public class DateUtils {
      */
     public static synchronized Date parse(@NonNull String dateString, @NonNull String dateFormat) throws ParseException {
 
-        SimpleDateFormat simpleDateFormat = sSimpleDateFormatCache;
+        Locale[] locales = {
+                Locale.getDefault(),
+                Locale.US, // Fallback locale for English day/month names (EEE/MMM)
+        };
+        dateString = fixUnsupportedTimeZones(dateString);
 
-        try {
-            // This is a hack to deal with time zones not known to Java
-            Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                dateString = dateString.replace(pair.getKey().toString(), pair.getValue().toString());
+        for (int i = 0; i < locales.length; i++) {
+            Locale locale = locales[i];
+            boolean last = i == locales.length - 1;
+            try {
+                SimpleDateFormat simpleDateFormat = getSimpleDateFormat(dateFormat, locale);
+                return simpleDateFormat.parse(dateString);
+            } catch (ParseException e) {
+                if (last) {
+                    throw e;
+                }
             }
-
-            simpleDateFormat = getSimpleDateFormat(dateFormat);
-            return simpleDateFormat.parse(dateString);
-        } catch (ParseException pe) {
-            ParseException pe2 = pe;
-            return simpleDateFormat.parse(dateString);
         }
+
+        // Will never be executed, only to satisfy code analysis
+        return null;
+    }
+
+    private static String fixUnsupportedTimeZones(@NonNull String dateString) {
+        String result = dateString;
+        // This is a hack to deal with time zones not known to Java
+        Iterator it = UNSUPPORTED_TIME_ZONE.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            result = result.replace(pair.getKey().toString(), pair.getValue().toString());
+        }
+        return result;
     }
 
     // Validators ---------------------------------------------------------------------------------
@@ -230,15 +247,16 @@ public class DateUtils {
         return sDateFormatKeys;
     }
 
-    private static SimpleDateFormat getSimpleDateFormat(@NonNull String argDateFormat) {
-        SimpleDateFormat simpleDateFormat = SIMPLE_DATE_FORMATS_LUT.get(argDateFormat);
+    private static SimpleDateFormat getSimpleDateFormat(@NonNull String argDateFormat, Locale locale) {
+        String lutKey = argDateFormat + locale.toString();
+        SimpleDateFormat simpleDateFormat = SIMPLE_DATE_FORMATS_LUT.get(lutKey);
 
         if (simpleDateFormat == null) {
             synchronized (SIMPLE_DATE_FORMATS_LUT) {
-                simpleDateFormat = new SimpleDateFormat(argDateFormat, Locale.getDefault());
+                simpleDateFormat = new SimpleDateFormat(argDateFormat, locale);
                 simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
 
-                SIMPLE_DATE_FORMATS_LUT.put(argDateFormat, simpleDateFormat);
+                SIMPLE_DATE_FORMATS_LUT.put(lutKey, simpleDateFormat);
             }
         }
 

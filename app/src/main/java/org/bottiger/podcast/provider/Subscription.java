@@ -65,6 +65,8 @@ public class Subscription extends BasePodcastSubscription {
 	private static final int NOTIFY_ON_NEW = (1 << 21);
 	private static final int PIN_AT_TOP_SET = (1 << 22);
 	private static final int PIN_AT_TOP = (1 << 23);
+	private static final int SHOW_LISTENED_SET = (1 << 24);
+	private static final int SHOW_LISTENED = (1 << 25);
 
 	private final int mOldestFirstID = R.string.pref_list_oldest_first_key;
 	private final int mDeleteAfterPlaybackID = R.string.pref_delete_when_finished_key;
@@ -511,6 +513,25 @@ public class Subscription extends BasePodcastSubscription {
 			mSettings |= SKIP_INTRO;
 		else
 			mSettings &= ~SKIP_INTRO;
+
+		notifyPropertyChanged(null);
+	}
+
+	public boolean doShowListened() {
+		if (!IsSettingEnabled(SHOW_LISTENED_SET))
+			return true;
+
+		return IsSettingEnabled(SHOW_LISTENED);
+	}
+
+	public void setShowListened(boolean argDoShowListened) {
+		mSettings = mSettings < 0 ? 0 : mSettings;
+		mSettings |= SHOW_LISTENED_SET;
+
+		if (argDoShowListened)
+			mSettings |= SHOW_LISTENED;
+		else
+			mSettings &= ~SHOW_LISTENED;
 
 		notifyPropertyChanged(null);
 	}

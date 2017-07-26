@@ -1,6 +1,5 @@
 //apply plugin: 'idea'
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 android {
 
@@ -30,8 +29,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 389        // even - release. Odd - development
-        versionName "0.158.9" // even - release. Odd - development
+        versionCode 391        // even - release. Odd - development
+        versionName "0.158.11" // even - release. Odd - development
         multiDexEnabled = true
 
         vectorDrawables.useSupportLibrary = true
@@ -54,7 +53,6 @@ android {
     // and there will be a point later where keeping control over this is important
     sourceSets.main {
         jni.srcDirs = ["src/main/jni"];
-        java.srcDirs += 'src/main/kotlin'
     }
     lintOptions {
         checkReleaseBuilds false
@@ -167,8 +165,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:multidex:1.0.1'
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-
     compile "com.android.support:support-v4:$supportLibraryVersion"
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
@@ -180,7 +176,6 @@ dependencies {
 
     compile "android.arch.lifecycle:runtime:$architectureComponentsVersion"
     compile "android.arch.lifecycle:extensions:$architectureComponentsVersion"
-    compile "android.arch.lifecycle:reactivestreams:$architectureComponentsVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$architectureComponentsVersion"
     compile "android.arch.persistence.room:runtime:$architectureComponentsVersion"
     annotationProcessor "android.arch.persistence.room:compiler:$architectureComponentsVersion"
@@ -203,18 +198,17 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
 
     compile 'io.requery:sqlite-android:3.19.2'
-    compile 'com.google.android.exoplayer:exoplayer:r2.4.2'
-    compile('com.wdullaer:materialdatetimepicker:3.1.1')  {
+    compile 'com.google.android.exoplayer:exoplayer:r2.4.3'
+    compile('com.wdullaer:materialdatetimepicker:3.1.1') {
         exclude group: 'com.android.support'
     }
 
     // Glide
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
-    compile 'com.github.bumptech.glide:okhttp3-integration:4.0.0-RC0'
-    compile 'com.github.bumptech.glide:annotations:4.0.0-RC0'
-    //compile 'com.github.bumptech.glide:compiler:4.0.0-RC0'
-    //compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC0"
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    compile 'com.github.bumptech.glide:okhttp3-integration:4.0.0-RC1'
+    compile 'com.github.bumptech.glide:compiler:4.0.0-RC1'
+    compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC1"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
 
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'
@@ -282,17 +276,5 @@ dependencies {
     // google cast
     compile project(':soundwavescommon')
 }
-
-/*
-task assembleNonFreeRelease << {
-    apply plugin: 'com.google.gms.google-services'
-}
-
-tasks.whenTaskAdded { task ->
-        task.dependsOn assembleNonFreeRelease
-}*/
-//preBuild.dependsOn assembleNonFreeRelease
-
-
 
 apply plugin: 'com.google.gms.google-services'

@@ -111,9 +111,9 @@ public class TopActivity extends AppCompatActivity implements LifecycleRegistryO
 
     @Override
     protected void onPause() {
-        super.onPause();
         if (SoundWaves.sAnalytics != null)
             SoundWaves.sAnalytics.activityPause();
+        super.onPause();
     }
 
     @Override
