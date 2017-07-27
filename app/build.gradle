@@ -215,6 +215,7 @@ dependencies {
     compile 'com.github.bumptech.glide:compiler:4.0.0-RC1'
     compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC1"
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
+    testAnnotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
 
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'

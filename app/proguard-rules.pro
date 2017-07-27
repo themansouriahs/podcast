@@ -16,7 +16,7 @@
 #   public *;
 #}
 
--dontoptimize
+#-dontoptimize
 
 -keep class org.bottiger.podcast.** {*;}
 -keep class com.dragontek.mygpoclient.** {*;}
@@ -52,14 +52,10 @@ public static *** w(...);
 #public static *** wtf(...);
     }
 
-# otto
--keepattributes *Annotation*
--keepclassmembers class ** {
-    @com.squareup.otto.Subscribe public *;
-    @com.squareup.otto.Produce public *;
-}
-
 #glide
+-keep public class * implements com.bumptech.glide.**
+-keep public class * extends com.bumptech.glide.**
+
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.AppGlideModule
 -keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
@@ -68,6 +64,13 @@ public static *** w(...);
 }
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
 -keep class com.bumptech.glide.GeneratedAppGlideModuleImpl
+
+-dontwarn com.squareup.**
+-dontwarn com.bumptech.**
+
+#Room
+-dontwarn android.arch.util.paging.CountedDataSource
+-dontwarn android.arch.persistence.room.paging.LimitOffsetDataSource
 
 # okhttp
 -dontwarn okhttp3.**
