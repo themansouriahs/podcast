@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.support.v7.graphics.Palette;
 import android.support.v7.util.SortedList;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
@@ -187,7 +188,7 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
 
     public void setImageURL(String argUrl) {
 
-        if (argUrl == null)
+        if (TextUtils.isEmpty(argUrl))
             return;
 
         argUrl = argUrl.trim();
@@ -196,7 +197,7 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
             return;
 
         mImageURL = argUrl;
-        notifyPropertyChanged(null);
+        notifyPropertyChanged(SubscriptionChanged.CHANGED, "UpdatedImage"); // NoI18N
     }
 
     public void setURL(String argUrl) {

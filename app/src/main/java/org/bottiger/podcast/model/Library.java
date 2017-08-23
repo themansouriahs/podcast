@@ -35,8 +35,10 @@ import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.SubscriptionColumns;
 import org.bottiger.podcast.provider.SubscriptionLoader;
+import org.bottiger.podcast.provider.base.BaseEpisode;
 import org.bottiger.podcast.utils.PreferenceHelper;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.rxbus.RxBasicSubscriber;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -52,6 +54,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -218,6 +221,34 @@ public class Library {
                         Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                     }
                 });
+
+        SoundWaves.getRxBus2()
+                .toFlowableCommon()
+                .ofType(ItemChanged.class)
+                .subscribe(new RxBasicSubscriber<ItemChanged>() {
+                    @Override
+                    public void onNext(ItemChanged changedEvent) {
+                        if (changedEvent instanceof EpisodeChanged) {
+                            handleChangedEvent((EpisodeChanged) changedEvent);
+                            return;
+                        }
+
+                        if (changedEvent instanceof SubscriptionChanged) {
+                            handleChangedEvent((SubscriptionChanged) changedEvent);
+                            return;
+                        }
+                    }
+                });
+
+        /*
+, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        VendorCrashReporter.handleException(throwable);
+                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+                    }
+                }
+         */
     }
 
     private void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
