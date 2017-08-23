@@ -160,9 +160,9 @@ repositories {
 
 //dependencies
 ext.espressoVersion = '2.2.2'
-ext.supportLibraryVersion = '26.0.0'
-ext.playServicesVersion = '11.0.2'
-ext.architectureComponentsVersion = '1.0.0-alpha6'
+ext.supportLibraryVersion = '26.0.1'
+ext.playServicesVersion = '11.2.0'
+ext.architectureComponentsVersion = '1.0.0-alpha9'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -210,12 +210,12 @@ dependencies {
     }
 
     // Glide
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
-    compile 'com.github.bumptech.glide:okhttp3-integration:4.0.0-RC1'
-    compile 'com.github.bumptech.glide:compiler:4.0.0-RC1'
-    compile "com.github.bumptech.glide:recyclerview-integration:4.0.0-RC1"
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
-    testAnnotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
+    compile 'com.github.bumptech.glide:glide:4.0.0'
+    compile 'com.github.bumptech.glide:okhttp3-integration:4.0.0'
+    compile 'com.github.bumptech.glide:compiler:4.0.0'
+    compile "com.github.bumptech.glide:recyclerview-integration:4.0.0"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
+    testAnnotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
 
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'
