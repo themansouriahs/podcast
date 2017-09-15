@@ -267,7 +267,7 @@ public class Library {
             mSubscriptionLock.lock();
             if (!subscription.IsSubscribed() &&
                 mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
-                    Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag());
+                    Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag()); // NoI18N
                     mActiveSubscriptions.remove(subscription);
                     mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
                     mSubscriptionsChangePublisher.onNext(subscription);
@@ -284,6 +284,8 @@ public class Library {
             case SubscriptionChanged.ADDED:
             case SubscriptionChanged.REMOVED:
             case SubscriptionChanged.SUBSCRIBED:
+            case SubscriptionChanged.LOADED:
+                break;
         }
     }
 

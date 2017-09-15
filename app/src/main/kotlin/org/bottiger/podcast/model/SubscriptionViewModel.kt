@@ -1,8 +1,12 @@
 package org.bottiger.podcast.model
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.SharedPreferences
+import android.support.v7.util.SortedList
+import org.bottiger.podcast.SoundWaves
 import org.bottiger.podcast.provider.IEpisode
 import org.bottiger.podcast.provider.ISubscription
 import org.bottiger.podcast.provider.Subscription
@@ -10,7 +14,13 @@ import org.bottiger.podcast.provider.Subscription
 /**
  * Created by aplb on 21-06-2017.
  */
-class LiveSubscription(argSubscription: ISubscription): LiveData<ISubscription>() {
+class SubscriptionViewModel: AndroidViewModel {
+
+    val subscriptions : LiveData<SortedList<Subscription>>
+
+    constructor(application: SoundWaves) : super(application) {
+         subscriptions = application.libraryInstance.liveSubscriptions;
+    }
 
     /*
     constructor(argSharedPreferences: SharedPreferences) : super(argSharedPreferences) {}

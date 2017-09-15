@@ -2,6 +2,8 @@ package org.bottiger.podcast;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleFragment;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,6 +14,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -51,7 +54,7 @@ import rx.schedulers.Schedulers;
 
 import static android.support.annotation.RestrictTo.Scope.TESTS;
 
-public class SubscriptionsFragment extends Fragment {
+public class SubscriptionsFragment extends LifecycleFragment {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -91,7 +94,6 @@ public class SubscriptionsFragment extends Fragment {
     private Activity mActivity;
     private FrameLayout mContainerView;
 
-    private rx.Subscription mRxSubscription;
     private rx.Subscription mRxSubscriptionChanged;
 
     private SharedPreferences shareprefs;
@@ -134,33 +136,20 @@ public class SubscriptionsFragment extends Fragment {
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
 
-        mRxSubscription = mLibrary.mSubscriptionsChangeObservable
-                .onBackpressureLatest()
-                .ofType(Subscription.class)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Subscription>() {
-                    @Override
-                    public void call(Subscription argSubscription) {
-                        Log.v(TAG, "Recieved Subscription event: " + argSubscription.getId());
-                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
-                        setSubscriptionFragmentLayout(subscriptions.size());
+        mLibrary.getLiveSubscriptions().observe(this, new Observer<SortedList<Subscription>>() {
+            @Override
+            public void onChanged(@Nullable SortedList<Subscription> subscriptionSortedList) {
+                Log.v(TAG, "Recieved Subscription event: ");
+                setSubscriptionFragmentLayout(subscriptionSortedList.size());
 
-                        mGridLayoutmanager.setSpanCount(numberOfColumns());
-                        mAdapter.setDataset(subscriptions);
+                mGridLayoutmanager.setSpanCount(numberOfColumns());
+                mAdapter.setDataset(subscriptionSortedList);
 
-                        if (!mGridView.isComputingLayout()) {
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError", throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
-                });
-
+                if (!mGridView.isComputingLayout()) {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        });
 
         mRxSubscriptionChanged = SoundWaves.getRxBus()
                 .toObserverable()
@@ -201,15 +190,13 @@ public class SubscriptionsFragment extends Fragment {
                     }
                 });
 
+
         return mContainerView;
 
     }
 
     @Override
     public void onDestroyView() {
-        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed()) {
-            mRxSubscription.unsubscribe();
-        }
         if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isUnsubscribed()) {
             mRxSubscriptionChanged.unsubscribe();
         }

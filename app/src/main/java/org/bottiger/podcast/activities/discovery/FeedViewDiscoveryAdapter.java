@@ -29,14 +29,6 @@ public class FeedViewDiscoveryAdapter extends FeedViewAdapter {
     @Override
     public FeedViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         FeedViewHolder viewHolder = super.onCreateViewHolder(viewGroup, i);
-
-        //ViewGroup.LayoutParams params = viewHolder.mPlayPauseButton.getLayoutParams();
-        //params.width = (int)mActivity.getResources().getDimension(R.dimen.playpause_button_size_small);
-        //params.height = (int)mActivity.getResources().getDimension(R.dimen.playpause_button_size_small);
-
-        //viewHolder.mPlayPauseButton.setLayoutParams(params);
-        //viewHolder.itemView.invalidate();
-
         return viewHolder;
 
     }

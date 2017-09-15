@@ -35,7 +35,7 @@ import java.util.HashSet;
  */
 public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultViewHolder> {
 
-    private static final String TAG = "DiscoverySearchAdapter";
+    private static final String TAG = DiscoverySearchAdapter.class.getSimpleName();
 
     private Activity mActivity;
     private LayoutInflater mInflater;
