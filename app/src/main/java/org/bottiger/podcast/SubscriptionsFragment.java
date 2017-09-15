@@ -119,16 +119,19 @@ public class SubscriptionsFragment extends LifecycleFragment {
         mContainerView = (FrameLayout) inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
-        mEmptySubscrptionList = (RelativeLayout) mContainerView.findViewById(R.id.subscription_empty);
-        mEmptySubscrptionImportOPMLButton = (Button) mContainerView.findViewById(R.id.import_opml_button);
+        mEmptySubscrptionList = mContainerView.findViewById(R.id.subscription_empty);
+        mEmptySubscrptionImportOPMLButton = mContainerView.findViewById(R.id.import_opml_button);
 
-        mGridContainerView = (FrameLayout) mContainerView.findViewById(R.id.subscription_grid_container);
+        mGridContainerView = mContainerView.findViewById(R.id.subscription_grid_container);
 
         //RecyclerView
         mAdapter = createAdapter();
-        setSubscriptionFragmentLayout(mLibrary.getSubscriptions().size());
 
-        mGridView = (RecyclerView) mContainerView.findViewById(R.id.gridview);
+        SortedList<Subscription> subscriptionsList = mLibrary.getLiveSubscriptions().getValue();
+        int listSize = subscriptionsList == null ? 0 : subscriptionsList.size();
+        setSubscriptionFragmentLayout(listSize);
+
+        mGridView = mContainerView.findViewById(R.id.gridview);
 
 
         mGridLayoutmanager = new PreloadGridLayoutManager(getActivity(), numberOfColumns());
@@ -140,6 +143,10 @@ public class SubscriptionsFragment extends LifecycleFragment {
             @Override
             public void onChanged(@Nullable SortedList<Subscription> subscriptionSortedList) {
                 Log.v(TAG, "Recieved Subscription event: ");
+                if (subscriptionSortedList == null) {
+                    return;
+                }
+
                 setSubscriptionFragmentLayout(subscriptionSortedList.size());
 
                 mGridLayoutmanager.setSpanCount(numberOfColumns());
@@ -348,7 +355,7 @@ public class SubscriptionsFragment extends LifecycleFragment {
         }
 
         if (numColumns == -1) {
-            if (mLibrary.getSubscriptions().size() > 3) {
+            if (mLibrary.getSubscriptionCount() > 3) {
                 numColumns = 3;
             } else {
                 numColumns = 2;

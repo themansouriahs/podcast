@@ -545,6 +545,10 @@ public class Library {
         return getSubscription(argUrl);
     }
 
+    public int getSubscriptionCount() {
+        return  mActiveSubscriptions.size();
+    }
+
     @Nullable
     public Subscription getSubscription(@NonNull Long argId, boolean doLookup) {
         if (mSubscriptionIdLUT.containsKey(argId)) {
