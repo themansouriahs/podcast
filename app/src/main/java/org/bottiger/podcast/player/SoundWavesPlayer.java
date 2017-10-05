@@ -57,7 +57,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
     @NonNull
     private NewExoPlayer mExoplayer;
 
-    private PlayerHandler mPlayerHandler;
+    private org.bottiger.podcast.player.PlayerHandler mPlayerHandler;
 
     public SoundWavesPlayer(@NonNull final Context argContext) {
         super(argContext);
@@ -248,8 +248,8 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         mIsInitialized = true;
 
-        IEpisode episode = getCurrentItem();
-        if (episode != null) {
+        //IEpisode episode = getCurrentItem();
+        if (argEpisode != null) {
             start();
             isPreparingMedia = false;
         }
@@ -268,10 +268,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
 
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mExoplayer.setPlayWhenReady(true);
-
-            //mPlayerService.notifyStatusChanged();
-
-            trackEventPlay();
+            //trackEventPlay();
         }
     }
 

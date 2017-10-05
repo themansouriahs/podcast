@@ -37,7 +37,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Created by Arvid on 8/27/2015.
  */
-public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterface {
+public abstract class SoundWavesPlayerBase implements org.bottiger.podcast.player.GenericMediaPlayerInterface {
 
     private static final String TAG = SoundWavesPlayerBase.class.getSimpleName();
 
@@ -57,7 +57,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
 
     @Nullable
     PlayerService mPlayerService;
-    PlayerStateManager mPlayerStateManager;
+    org.bottiger.podcast.player.PlayerStateManager mPlayerStateManager;
 
     @javax.annotation.Nullable
     private NotificationPlayer mNotificationPlayer;
@@ -280,19 +280,19 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     public void setRemoveSilence(boolean argDoRemoveSilence) {
     }
 
-    void trackEventPlay() {
+    void trackEventPlay(@Nullable IEpisode argEpisode) {
         if (SoundWaves.sAnalytics == null) {
             VendorCrashReporter.report("sAnalytics null", "In playerService");
         }
 
         SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.PLAY);
 
-        ISubscription sub = mPlayerService.getCurrentItem().getSubscription(mPlayerService);
+        ISubscription sub = argEpisode.getSubscription(mPlayerService);
         String url = sub != null ? sub.getURLString() : "";
         EventLogger.postEvent(mPlayerService,
                 EventLogger.LISTEN_EPISODE,
-                mPlayerService.getCurrentItem().isDownloaded(mContext) ? 1 : null,
-                mPlayerService.getCurrentItem().getURL(),
+                argEpisode.isDownloaded(mContext) ? 1 : null,
+                argEpisode.getURL(),
                 url);
 
         EventLogger.postEvent(mPlayerService,
@@ -303,7 +303,7 @@ public abstract class SoundWavesPlayerBase implements GenericMediaPlayerInterfac
     }
 
     public static long getStartPosition(@NonNull Context argContext, @NonNull IEpisode argEpisode) {
-        GenericMediaPlayerInterface player = SoundWaves.getAppContext(argContext).getPlayer();
+        org.bottiger.podcast.player.GenericMediaPlayerInterface player = SoundWaves.getAppContext(argContext).getPlayer();
         long episodeOffset = argEpisode.getOffset();
 
         if (player.isInitialized() && argEpisode.equals(player.getEpisode()))

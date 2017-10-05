@@ -174,7 +174,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
                 });
     }
 
-    void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+    public void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
         Log.d(TAG, "Update State:" + argState); // NoI18N
 
         PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);

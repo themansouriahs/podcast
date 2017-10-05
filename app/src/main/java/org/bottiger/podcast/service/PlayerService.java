@@ -336,7 +336,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 			return true;
 		}
 
-		currentItem = setCurrentItem(argEpisode);
+		currentItem = argEpisode; //setCurrentItem(argEpisode);
 
         if (triggeredManually)
             mPlaylist.setAsFrist(currentItem);
@@ -345,6 +345,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
         mPlayer.setPlaybackSpeed(speed);
         mPlayer.setDataSourceAsync(currentItem);
+
+		setCurrentItem(argEpisode);
+
 
 		updateMetadata(currentItem);
 

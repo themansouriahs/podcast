@@ -25,7 +25,7 @@ android {
     }
 
     compileSdkVersion 26
-    buildToolsVersion '26.0.0'
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
@@ -160,9 +160,9 @@ repositories {
 
 //dependencies
 ext.espressoVersion = '2.2.2'
-ext.supportLibraryVersion = '26.0.2'
-ext.playServicesVersion = '11.2.0'
-ext.architectureComponentsVersion = '1.0.0-alpha9'
+ext.supportLibraryVersion = '26.1.0'
+ext.playServicesVersion = '11.4.0'
+ext.architectureComponentsVersion = '1.0.0-beta1'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -251,8 +251,8 @@ dependencies {
     }
     // Espresso
     // https://developer.android.com/training/testing/ui-testing/espresso-testing.html
-    androidTestCompile 'com.android.support.test:runner:1.0.0'
-    androidTestCompile 'com.android.support.test:rules:1.0.0'
+    androidTestCompile 'com.android.support.test:runner:1.0.1'
+    androidTestCompile 'com.android.support.test:rules:1.0.1'
     androidTestCompile 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
     androidTestCompile 'com.squareup.okhttp3:okhttp:3.8.1'
     androidTestCompile("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
