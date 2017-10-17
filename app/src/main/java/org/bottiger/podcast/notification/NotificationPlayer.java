@@ -14,12 +14,12 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -258,12 +258,12 @@ public class NotificationPlayer extends BroadcastReceiver {
         NotificationCompat.Action actionNext = new NotificationCompat.Action(next, "Next", pendingNextIntent);
         NotificationCompat.Action actionClear = new NotificationCompat.Action(clear, "Clear", pendingClearIntent);
 
-        NotificationCompat.MediaStyle mediaStyle = new NotificationCompat.MediaStyle();
+        android.support.v4.media.app.NotificationCompat.MediaStyle mediaStyle = new android.support.v4.media.app.NotificationCompat.MediaStyle();
         mediaStyle.setShowActionsInCompactView(1, 2);
         mediaStyle.setShowCancelButton(true);
         MediaSessionCompat.Token mediaSessionToken = mPlayerService.getPlayerStateManager().getToken();
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mPlayerService);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mPlayerService, NotificationChannels.CHANNEL_ID_PLAYER);
         mBuilder.setSmallIcon(smallIcon);
         mBuilder.setContentTitle(title);
         mBuilder.setContentText(content);
@@ -322,7 +322,9 @@ public class NotificationPlayer extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getActivity(mPlayerService.getApplicationContext(), 0, intent, 0);
         mBuilder.setContentIntent(pendingIntent);
 
-        mBuilder.setChannelId(NotificationChannels.CHANNEL_ID_PLAYER);
+        // Set in the constructor
+        //mBuilder.setChannelId(NotificationChannels.CHANNEL_ID_PLAYER);
+        mBuilder.setSound(null);
 
         return mBuilder;
     }

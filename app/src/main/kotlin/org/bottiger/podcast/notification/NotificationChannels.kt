@@ -28,6 +28,7 @@ object NotificationChannels {
         val name = resources.getString(R.string.channel_name_player)
         val importance = NotificationManagerCompat.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(CHANNEL_ID_PLAYER, name, importance)
+        channel.setSound(null, null);
 
         val notificationManager = argContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
