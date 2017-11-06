@@ -56,3 +56,4 @@ app/google-services.json
 google-services.json
 app/.externalNativeBuild/
 keystore.properties
+*.jks
