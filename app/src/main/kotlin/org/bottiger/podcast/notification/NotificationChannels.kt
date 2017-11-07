@@ -26,7 +26,7 @@ object NotificationChannels {
         // The user-visible name of the channel.
         val resources = argContext.resources;
         val name = resources.getString(R.string.channel_name_player)
-        val importance = NotificationManagerCompat.IMPORTANCE_DEFAULT
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(CHANNEL_ID_PLAYER, name, importance)
         channel.setSound(null, null);
 
@@ -42,7 +42,7 @@ object NotificationChannels {
         // The user-visible name of the channel.
         val resources = argContext.resources;
         val name = resources.getString(R.string.channel_name_episodes)
-        val importance = NotificationManagerCompat.IMPORTANCE_DEFAULT
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(CHANNEL_ID_ALL_EPISODES, name, importance)
 
         channel.setShowBadge(true)
@@ -58,7 +58,7 @@ object NotificationChannels {
         val resources = argContext.resources;
         val name = argSubscription.title;
         val group = resources.getString(R.string.channel_name_subscriptions)
-        val importance = NotificationManagerCompat.IMPORTANCE_MIN
+        val importance = NotificationManager.IMPORTANCE_MIN
         val channel_id = getChannelId(argSubscription)
         val channel = NotificationChannel(channel_id, name, importance)
 
