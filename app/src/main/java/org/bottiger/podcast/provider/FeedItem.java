@@ -529,6 +529,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 	}
 
 	// in ms
+	private static final int PERSIST_INTERVAL_MS = 15_000;
 	private static long lastPositionUpdate = System.currentTimeMillis();
 	public long setPosition(long pos, boolean forceWrite) {
 
@@ -540,7 +541,7 @@ public class FeedItem extends BaseEpisode implements Comparable<FeedItem> {
 
 		long now = System.currentTimeMillis();
 		// more than a second ago
-		if (forceWrite || (offset == -1 && pos > offset) || (now - lastPositionUpdate) > 5000) {
+		if (forceWrite || (offset == -1 && pos > offset) || (now - lastPositionUpdate) > PERSIST_INTERVAL_MS) {
 			notifyPropertyChanged(EpisodeChanged.PLAYING_PROGRESS);
 			lastPositionUpdate = now;
 		}

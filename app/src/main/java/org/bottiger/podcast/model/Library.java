@@ -289,18 +289,29 @@ public class Library {
         }
     }
 
-    public void handleChangedEvent(EpisodeChanged argEpisodeChanged) {
+    private void handleChangedEvent(EpisodeChanged argEpisodeChanged) {
         @EpisodeChanged.Action int action = argEpisodeChanged.getAction();
-        if (action == EpisodeChanged.PARSED) {
-            if (mEpisodesUrlLUT.containsKey(argEpisodeChanged.getUrl()))
-                return;
-        }
 
-        if (action == EpisodeChanged.CHANGED ||
-            action == EpisodeChanged.ADDED ||
-            action == EpisodeChanged.REMOVED) {
-            IEpisode episode = getEpisode(argEpisodeChanged.getId());
-            updateEpisode(episode);
+        switch (action) {
+            case EpisodeChanged.DOWNLOADED:
+            case EpisodeChanged.DOWNLOAD_PROGRESS:
+            case EpisodeChanged.FILE_DELETED:
+                break;
+            case EpisodeChanged.PARSED: {
+                if (mEpisodesUrlLUT.containsKey(argEpisodeChanged.getUrl()))
+                    return;
+
+                break;
+            }
+            case EpisodeChanged.ADDED:
+            case EpisodeChanged.REMOVED:
+            case EpisodeChanged.CHANGED:
+            case EpisodeChanged.PLAYING_PROGRESS: {
+                IEpisode episode = getEpisode(argEpisodeChanged.getId());
+                if (episode != null)
+                    updateEpisode(episode);
+                break;
+            }
         }
     }
 

@@ -87,7 +87,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     private rx.Subscription mRxSubscription_episodes;
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
-
 	public Playlist(@NonNull Context argContext, int length) {
 		this(argContext, length, false);
 	}
@@ -507,7 +506,7 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
         }
         return result;
     }
-    
+
     /**
 	 * 
 	 *
