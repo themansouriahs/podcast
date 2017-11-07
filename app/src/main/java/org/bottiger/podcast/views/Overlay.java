@@ -59,9 +59,9 @@ public class Overlay extends FrameLayout {
     @Override
     public void onFinishInflate() {
         super.onFinishInflate();
-        mBackwards = (TextView) findViewById(R.id.seekbar_time_backwards);
-        mCurrent =   (TextView) findViewById(R.id.seekbar_time_current);
-        mForwards =  (TextView) findViewById(R.id.seekbar_time_forward);
+        mBackwards = findViewById(R.id.seekbar_time_backwards);
+        mCurrent =   findViewById(R.id.seekbar_time_current);
+        mForwards =  findViewById(R.id.seekbar_time_forward);
     }
 
     private void init() {
@@ -81,8 +81,15 @@ public class Overlay extends FrameLayout {
         mStringBuilder.setLength(0);
         boolean positiveOffset = argOffsetMs >= 0;
 
+        long currentTimeMs = Math.max(argCurrentTimeMs, 0);
+        long offsetMs = argOffsetMs;
+
+        if (!positiveOffset && Math.abs(offsetMs) > currentTimeMs) {
+            offsetMs = -currentTimeMs;
+        }
+
         mStringBuilder.append(positiveOffset ? "+" : "-");
-        mStringBuilder.append(StrUtils.formatTime(argOffsetMs));
+        mStringBuilder.append(StrUtils.formatTime(offsetMs));
 
         TextView current = mCurrent;
         TextView forward = mForwards;
@@ -93,7 +100,7 @@ public class Overlay extends FrameLayout {
             return;
         }
 
-        current.setText(StrUtils.formatTime(argCurrentTimeMs));
+        current.setText(StrUtils.formatTime(currentTimeMs));
         forward.setText(positiveOffset ? mStringBuilder.toString() : "");
         backward.setText(positiveOffset ? "" : mStringBuilder.toString());
     }

@@ -152,7 +152,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         Log.d(TAG, "Update media: episode: " + argEpisode); // NoI18N
 
         final MediaMetadataCompat.Builder mMetaBuilder = new MediaMetadataCompat.Builder();
-        populateFastMediaMetadata(mMetaBuilder, argEpisode);
+        populateFastMediaMetadata(mMetaBuilder, argEpisode, mPlayerService);
 
         int bitmapSize = 512;
 
@@ -198,18 +198,18 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         return wasHandled;
     }
 
-    private void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder, @NonNull IEpisode argEpisode) {
-        ISubscription subscription = argEpisode.getSubscription(mPlayerService);
+    public static void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder,
+                                                  @NonNull IEpisode argEpisode,
+                                                  @NonNull PlayerService argPlayerService) {
+        ISubscription subscription = argEpisode.getSubscription(argPlayerService);
         String author = !TextUtils.isEmpty(argEpisode.getAuthor()) ? argEpisode.getAuthor() : subscription.getTitle();
 
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, argEpisode.getURL());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_TITLE, argEpisode.getTitle());
         mMetaBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, argEpisode.getDuration());
         mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ARTIST, author);
-        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, argEpisode.getArtwork(mPlayerService));
-
-        if (subscription != null)
-            mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, subscription.getTitle());
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, argEpisode.getArtwork(argPlayerService));
+        mMetaBuilder.putText(MediaMetadataCompat.METADATA_KEY_ALBUM, subscription.getTitle());
     }
 
     private PlaybackStateCompat.Builder getPlaybackState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {

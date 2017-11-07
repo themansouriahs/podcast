@@ -250,7 +250,11 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	@Override
 	public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-		result.sendResult(new LinkedList<MediaBrowserCompat.MediaItem>());
+		List<MediaBrowserCompat.MediaItem> items = new LinkedList<>();
+		if (mPlaylist != null) {
+			items = mPlaylist.getMediaItems(this);
+		}
+		result.sendResult(items);
 	}
 
 	/**

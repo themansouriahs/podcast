@@ -3,11 +3,14 @@ package org.bottiger.podcast.playlist;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.util.SortedList;
 import android.text.TextUtils;
@@ -32,6 +35,7 @@ import org.bottiger.podcast.service.PlayerService;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.Observable;
@@ -41,6 +45,8 @@ import io.reactivex.Single;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static org.bottiger.podcast.player.PlayerStateManager.populateFastMediaMetadata;
 
 public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -81,7 +87,6 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
     private rx.Subscription mRxSubscription_episodes;
 
 	// http://stackoverflow.com/questions/1036754/difference-between-wait-and-sleep
-
 	public Playlist(@NonNull Context argContext, int length) {
 		this(argContext, length, false);
 	}
@@ -489,7 +494,20 @@ public class Playlist implements SharedPreferences.OnSharedPreferenceChangeListe
 
     }
 
-	/**
+    public List<MediaBrowserCompat.MediaItem> getMediaItems(@NonNull PlayerService argPlayerService) {
+        List<MediaBrowserCompat.MediaItem> result = new ArrayList<>();
+        MediaBrowserCompat.MediaItem item;
+        for (IEpisode episode : mInternalPlaylist) {
+            final MediaMetadataCompat.Builder mMetaBuilder = new MediaMetadataCompat.Builder();
+            populateFastMediaMetadata(mMetaBuilder, episode, argPlayerService);
+            MediaMetadataCompat metadata = mMetaBuilder.build();
+            item = new MediaBrowserCompat.MediaItem(metadata.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE);
+            result.add(item);
+        }
+        return result;
+    }
+
+    /**
 	 * 
 	 *
 	 *            of episodes
