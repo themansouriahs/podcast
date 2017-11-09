@@ -5,6 +5,10 @@ import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.session.MediaSessionManager;
 import android.net.ConnectivityManager;
@@ -19,8 +23,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v7.util.SortedList;
 import android.telephony.PhoneStateListener;
 import android.util.Log;
 
@@ -29,6 +35,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.dependencyinjector.DependencyInjector;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.player.GenericMediaPlayerInterface;
 import org.bottiger.podcast.player.Player;
@@ -36,11 +43,14 @@ import org.bottiger.podcast.player.PlayerPhoneListener;
 import org.bottiger.podcast.player.PlayerStateManager;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.FeedItem;
+import org.bottiger.podcast.provider.IDbItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.utils.PlaybackSpeed;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.chapter.ChapterUtil;
 import org.bottiger.podcast.widgets.SoundWavesWidgetProvider;
 
@@ -53,9 +63,14 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import io.reactivex.functions.Function;
 import io.reactivex.processors.FlowableProcessor;
+import io.reactivex.schedulers.Schedulers;
 
+import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_BROWSABLE;
+import static android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE;
 import static org.bottiger.podcast.player.PlayerStateManager.ACTION_TOGGLE;
+import static org.bottiger.podcast.service.MediaBrowserHelper.*;
 
 /**
  * The service which handles the audio extended_player. This is responsible for playing
@@ -80,6 +95,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 	@Inject GenericMediaPlayerInterface mPlayer;
 	@Inject Playlist mPlaylist;
+	@Inject Library mLibrary;
+
+	private MediaBrowserHelper mediaBrowserHelper;
 
     private MediaControllerCompat mController;
 
@@ -113,6 +131,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements
         return SoundWaves.getAppContext(this).getPlayer();
     }
 
+    @Deprecated
 	private static PlayerService sInstance = null;
 
 	@Nullable
@@ -137,6 +156,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 
 		mPlayerStateManager = SoundWaves.getAppContext(this).getPlayerStateManager();
 		mPlayerStateManager.setService(this);
+
+        mediaBrowserHelper = new MediaBrowserHelper(this, mLibrary, mPlaylist);
 
 		mPlayerStatusObservable = new PlayerStatusObservable(this);
 
@@ -245,15 +266,29 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	@android.support.annotation.Nullable
 	@Override
 	public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @android.support.annotation.Nullable Bundle rootHints) {
-		return new BrowserRoot(getString(R.string.app_name), null);
+		Log.d(TAG, "onGetRoot");
+		return new BrowserRoot(MediaBrowserHelper.BROWSER_ROOT_ID, null);
 	}
 
 	@Override
 	public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
+		Log.d(TAG, "onLoadChildren. parent: " + parentId);
+
 		List<MediaBrowserCompat.MediaItem> items = new LinkedList<>();
-		if (mPlaylist != null) {
-			items = mPlaylist.getMediaItems(this);
+
+		if (BROWSER_ROOT_ID.equals(parentId)) {
+            items.add(mediaBrowserHelper.playlistItem());
+
+			// Add subscriptions
+            items.addAll(mediaBrowserHelper.SubscriptionItems());
+		} else if (BROWSER_PLAYLIST_ID.equals(parentId)) {
+			if (mPlaylist != null) {
+				items = mPlaylist.getMediaItems(this);
+			}
+		} else if (parentId.startsWith(BROWSER_SUBSCRIPTION_PREFIX)) {
+		    items.addAll(mediaBrowserHelper.EpisodeItems(parentId));
 		}
+
 		result.sendResult(items);
 	}
 

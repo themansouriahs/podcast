@@ -73,6 +73,9 @@ public interface IEpisode extends IDbItem {
     @NonNull
     String getURL();
 
+    @NonNull
+    String getUUID();
+
     @Nullable
     Uri getFileLocation(@Location int argLocation, @NonNull Context argContext);
 

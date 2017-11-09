@@ -11,6 +11,7 @@ import org.bottiger.podcast.model.events.EpisodeChanged;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.SDCardManager;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.chapter.Chapter;
 
 import java.io.IOException;
@@ -73,6 +74,12 @@ public abstract class BaseEpisode extends LiveData<IEpisode> implements IEpisode
         }
 
         return canSet;
+    }
+
+    @NonNull
+    public String getUUID() {
+        //return StrUtils.SHA1(getURL());
+        return getURL();
     }
 
     /**

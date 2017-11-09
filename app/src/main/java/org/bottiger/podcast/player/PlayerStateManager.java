@@ -22,10 +22,14 @@ import android.view.KeyEvent;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
+import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.provider.IDbItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
+import org.bottiger.podcast.service.MediaBrowserHelper;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 
@@ -83,12 +87,39 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         if (!mSession.isActive()) {
             mSession.setActive(true);
-        }
 
-        // The service needs to continue running even after the bound client (usually a
-        // MediaController) disconnects, otherwise the music playback will stop.
-        // Calling startService(Intent) will keep the service running until it is explicitly killed.
-        mPlayerService.startService(new Intent(mPlayerService.getApplicationContext(), PlayerService.class));
+            // The service needs to continue running even after the bound client (usually a
+            // MediaController) disconnects, otherwise the music playback will stop.
+            // Calling startService(Intent) will keep the service running until it is explicitly killed.
+            mPlayerService.startService(new Intent(mPlayerService.getApplicationContext(), PlayerService.class));
+        } else {
+            mPlayerService.play();
+        }
+    }
+
+    /**
+     * Callback method called from PlaybackManager whenever the music is about to pause.
+     */
+    public void onPause() {
+        Log.d(TAG, "onPause");
+
+        mPlayerService.pause();
+    }
+
+    /**
+     * Callback method for playing a specific episode.
+     * This is typically called from something like Android Auto where a track is selected on an
+     * external display.
+     */
+    public void onPlayFromMediaId(String mediaId, Bundle extras) {
+        Log.d(TAG, "onPlayFromMediaId: " + mediaId);
+
+        Library library = SoundWaves.getAppContext(mPlayerService).getLibraryInstance();
+        IDbItem item = MediaBrowserHelper.Companion.parseMediaId(mediaId, library);
+
+        if (item instanceof IEpisode) {
+            mPlayerService.play((IEpisode) item , true);
+        }
     }
 
 
@@ -235,7 +266,12 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
 
-        stateBuilder.setActions(actions);
+        //long features = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH;
+        long features = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID;
+
+        long currentState = actions | features;
+
+        stateBuilder.setActions(currentState);
         //stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f);
         stateBuilder.setState(argState, argPosition, argPlaybackSpeed, SystemClock.elapsedRealtime());
 

@@ -202,6 +202,14 @@
     <string name="action_exit_fullscreen">Exit fullscreen</string>
     <string name="unknown_filesize">Filesize unknown</string>
 
+    <!-- Media Browser -->
+    <string name="media_browser_playlist_title">Playlist</string>
+    <string name="media_browser_playlist_description">Recent and queued episodes</string>
+    <plurals name="media_browser_playlist_subtitle">
+        <item quantity="one">%d episode</item>
+        <item quantity="other">%d episodes</item>
+    </plurals>
+
     <!-- log_submit_activity -->
     <string name="log_submit_activity__log_fetch_failed">Could not read the log on your device. You can still use ADB to get a debug log instead.</string>
     <string name="log_submit_activity__thanks">Thanks for your help!</string>

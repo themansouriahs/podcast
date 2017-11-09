@@ -22,6 +22,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +34,7 @@ import java.util.zip.Adler32;
 
 public class StrUtils {
 
-    private static DecimalFormat mTimeDecimalFormat = new DecimalFormat("00");
+	private static DecimalFormat mTimeDecimalFormat = new DecimalFormat("00");
 
     /*
      * Calculates the current position by parsing the Duration String
@@ -273,17 +275,74 @@ From here: http://stackoverflow.com/questions/9027317/how-to-convert-millisecond
 		return null;
 	}
 
+
+	private static String convertToHex(byte[] data) {
+		StringBuilder buf = new StringBuilder();
+		for (byte b : data) {
+			int halfbyte = (b >>> 4) & 0x0F;
+			int two_halfs = 0;
+			do {
+				buf.append((0 <= halfbyte) && (halfbyte <= 9) ? (char) ('0' + halfbyte) : (char) ('a' + (halfbyte - 10)));
+				halfbyte = b & 0x0F;
+			} while (two_halfs++ < 1);
+		}
+		return buf.toString();
+	}
+
+	public static String SHA1(String text)  {
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("SHA-1");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return "";
+		}
+		byte[] textBytes = new byte[0];
+		try {
+			textBytes = text.getBytes("iso-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return "";
+		}
+		md.update(textBytes, 0, textBytes.length);
+		byte[] sha1hash = md.digest();
+		return convertToHex(sha1hash);
+	}
+
 	/**
 	 *
 	 * @param argTitle The title of the episode
 	 * @return
      */
 	public static String formatTitle(@Nullable String argTitle) {
-		if (argTitle == null)
+		if (TextUtils.isEmpty(argTitle))
 			return "";
 
-		String[] parts = argTitle.split("-"); // NoI18N
-		String episodeTitle = parts[parts.length-1];
+		final String delimiter = "-"; // NoI18N
+		StringBuilder titleBuilder = new StringBuilder(argTitle.length());
+		String[] parts = argTitle.split(delimiter);
+
+		boolean discardPart = false;
+		for (int i = 0; i < parts.length; i++) {
+			String part = parts[i];
+
+			// first part
+			discardPart = i == 0 && TextUtils.isDigitsOnly(part);
+
+			if (!discardPart) {
+
+				if (titleBuilder.length() > 0) {
+					titleBuilder.append(" " + delimiter + " ");
+				}
+
+				titleBuilder.append(part);
+			}
+
+			discardPart = false;
+		}
+
+		//String episodeTitle = parts[parts.length-1];
+		String episodeTitle = titleBuilder.toString().trim();
 
 		return episodeTitle.trim();
 	}

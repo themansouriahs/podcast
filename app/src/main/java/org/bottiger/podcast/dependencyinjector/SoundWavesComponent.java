@@ -7,6 +7,7 @@ import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.SubscriptionsFragment;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.dependencyinjector.SoundWavesModule;
+import org.bottiger.podcast.service.MediaBrowserHelper;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.views.dialogs.DialogPlaylistFilters;
 

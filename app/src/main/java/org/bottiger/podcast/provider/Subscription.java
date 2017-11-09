@@ -445,8 +445,9 @@ public class Subscription extends BasePodcastSubscription {
 	}
 
 	public int getEpisodeCount() {
-		if (mIsLoaded)
-			return 0; //mEpisodes.getValue().size();
+		if (mIsLoaded) {
+			return mEpisodes.size();
+		}
 
 		return episode_count_cache;
 	}

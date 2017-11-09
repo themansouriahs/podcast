@@ -111,7 +111,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     public static int sizeActionbar             =   -1;
 
     public static int sizeStartShrink           =   -1;
-    public static int sizeShrinkBuffer           =   -1;
+    public static int sizeShrinkBuffer          =   -1;
 
     private static int sScreenHeight = -1;
 
@@ -329,29 +329,28 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
 
         getPlayerControlHeight(mControls);
 
-        mEpisodeTitle           =    (TextView) findViewById(R.id.player_title);
-        mEpisodeInfo            =    (TextView) findViewById(R.id.player_podcast);
-        mFavoriteButton         =    (MaterialFavoriteButton) findViewById(R.id.favorite);
+        mEpisodeTitle           =    findViewById(R.id.player_title);
+        mEpisodeInfo            =    findViewById(R.id.player_podcast);
+        mFavoriteButton         =    findViewById(R.id.favorite);
 
-        mCurrentTime            =    (TextViewObserver) findViewById(R.id.current_time);
-        mTotalTime              =    (TextView) findViewById(R.id.total_time);
+        mCurrentTime            =    findViewById(R.id.current_time);
+        mTotalTime              =    findViewById(R.id.total_time);
 
-        mPlayPauseButton        =    (PlayPauseButton) findViewById(R.id.playpause);
-        mPlayerSeekbar          =    (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
-        mPlayerDownloadButton   =    (DownloadButtonView) findViewById(R.id.download);
+        mPlayPauseButton        =    findViewById(R.id.playpause);
+        mPlayerSeekbar          =    findViewById(R.id.top_player_seekbar);
+        mPlayerDownloadButton   =    findViewById(R.id.download);
 
-        mPlayPauseButton = (PlayPauseButton) findViewById(R.id.playpause);
-        mFavoriteButton = (MaterialFavoriteButton) findViewById(R.id.favorite);
-        mFastForwardButton = (ImageView) findViewById(R.id.top_player_fastforward);
-        mRewindButton = (ImageView) findViewById(R.id.top_player_rewind);
-        mPhoto = (ImageView) findViewById(R.id.session_photo);
-        mMoreButton = (ImageButton) findViewById(R.id.player_more_button);
-        mPlayerSeekbar = (PlayerSeekbar) findViewById(R.id.top_player_seekbar);
-        mPlaylistUpArrow = (ImageView) findViewById(R.id.playlist_up_arrow);
+        mPlayPauseButton        =    findViewById(R.id.playpause);
+        mFavoriteButton         =    findViewById(R.id.favorite);
+        mFastForwardButton      =    findViewById(R.id.top_player_fastforward);
+        mRewindButton           =    findViewById(R.id.top_player_rewind);
+        mPhoto                  =    findViewById(R.id.session_photo);
+        mMoreButton             =    findViewById(R.id.player_more_button);
+        mPlayerSeekbar          =    findViewById(R.id.top_player_seekbar);
+        mPlaylistUpArrow        =    findViewById(R.id.playlist_up_arrow);
 
-        mMoreButtonsStub = (ViewStub) findViewById(R.id.expanded_action_bar);
-
-        mTriangle = findViewById(R.id.visual_triangle);
+        mMoreButtonsStub        =    findViewById(R.id.expanded_action_bar);
+        mTriangle               =    findViewById(R.id.visual_triangle);
 
         int mPlayPauseLargeSize = mPlayPauseButton.getLayoutParams().height;
         mPlayPauseButton.setIconColor(Color.WHITE);
