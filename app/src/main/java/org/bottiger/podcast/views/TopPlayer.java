@@ -44,6 +44,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.OverScroller;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -189,7 +190,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     private @ColorInt int mBackgroundColor = -1;
 
     private SharedPreferences prefs;
-    public ScrollerCompat mScroller;
+    public OverScroller mScroller;
 
     private class PlayerLayoutParameter {
         public int SeekBarLeftMargin;
@@ -1391,7 +1392,7 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             }
 
             if(TopPlayer.this.mScroller == null) {
-                TopPlayer.this.mScroller = ScrollerCompat.create(getContext());
+                TopPlayer.this.mScroller = new OverScroller(getContext());
             }
 
             scrollingChildHelper.startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
