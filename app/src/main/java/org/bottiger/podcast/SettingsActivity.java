@@ -16,12 +16,14 @@
 
 package org.bottiger.podcast;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 
+import org.bottiger.podcast.activities.openopml.OPMLImportExportActivity;
 import org.bottiger.podcast.utils.UIUtils;
 
 public class SettingsActivity extends ToolbarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -89,5 +91,4 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
     protected boolean transparentNavigationBar() {
         return false;
     }
-
 }

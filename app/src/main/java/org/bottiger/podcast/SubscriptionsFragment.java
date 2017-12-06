@@ -60,13 +60,14 @@ public class SubscriptionsFragment extends LifecycleFragment {
 
     private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
     private static final boolean SHARE_CLOUD_DEFAULT = false;
-    private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
     private static final String EXTRAS_CODE = "path";
     private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
     public static final int RESULT_IMPORT = 201;
     public static final int RESULT_EXPORT = 202;
     public static final int RESULT_EXPORT_TO_CLIPBOARD = 203;
-    private static final String EXPORT_FILENAME = "/podcast_export.opml";
+    public static final String EXPORT_FILENAME = "/podcast_export.opml";
+
+    private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
 
     /**
      1 = Auto
@@ -412,40 +413,8 @@ public class SubscriptionsFragment extends LifecycleFragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        OPMLImportExport importExport = new OPMLImportExport(getActivity());
-
         if (requestCode == OPML_ACTIVITY_STATUS_CODE) {
-            if (resultCode == RESULT_IMPORT){
-                //Log.d("OPML", data.getData().getPath());// NoI18N
-                Uri extraData = data.getData();
-
-                if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-
-                Log.d(TAG, "IMPORT SUBSCRIPTIONS. File: " + extraData);// NoI18N
-                Intent selectSubs = new Intent(mActivity.getApplicationContext(), OpenOpmlFromIntentActivity.class);
-                selectSubs.setData(extraData);
-                startActivity(selectSubs);
-
-            }
-            else if (resultCode == RESULT_EXPORT) {
-                String export_dir = null;
-                try {
-                    export_dir = SDCardManager.getExportDir();
-                } catch (IOException e) {
-                    VendorCrashReporter.report("EXPORT FAIL", "Cannot export OPML file");
-                }
-                Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
-                Log.d(TAG, "Export to: " + export_dir + EXPORT_FILENAME);// NoI18N
-                importExport.exportSubscriptions(new File(export_dir + EXPORT_FILENAME));
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_toast) + export_dir + EXPORT_FILENAME, Toast.LENGTH_SHORT).show();
-            } else if (resultCode == RESULT_EXPORT_TO_CLIPBOARD) {
-                Log.d(TAG, "EXPORT SUBSCRIPTIONS TO CLIPBOARD");// NoI18N
-
-                importExport.exportSubscriptionsToClipboard();
-                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.opml_exported_to_clipboard_toast), Toast.LENGTH_SHORT).show();
-            }
+            OPMLImportExportActivity.handleResult(getActivity(), requestCode, resultCode, data);
         }
     }
 
