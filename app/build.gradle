@@ -24,13 +24,13 @@ android {
         android.buildTypes.release.signingConfig = null
     }
 
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
-        targetSdkVersion 26
-        versionCode 391        // even - release. Odd - development
+        targetSdkVersion 27
+        versionCode 395        // even - release. Odd - development
         versionName "0.158.11" // even - release. Odd - development
         multiDexEnabled = true
 
