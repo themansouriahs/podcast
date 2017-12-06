@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.res.Resources
+import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationManagerCompat
 
 import org.bottiger.podcast.R
@@ -21,7 +22,7 @@ object NotificationChannels {
     const val CHANNEL_ID_SUBSCRIPTION   = "subscription_channel"
     const val CHANNEL_ID_ALL_EPISODES   = "episodes_channel"
 
-    @TargetApi(26)
+    @RequiresApi(26)
     fun createPlayerChannel(argContext: Context) {
         // The user-visible name of the channel.
         val resources = argContext.resources;
@@ -37,7 +38,7 @@ object NotificationChannels {
         notificationManager.createNotificationChannel(channel);
     }
 
-    @TargetApi(26)
+    @RequiresApi(26)
     fun createEpisodesChannel(argContext: Context) {
         // The user-visible name of the channel.
         val resources = argContext.resources;
@@ -52,7 +53,7 @@ object NotificationChannels {
         notificationManager.createNotificationChannel(channel);
     }
 
-    @TargetApi(26)
+    @RequiresApi(26)
     fun getSubscriptionUpdatedChannel(argContext: Context, argSubscription: Subscription) {
         // The user-visible name of the channel.
         val resources = argContext.resources;

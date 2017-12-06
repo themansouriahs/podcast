@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableStringBuilder;
@@ -48,7 +49,9 @@ public class NewEpisodesNotification {
 
     public synchronized void show(@NonNull Context argContext, @NonNull List<? extends IEpisode> argEpisodes) {
 
-        NotificationChannels.INSTANCE.createEpisodesChannel(argContext);
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannels.INSTANCE.createEpisodesChannel(argContext);
+        }
 
         IEpisode episode = null;
         boolean addedEpisode = false;
@@ -61,7 +64,9 @@ public class NewEpisodesNotification {
                     mSubscriptions.add(subscription);
 
                     if (subscription instanceof Subscription) {
-                        NotificationChannels.INSTANCE.getSubscriptionUpdatedChannel(argContext, (Subscription)subscription);
+                        if (Build.VERSION.SDK_INT >= 26) {
+                            NotificationChannels.INSTANCE.getSubscriptionUpdatedChannel(argContext, (Subscription) subscription);
+                        }
                     }
                 }
                 addedEpisode = true;
