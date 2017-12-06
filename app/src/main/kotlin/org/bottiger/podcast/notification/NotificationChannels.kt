@@ -1,15 +1,11 @@
 package org.bottiger.podcast.notification
 
-import android.annotation.TargetApi
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.res.Resources
 import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationManagerCompat
 
 import org.bottiger.podcast.R
-import org.bottiger.podcast.provider.ISubscription
 import org.bottiger.podcast.provider.Subscription
 import org.bottiger.podcast.provider.Subscription.STATUS_UNSUBSCRIBED
 
@@ -47,6 +43,7 @@ object NotificationChannels {
         val channel = NotificationChannel(CHANNEL_ID_ALL_EPISODES, name, importance)
 
         channel.setShowBadge(true)
+        channel.setSound(null, null);
 
         val notificationManager = argContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -60,8 +57,8 @@ object NotificationChannels {
         val name = argSubscription.title;
         val group = resources.getString(R.string.channel_name_subscriptions)
         val importance = NotificationManager.IMPORTANCE_MIN
-        val channel_id = getChannelId(argSubscription)
-        val channel = NotificationChannel(channel_id, name, importance)
+        val channelId = getChannelId(argSubscription)
+        val channel = NotificationChannel(channelId, name, importance)
 
         channel.group = group
         channel.setShowBadge(true)
@@ -71,7 +68,7 @@ object NotificationChannels {
         val remove = argSubscription.status.toInt() == STATUS_UNSUBSCRIBED
 
         if (remove) {
-            notificationManager.deleteNotificationChannel(channel_id)
+            notificationManager.deleteNotificationChannel(channelId)
         } else {
             notificationManager.createNotificationChannel(channel)
         }
