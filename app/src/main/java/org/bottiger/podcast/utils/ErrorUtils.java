@@ -15,7 +15,7 @@ public class ErrorUtils {
 
     public static void handleException(@Nullable Throwable argThrowable, @Nullable String argTag) {
         VendorCrashReporter.handleException(argThrowable);
-        argThrowable.printStackTrace();
+        //argThrowable.printStackTrace();
 
         String tag = argTag != null ? argTag : TAG;
         Log.w(TAG, argThrowable.toString());

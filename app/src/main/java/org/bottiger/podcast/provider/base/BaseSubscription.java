@@ -252,12 +252,12 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
 
         String url = getImageURL();
         try {
-            bitmap = (Bitmap) ImageLoaderUtils.getGlide(argContext, url)
+            bitmap = ImageLoaderUtils.getGlide(argContext, url)
                     .into(200, 200) // Width and height
                     .get();
             palette = Palette.from(bitmap).generate();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch (ExecutionException e) {
             Log.e(TAG, "Glide execution error. URL probably not valid");
         }
@@ -319,10 +319,10 @@ public abstract class BaseSubscription extends LiveData<ISubscription> implement
 
                             rm.load(url).apply(options).into(200, 200).get();
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                             return false;
                         } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                             return false;
                         }
 

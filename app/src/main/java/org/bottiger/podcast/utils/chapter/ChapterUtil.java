@@ -69,7 +69,7 @@ public class ChapterUtil {
             chapters = reader.getChapters();
         } catch (ID3ReaderException | IOException e) {
             VendorCrashReporter.handleException(e);
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         // reader.getChapters() can return null
@@ -96,7 +96,7 @@ public class ChapterUtil {
             path = Uri.parse((item.getAbsolutePath(argContext)));
         } catch (IOException e) {
             VendorCrashReporter.handleException(e);
-            e.printStackTrace();
+            //e.printStackTrace();
             return chapters;
         }
         FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();

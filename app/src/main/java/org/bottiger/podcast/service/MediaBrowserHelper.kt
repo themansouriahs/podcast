@@ -81,7 +81,7 @@ class  MediaBrowserHelper(private var context: Context, private var library: Lib
     }
 
     fun SubscriptionItems() : List<MediaBrowserCompat.MediaItem> {
-        val items : MutableList<MediaBrowserCompat.MediaItem> = mutableListOf<MediaBrowserCompat.MediaItem>()
+        val items : MutableList<MediaBrowserCompat.MediaItem> = mutableListOf()
 
         // Add subscriptions
         val subscriptions = library.getSubscriptions()

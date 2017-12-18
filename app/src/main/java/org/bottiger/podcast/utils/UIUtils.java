@@ -357,7 +357,7 @@ public class UIUtils {
     }
 
     public static void tintStatusBar(int argColor, Activity argActivity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= 22){
             Window window = argActivity.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(argColor);

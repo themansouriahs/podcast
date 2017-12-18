@@ -130,7 +130,7 @@ public class ITunes extends GenericDirectory {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            ErrorUtils.handleException(e, NAME);
             argCallback.error(e);
             return;
         }
@@ -248,7 +248,7 @@ public class ITunes extends GenericDirectory {
                 node = node.get("results");
                 list = mapper.readValue(node.traverse(), typeRef);
             } catch (IOException e) {
-                e.printStackTrace();
+                ErrorUtils.handleException(e, NAME);
                 mCallback.error(e);
             }
 

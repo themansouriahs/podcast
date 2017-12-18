@@ -796,26 +796,19 @@ public class Library {
     private void loadSubscriptions() {
         Observable.just(1)
                 .subscribeOn(Schedulers.io())
-                .map(new Func1<Integer, Boolean>() {
-                    @Override
-                    public Boolean call(Integer integer) {
-                        loadSubscriptionsInternalSync(true);
-                        return true;
-                    }
+                .map(integer -> {
+                    loadSubscriptionsInternalSync(true);
+                    return true;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean aBoolean) {
-                        // This is done in the adapter instead.
-                        // The reason for this is that the adapter nows the size of the views
-                        //preloadImages();
-                    }
+                .subscribe(aBoolean -> {
+                    // This is done in the adapter instead.
+                    // The reason for this is that the adapter nows the size of the views
+                    //preloadImages();
                 });
     }
 
-    @WorkerThread
-    private void loadSubscriptionsInternalSync(boolean doReload) {
+    public void loadSubscriptionsInternalSync(boolean doReload) {
         Cursor cursor = null;
 
         if (doReload) {

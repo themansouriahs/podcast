@@ -67,8 +67,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         ComponentName mediaButtonReceiver = new ComponentName(mPlayerService, HeadsetReceiver.class);
         mSession = new MediaSessionCompat(mPlayerService, SESSION_TAG, mediaButtonReceiver, null);
-        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         Intent toggleIntent = new Intent(NotificationPlayer.toggleAction);
         PendingIntent pendingToggleIntent = PendingIntent.getBroadcast(mPlayerService, 0, toggleIntent, 0);
@@ -82,6 +81,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     /**
      * Callback method called from PlaybackManager whenever the music is about to play.
      */
+    @Override
     public void onPlay() {
         Log.d(TAG, "onPlay");
 
@@ -100,6 +100,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     /**
      * Callback method called from PlaybackManager whenever the music is about to pause.
      */
+    @Override
     public void onPause() {
         Log.d(TAG, "onPause");
 
@@ -126,6 +127,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     /**
      * Callback method called from PlaybackManager whenever the music stops playing.
      */
+    @Override
     public void onStop() {
         Log.d(TAG, "onStop");
         // Reset the delayed stop handler, so after STOP_DELAY it will be executed again,
@@ -137,6 +139,13 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         mPlayerService.stopForeground(true);
     }
 
+    @Override
+    public void onSkipToPrevious() {
+        Log.d(TAG, "skipToPrevious");
+        mPlayerService.getPlayer().seekTo(0);
+    }
+
+    @Override
     public void onSkipToNext() {
         Log.d(TAG, "skipToNext");
         mPlayerService.playNext();
@@ -165,8 +174,10 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         if (ACTION_TOGGLE_MUTE.equals(action)) {
             if (Build.VERSION.SDK_INT >= 23) {
                 AudioManager audioManager = (AudioManager) mPlayerService.getSystemService(Context.AUDIO_SERVICE);
-                audioManager.adjustStreamVolume(AUDIO_STREAM, AudioManager.ADJUST_TOGGLE_MUTE, 0);
-                mPlayerService.notifyStatusChanged();
+                if (audioManager != null) {
+                    audioManager.adjustStreamVolume(AUDIO_STREAM, AudioManager.ADJUST_TOGGLE_MUTE, 0);
+                    mPlayerService.notifyStatusChanged();
+                }
             }
         }
     }

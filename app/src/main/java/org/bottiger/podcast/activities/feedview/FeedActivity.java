@@ -151,7 +151,7 @@ public class FeedActivity extends TopActivity {
 
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 22) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 

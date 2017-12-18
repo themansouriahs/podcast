@@ -189,7 +189,7 @@ public class ShortcutManagerUtil {
 
                 bitmap = getCroppedBitmap(bitmap);
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 ErrorUtils.handleException(e, TAG);
             }
         }

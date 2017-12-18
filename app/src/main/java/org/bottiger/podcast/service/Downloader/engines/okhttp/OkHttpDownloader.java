@@ -65,30 +65,26 @@ public class OkHttpDownloader extends DownloadEngineBase {
         super(argContext, argEpisode);
         mURL = argEpisode.getUrl();
 
-        final ProgressListener progressListener = new ProgressListener() {
-            @Override public void update(long bytesRead, long contentLength, boolean done, long startTime) {
-                long nowTime = System.currentTimeMillis();
-                long timeS = (nowTime-startTime)/1000;
-                if (timeS > 0) {
-                    setSpeed(bytesRead / timeS);
-                }
+        final ProgressListener progressListener = (bytesRead, contentLength, done, startTime) -> {
+            long nowTime = System.currentTimeMillis();
+            long timeS = (nowTime-startTime)/1000;
+            if (timeS > 0) {
+                setSpeed(bytesRead / timeS);
+            }
 
-                if (bytesRead != contentLength) {
-                    float progress = (100 * bytesRead) / contentLength;
-                    setProgress(progress);
-                }
+            if (bytesRead != contentLength) {
+                float progress = (100 * bytesRead) / contentLength;
+                setProgress(progress);
             }
         };
 
         mOkHttpClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new UserAgentInterceptor(argContext, DOWNLOAD_EPISODE))
-                .addNetworkInterceptor(new Interceptor() {
-                    @Override public Response intercept(Interceptor.Chain chain) throws IOException {
-                        Response originalResponse = chain.proceed(chain.request());
-                        return originalResponse.newBuilder()
-                                .body(new ProgressResponseBody(originalResponse.body(), progressListener))
-                                .build();
-                    }
+                .addNetworkInterceptor(chain -> {
+                    Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                            .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                            .build();
                 })
                 .build();
     }
