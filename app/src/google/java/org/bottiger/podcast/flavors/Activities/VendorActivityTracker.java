@@ -31,7 +31,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.BehaviorSubject;
 
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 import static org.bottiger.podcast.flavors.Activities.Constants.BROADCAST_ACTION;
 import static org.bottiger.podcast.flavors.Activities.Constants.DEBUGGING;
 import static org.bottiger.podcast.flavors.Activities.Constants.IN_VEHICLE;

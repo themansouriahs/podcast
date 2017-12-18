@@ -56,6 +56,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <meta-data
@@ -351,6 +354,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.bottiger.podcast.MainActivity" />
         </activity>
+
     </application>
 
 </manifest>

@@ -171,6 +171,52 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
         }
     }
 
+    @Override
+    public void onPlayFromSearch(String query, Bundle extras) {
+        onPlay();
+        /*
+        if (TextUtils.isEmpty(query)) {
+            // The user provided generic string e.g. 'Play music'
+            // Build appropriate playlist queue
+        } else {
+            // Build a queue based on songs that match "query" or "extras" param
+            String mediaFocus = extras.getString(MediaStore.EXTRA_MEDIA_FOCUS);
+            if (TextUtils.equals(mediaFocus,
+                    MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE)) {
+                isArtistFocus = true;
+                artist = extras.getString(MediaStore.EXTRA_MEDIA_ARTIST);
+            } else if (TextUtils.equals(mediaFocus,
+                    MediaStore.Audio.Albums.ENTRY_CONTENT_TYPE)) {
+                isAlbumFocus = true;
+                album = extras.getString(MediaStore.EXTRA_MEDIA_ALBUM);
+            }
+
+            // Implement additional "extras" param filtering
+        }
+
+        // Implement your logic to retrieve the queue
+        if (isArtistFocus) {
+            result = searchMusicByArtist(artist);
+        } else if (isAlbumFocus) {
+            result = searchMusicByAlbum(album);
+        }
+
+        if (result == null) {
+            // No focus found, search by query for song title
+            result = searchMusicBySongTitle(query);
+        }
+
+        if (result != null && !result.isEmpty()) {
+            // Immediately start playing from the beginning of the search results
+            // Implement your logic to start playing music
+            playMusic(result);
+        } else {
+            // Handle no queue found. Stop playing if the app
+            // is currently playing a song
+        }
+        */
+    }
+
     public void release() {
         mSession.release();
     }
