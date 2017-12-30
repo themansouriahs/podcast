@@ -8,9 +8,9 @@ buildscript {
     ext {
         espressoVersion = '2.2.2'
         supportLibraryVersion = '27.0.2'
-        playServicesVersion = '11.6.2'
+        playServicesVersion = '11.8.0'
         architectureComponentsVersion = '1.0.0'
-        kotlin_version = '1.2.0'
+        kotlin_version = '1.2.10'
     }
 
     repositories {
