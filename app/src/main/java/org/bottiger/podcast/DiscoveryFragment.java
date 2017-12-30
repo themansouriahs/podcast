@@ -39,7 +39,6 @@ import org.bottiger.podcast.views.dialogs.DialogSearchDirectory;
 import org.bottiger.podcast.webservices.directories.IDirectoryProvider;
 import org.bottiger.podcast.webservices.directories.ISearchParameters;
 import org.bottiger.podcast.webservices.directories.ISearchResult;
-import org.bottiger.podcast.webservices.directories.audiosearch.AudioSearch;
 import org.bottiger.podcast.webservices.directories.generic.GenericDirectory;
 import org.bottiger.podcast.webservices.directories.generic.GenericSearchParameters;
 import org.bottiger.podcast.webservices.directories.gpodder.GPodder;
@@ -76,14 +75,13 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
     // Match with entries_webservices_discovery_engine
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({ GPODDER_INDEX, ITUNES_INDEX, AUDIOSEARCH_INDEX})
+    @IntDef({ GPODDER_INDEX, ITUNES_INDEX})
     public @interface SearchEngine {}
     private static final int GPODDER_INDEX = 0;
     private static final int ITUNES_INDEX  = 1;
-    private static final int AUDIOSEARCH_INDEX  = 2;
 
-    public static final @SearchEngine int[] ENGINE_IDS = {GPODDER_INDEX, ITUNES_INDEX, AUDIOSEARCH_INDEX};
-    public static final @StringRes int[] ENGINE_RES = {GPodder.getNameRes(), ITunes.getNameRes(), AudioSearch.getNameRes()};
+    public static final @SearchEngine int[] ENGINE_IDS = {GPODDER_INDEX, ITUNES_INDEX};
+    public static final @StringRes int[] ENGINE_RES = {GPodder.getNameRes(), ITunes.getNameRes()};
 
     private static final int HANDLER_WHAT_SEARCH   = 27407; // whatever
     private static final int HANDLER_WHAT_CANCEL   = 27408; // whatever
@@ -370,9 +368,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             case DiscoveryFragment.ITUNES_INDEX:
                 directoryProvider = new ITunes(argContext);
                 break;
-            case DiscoveryFragment.AUDIOSEARCH_INDEX:
-                directoryProvider = new AudioSearch(argContext);
-                break;
         }
 
         return directoryProvider != null && directoryProvider.isEnabled();
@@ -436,11 +431,6 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             case ITUNES_INDEX: {
                 mDirectoryProvider = new ITunes(context);
                 mSearchEngineButton.setImageResource(R.drawable.discovery_itunes);
-                break;
-            }
-            case AUDIOSEARCH_INDEX: {
-                mDirectoryProvider = new AudioSearch(context);
-                mSearchEngineButton.setImageResource(R.drawable.audiosearch_logo);
                 break;
             }
         }
