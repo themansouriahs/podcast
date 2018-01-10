@@ -49,7 +49,7 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
     @NonNull
     private RemoteMediaClient.Listener mClientListener;
 
-    private final CopyOnWriteArrayList<ExoPlayer.EventListener> listeners;
+    private final CopyOnWriteArrayList<com.google.android.exoplayer2.Player.EventListener> listeners;
 
     public GoogleCastPlayer(@NonNull Context argContext) {
         super(argContext);
@@ -63,12 +63,12 @@ public abstract class GoogleCastPlayer extends SoundWavesPlayerBase {
     }
 
     @Override
-    public void addListener(ExoPlayer.EventListener listener) {
+    public void addListener(com.google.android.exoplayer2.Player.EventListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void removeListener(ExoPlayer.EventListener listener) {
+    public void removeListener(com.google.android.exoplayer2.Player.EventListener listener) {
         listeners.remove(listener);
     }
 

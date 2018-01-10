@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.*;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -19,6 +19,7 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.flavors.CrashReporter.VendorCrashReporter;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
 import org.bottiger.podcast.notification.NotificationPlayer;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerEventListener;
 import org.bottiger.podcast.provider.FeedItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
@@ -248,7 +249,7 @@ public abstract class SoundWavesPlayerBase implements org.bottiger.podcast.playe
     public boolean isCasting() {
         return false;
     }
-    public abstract void removeListener(ExoPlayer.EventListener listener);
+    public abstract void removeListener(com.google.android.exoplayer2.Player.EventListener listener);
 
     @Override
     public void setOnErrorListener(final OnErrorListener listener) {

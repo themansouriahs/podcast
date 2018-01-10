@@ -22,6 +22,7 @@ import android.media.AudioManager;
 import android.media.PlaybackParams;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -37,11 +38,11 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Renderer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
-import com.google.android.exoplayer2.audio.AudioTrack;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
@@ -432,18 +433,23 @@ public final class NewExoPlayer implements ExoPlayer {
     // ExoPlayer implementation
 
     @Override
-    public void addListener(EventListener listener) {
+    public void addListener(Player.EventListener listener) {
         player.addListener(listener);
     }
 
     @Override
-    public void removeListener(EventListener listener) {
+    public void removeListener(Player.EventListener listener) {
         player.removeListener(listener);
     }
 
     @Override
     public int getPlaybackState() {
         return player.getPlaybackState();
+    }
+
+    @Override
+    public Looper getPlaybackLooper() {
+        return null;
     }
 
     @Override
@@ -464,6 +470,26 @@ public final class NewExoPlayer implements ExoPlayer {
     @Override
     public boolean getPlayWhenReady() {
         return player.getPlayWhenReady();
+    }
+
+    @Override
+    public void setRepeatMode(int repeatMode) {
+
+    }
+
+    @Override
+    public int getRepeatMode() {
+        return 0;
+    }
+
+    @Override
+    public void setShuffleModeEnabled(boolean shuffleModeEnabled) {
+
+    }
+
+    @Override
+    public boolean getShuffleModeEnabled() {
+        return false;
     }
 
     @Override
@@ -532,6 +558,16 @@ public final class NewExoPlayer implements ExoPlayer {
     }
 
     @Override
+    public int getNextWindowIndex() {
+        return 0;
+    }
+
+    @Override
+    public int getPreviousWindowIndex() {
+        return 0;
+    }
+
+    @Override
     public long getDuration() {
         return player.getDuration();
     }
@@ -559,6 +595,26 @@ public final class NewExoPlayer implements ExoPlayer {
     @Override
     public boolean isCurrentWindowSeekable() {
         return player.isCurrentWindowSeekable();
+    }
+
+    @Override
+    public boolean isPlayingAd() {
+        return false;
+    }
+
+    @Override
+    public int getCurrentAdGroupIndex() {
+        return 0;
+    }
+
+    @Override
+    public int getCurrentAdIndexInAdGroup() {
+        return 0;
+    }
+
+    @Override
+    public long getContentPosition() {
+        return 0;
     }
 
     @Override
@@ -791,10 +847,10 @@ public final class NewExoPlayer implements ExoPlayer {
         }
 
         @Override
-        public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs,
+        public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs,
                                          long elapsedSinceLastFeedMs) {
             if (audioDebugListener != null) {
-                audioDebugListener.onAudioTrackUnderrun(bufferSize, bufferSizeMs, elapsedSinceLastFeedMs);
+                audioDebugListener.onAudioSinkUnderrun(bufferSize, bufferSizeMs, elapsedSinceLastFeedMs);
             }
         }
 

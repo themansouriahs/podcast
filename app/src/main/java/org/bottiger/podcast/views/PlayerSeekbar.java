@@ -449,6 +449,16 @@ public class PlayerSeekbar extends android.support.v7.widget.AppCompatSeekBar im
     }
 
     @Override
+    public void onRepeatModeChanged(int repeatMode) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
+    }
+
+    @Override
     public void onLoadingChanged(boolean isLoading) {
         Log.d(TAG, "onLoadingChanged:" + isLoading);
     }
@@ -469,12 +479,17 @@ public class PlayerSeekbar extends android.support.v7.widget.AppCompatSeekBar im
     }
 
     @Override
-    public void onPositionDiscontinuity() {
-        Log.d(TAG, "onPositionDiscontinuity");
+    public void onPositionDiscontinuity(int reason) {
+
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
         Log.d(TAG, "onPlaybackParametersChanged");
+    }
+
+    @Override
+    public void onSeekProcessed() {
+
     }
 }

@@ -40,6 +40,7 @@ import android.webkit.MimeTypeMap;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -51,6 +52,7 @@ import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.DownloadObserver;
 import org.bottiger.podcast.listeners.PlayerStatusProgressData;
 import org.bottiger.podcast.player.SoundWavesPlayerBase;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerEventListener;
 import org.bottiger.podcast.playlist.Playlist;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.service.PlayerService;
@@ -79,7 +81,7 @@ import static org.bottiger.podcast.player.SoundWavesPlayerBase.STATE_READY;
  */
 public class PlayPauseButton extends View implements DownloadObserver,
                                                                 View.OnClickListener,
-                                                                ExoPlayer.EventListener {
+                                                                Player.EventListener {
 
     private static final String TAG = PlayPauseButton.class.getSimpleName();
 
@@ -525,6 +527,16 @@ public class PlayPauseButton extends View implements DownloadObserver,
     }
 
     @Override
+    public void onRepeatModeChanged(int repeatMode) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
+    }
+
+    @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
 
     }
@@ -540,12 +552,17 @@ public class PlayPauseButton extends View implements DownloadObserver,
     }
 
     @Override
-    public void onPositionDiscontinuity() {
+    public void onPositionDiscontinuity(int reason) {
 
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+    }
+
+    @Override
+    public void onSeekProcessed() {
 
     }
 

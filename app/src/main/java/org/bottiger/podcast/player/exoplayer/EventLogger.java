@@ -84,13 +84,23 @@ import java.util.Locale;
     }
 
     @Override
-    public void onPositionDiscontinuity() {
-        Log.d(TAG, "positionDiscontinuity");
+    public void onRepeatModeChanged(int repeatMode) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
         Log.d(TAG, "onPlaybackParametersChanged");
+    }
+
+    @Override
+    public void onSeekProcessed() {
+
     }
 
     @Override
@@ -173,6 +183,11 @@ import java.util.Locale;
         Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
     }
 
+    @Override
+    public void onPositionDiscontinuity(int reason) {
+
+    }
+
     // MetadataRenderer.Output<List<Id3Frame>>
 
     /*
@@ -235,7 +250,7 @@ import java.util.Locale;
     }
 
     @Override
-    public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+    public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
         printInternalError("audioTrackUnderrun [" + bufferSize + ", " + bufferSizeMs + ", "
                 + elapsedSinceLastFeedMs + "]", null);
     }

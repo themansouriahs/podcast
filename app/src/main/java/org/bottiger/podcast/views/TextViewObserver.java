@@ -10,6 +10,7 @@ import android.widget.Chronometer;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -25,7 +26,7 @@ import static android.os.SystemClock.elapsedRealtime;
 /**
  * Created by apl on 25-03-2015.
  */
-public class TextViewObserver extends Chronometer implements ExoPlayer.EventListener {
+public class TextViewObserver extends Chronometer implements Player.EventListener {
 
     protected IEpisode mEpisode = null;
     private boolean mIsTicking = false;
@@ -53,12 +54,7 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
         mEpisode = argEpisode;
         mPlayer = SoundWaves.getAppContext(getContext()).getPlayer();
 
-        setOnChronometerTickListener(new OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-                setPosition();
-            }
-        });
+        setOnChronometerTickListener(chronometer -> setPosition());
     }
 
     private void setPosition() {
@@ -81,6 +77,16 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
     }
 
     @Override
+    public void onRepeatModeChanged(int repeatMode) {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
+    }
+
+    @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
     }
 
@@ -95,12 +101,17 @@ public class TextViewObserver extends Chronometer implements ExoPlayer.EventList
     }
 
     @Override
-    public void onPositionDiscontinuity() {
-        setPosition();
+    public void onPositionDiscontinuity(int reason) {
+
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+    }
+
+    @Override
+    public void onSeekProcessed() {
 
     }
 

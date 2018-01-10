@@ -11,11 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.*;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
@@ -24,6 +21,7 @@ import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.flavors.Analytics.IAnalytics;
 import org.bottiger.podcast.listeners.PlayerStatusObservable;
+import org.bottiger.podcast.player.exoplayer.ExoPlayerEventListener;
 import org.bottiger.podcast.player.exoplayer.ExoPlayerMediaSourceHelper;
 import org.bottiger.podcast.player.exoplayer.NewExoPlayer;
 import org.bottiger.podcast.provider.FeedItem;
@@ -74,7 +72,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
         mExoplayer = NewExoPlayer.newInstance(argContext);
         mPlayerHandler = new PlayerHandler(argContext);
 
-        addListener(new ExoPlayer.EventListener() {
+        addListener(new ExoPlayerEventListener() {
             @Override
             public void onLoadingChanged(boolean isLoading) {
                 Log.d(TAG, "loading chanced: " + isLoading);
@@ -124,35 +122,18 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             }
 
             @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-            }
-
-            @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-            }
-
-            @Override
             public void onPlayerError(ExoPlaybackException error) {
                 Log.e(TAG, error.toString());
             }
 
-            @Override
-            public void onPositionDiscontinuity() {
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-            }
         });
     }
 
-    public void addListener(ExoPlayer.EventListener listener) {
+    public void addListener(Player.EventListener listener) {
         mExoplayer.addListener(listener);
     }
 
-    public void removeListener(ExoPlayer.EventListener listener) {
+    public void removeListener(Player.EventListener listener) {
         mExoplayer.removeListener(listener);
     }
 
@@ -199,21 +180,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
             return;
         }
 
-        mExoplayer.addListener(new ExoPlayer.EventListener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-            }
-
-            @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-
-            }
+        mExoplayer.addListener(new ExoPlayerEventListener() {
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
@@ -231,20 +198,7 @@ public class SoundWavesPlayer extends org.bottiger.podcast.player.SoundWavesPlay
                 errorListener.onError(SoundWavesPlayer.this, error.type, 0);
             }
 
-            @Override
-            public void onPositionDiscontinuity() {
-
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-            }
         });
-
-        //setOnCompletionListener(completionListener);
-        //setOnBufferingUpdateListener(bufferListener);
-        //setOnErrorListener(errorListener);
 
         mIsInitialized = true;
 
