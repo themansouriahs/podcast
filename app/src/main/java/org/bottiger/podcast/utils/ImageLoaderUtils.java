@@ -56,8 +56,8 @@ public class ImageLoaderUtils {
         bitmapRequestBuilder = requestManager.asBitmap();
 
         RequestOptions options = argRequestOptions == null ? getRequestOptions(argContext) : argRequestOptions;
-        bitmapRequestBuilder.apply(options);
 
+        bitmapRequestBuilder = bitmapRequestBuilder.apply(options);
         bitmapRequestBuilder = bitmapRequestBuilder.load(argUrl);
 
         return bitmapRequestBuilder;

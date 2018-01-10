@@ -23,6 +23,7 @@ import org.bottiger.podcast.webservices.datastore.gpodder.GPodderUtils;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.List;
 
 /**
  * Created by aplb on 14-09-2015.
@@ -75,7 +76,7 @@ public class CloudSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            SortedList<Subscription> iSubscriptionLongSparseArray = SoundWaves.getAppContext(getContext()).getLibraryInstance().getSubscriptions();
+            List<Subscription> iSubscriptionLongSparseArray = SoundWaves.getAppContext(getContext()).getLibraryInstance().getLiveSubscriptions().getValue();
 
             // FIXME Hack to convet types
             LongSparseArray<Subscription> subscriptionLongSparseArray = new LongSparseArray<>(iSubscriptionLongSparseArray.size());

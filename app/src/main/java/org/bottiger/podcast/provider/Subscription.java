@@ -389,9 +389,11 @@ public class Subscription extends BasePodcastSubscription {
 
 		status = argStatus;
 
-		if (status == STATUS_SUBSCRIBED)
+		if (status == STATUS_SUBSCRIBED) {
 			notifyPropertyChanged(SubscriptionChanged.SUBSCRIBED, argTag);
-		else {
+		} else if (status == STATUS_UNSUBSCRIBED) {
+			notifyPropertyChanged(SubscriptionChanged.REMOVED, argTag);
+		} else {
 			VendorCrashReporter.report("setstatus", argTag);
 			notifyPropertyChanged(argTag);
 		}

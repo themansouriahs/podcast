@@ -1,5 +1,6 @@
 package org.bottiger.podcast;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -90,6 +91,8 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private static final String HANDLER_QUERY = "query";
     private SearchHandler mSearchHandler = new SearchHandler(this);
 
+    private Activity mActivity;
+
     // Spinner values
     private static final int SPINNER_TOP_ITEM = 0;
 
@@ -124,7 +127,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 subscription.fetchImage(context);
 
                 // Log the subscription
-                SoundWaves.getAppContext(getActivity()).getAnalystics().logFeed(subscription.getURLString(), false);
+                SoundWaves.getAppContext(mActivity).getAnalystics().logFeed(subscription.getURLString(), false);
             }
 
             String searchQuery = argResult.getSearchQuery();
@@ -144,12 +147,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         @Override
         public void error(@NonNull Exception argException) {
             Log.e(TAG, "Search failed", argException);
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mProgress.setVisibility(View.GONE);
-                }
-            });
+            mActivity.runOnUiThread(() -> mProgress.setVisibility(View.GONE));
         }
     };
 
@@ -158,12 +156,16 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
         mDiscoveryEngineKey = getResources().getString(R.string.pref_webservices_discovery_engine_key);
 
+        if (context instanceof Activity){
+            mActivity = (Activity) context;
+        }
+
         super.onAttach(context);
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         setHasOptionsMenu(true);
@@ -171,35 +173,32 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSpinner = (AppCompatSpinner) view.findViewById(R.id.search_spinner);
+        mSpinner = view.findViewById(R.id.search_spinner);
 
-        mSearchEngineButton = (ImageButton) view.findViewById(R.id.discovery_searchIcon);
-        mSearchEngineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<Integer> ids = new LinkedList<>();
-                List<Integer> res = new LinkedList<>();
+        mSearchEngineButton = view.findViewById(R.id.discovery_searchIcon);
+        mSearchEngineButton.setOnClickListener(v -> {
+            List<Integer> ids = new LinkedList<>();
+            List<Integer> res = new LinkedList<>();
 
-                for (int i = 0; i < ENGINE_IDS.length; i++) {
-                    @SearchEngine int id = ENGINE_IDS[i];
-                    if (isEnabled(id, getContext())) {
-                        ids.add(id);
-                        res.add(ENGINE_RES[i]);
-                    }
+            for (int i = 0; i < ENGINE_IDS.length; i++) {
+                @SearchEngine int id = ENGINE_IDS[i];
+                if (isEnabled(id, mActivity)) {
+                    ids.add(id);
+                    res.add(ENGINE_RES[i]);
                 }
-
-                int[] enabled_ids = IntUtils.toIntArray(ids);
-                int[] enabled_res = IntUtils.toIntArray(res);
-
-                DialogSearchDirectory dialogSearchDirectory = DialogSearchDirectory.newInstance(enabled_ids, enabled_res);
-                dialogSearchDirectory.show(getFragmentManager(), "SearchEnginePicker"); // NoI18N
             }
+
+            int[] enabled_ids = IntUtils.toIntArray(ids);
+            int[] enabled_res = IntUtils.toIntArray(res);
+
+            DialogSearchDirectory dialogSearchDirectory = DialogSearchDirectory.newInstance(enabled_ids, enabled_res);
+            dialogSearchDirectory.show(getFragmentManager(), "SearchEnginePicker"); // NoI18N
         });
 
-        mSearchView = (android.support.v7.widget.SearchView) view.findViewById(R.id.discovery_searchView);
+        mSearchView = view.findViewById(R.id.discovery_searchView);
         mSearchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -213,57 +212,48 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
                 return false;
             }
         });
-        mSearchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.discovery_searchView:
-                        mSearchView.onActionViewExpanded();
-                        break;
-                }
+        mSearchView.setOnClickListener(v -> {
+            switch (v.getId()) {
+                case R.id.discovery_searchView:
+                    mSearchView.onActionViewExpanded();
+                    break;
             }
         });
 
         // requires both mSearchEngineButton and mSearchView to be NonNull
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity.getApplicationContext());
         onSharedPreferenceChanged(sharedPreferences, mDiscoveryEngineKey);
 
         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(mSpinnerAdapter);
         mSpinner.setOnItemSelectedListener(this);
 
-        mResultsAdapter = new DiscoverySearchAdapter(getActivity());
+        mResultsAdapter = new DiscoverySearchAdapter(mActivity);
         mResultsAdapter.setHasStableIds(true);
 
-        mResultsRecyclerView = (RecyclerView) view.findViewById(R.id.search_result_view);
+        mResultsRecyclerView = view.findViewById(R.id.search_result_view);
         mResultsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mResultsRecyclerView.setHasFixedSize(true);
         mResultsRecyclerView.setAdapter(mResultsAdapter);
 
-        mProgress = (ProgressBar) view.findViewById(R.id.discovery_progress);
+        mProgress = view.findViewById(R.id.discovery_progress);
 
-        populateResults(GenericDirectory.defaultMode(getContext()));
+        populateResults(GenericDirectory.defaultMode(mActivity));
 
         mRxSubscription = SoundWaves
-                .getAppContext(getContext())
+                .getAppContext(mActivity)
                 .getLibraryInstance()
                 .mSubscriptionsChangeObservable
                 .onBackpressureLatest()
                 .ofType(org.bottiger.podcast.provider.Subscription.class)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<org.bottiger.podcast.provider.Subscription>() {
-                    @Override
-                    public void call(org.bottiger.podcast.provider.Subscription argSubscription) {
-                        mResultsAdapter.populateSubscribedUrls();
-                        mResultsAdapter.notifyDataSetChanged();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
+                .subscribe(argSubscription -> {
+                    mResultsAdapter.populateSubscribedUrls();
+                    mResultsAdapter.notifyDataSetChanged();
+                }, throwable -> {
+                    VendorCrashReporter.report("subscribeError" , throwable.toString());
+                    Log.d(TAG, "error: " + throwable.toString());
                 });
     }
 
@@ -312,7 +302,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         if (TextUtils.isEmpty(argQuery)) {
             mProgress.setVisibility(View.GONE);
             mSearchEngineButton.setVisibility(View.VISIBLE);
-            populateResults(GenericDirectory.defaultMode(getContext()));
+            populateResults(GenericDirectory.defaultMode(mActivity));
             return;
         }
 
@@ -353,7 +343,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             // FIXME: I do not fully understand why this is needed
             // bug: 5600e81488f8ad5351d0bdd7
             if (isAdded()) {
-                updateSpinnerValues(GenericDirectory.defaultMode(getContext()), null);
+                updateSpinnerValues(GenericDirectory.defaultMode(mActivity), null);
                 setQueryHint();
             }
         }
@@ -385,7 +375,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
         String value = mSpinnerAdapter.getItem(position);
 
-        if (position == 0) {
+        if (position == 0 ||value == null) {
             searchviewQueryChanged(null, false);
             return;
         }
@@ -404,13 +394,11 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
 
         if (value.equals(getListModeName(BY_AUTHOR))) {
             populateRecommendations();
-            return;
         }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        return;
     }
 
     private void setSearchEngine(@SearchEngine int argSearchEngine) {
@@ -475,7 +463,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
         ArrayList<String> lst = new ArrayList<>(items);
 
         if (mSpinnerAdapter == null) {
-            mSpinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.discovery_spinner_item, lst);
+            mSpinnerAdapter = new ArrayAdapter<>(mActivity, R.layout.discovery_spinner_item, lst);
         } else {
             mSpinnerAdapter.clear();
             for (int i = 0; i < items.size(); i++) {
@@ -487,7 +475,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
     private String[] supportedModeNames() {
 
         if (mDirectoryProvider == null) {
-            return new String[]{ getListModeName(GenericDirectory.defaultMode(getContext())) };
+            return new String[]{ getListModeName(GenericDirectory.defaultMode(mActivity)) };
         }
 
         int[] modes = mDirectoryProvider.supportedListModes();
@@ -588,7 +576,7 @@ public class DiscoveryFragment extends Fragment implements SharedPreferences.OnS
             return;
         }
 
-        updateSpinnerValues(GenericDirectory.defaultMode(getContext()), null);
+        updateSpinnerValues(GenericDirectory.defaultMode(mActivity), null);
         mResultsAdapter.setDataset(subscriptions);
     }
 

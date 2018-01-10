@@ -46,7 +46,10 @@ import org.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Predicate;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -54,7 +57,7 @@ import rx.schedulers.Schedulers;
 
 import static android.support.annotation.RestrictTo.Scope.TESTS;
 
-public class SubscriptionsFragment extends LifecycleFragment {
+public class SubscriptionsFragment extends Fragment {
 
     private static final String TAG = "SubscriptionsFragment";
 
@@ -95,7 +98,7 @@ public class SubscriptionsFragment extends LifecycleFragment {
     private Activity mActivity;
     private FrameLayout mContainerView;
 
-    private rx.Subscription mRxSubscriptionChanged;
+    private Disposable mRxSubscriptionChanged;
 
     private SharedPreferences shareprefs;
     private static String PREF_SUBSCRIPTION_COLUMNS;
@@ -128,7 +131,7 @@ public class SubscriptionsFragment extends LifecycleFragment {
         //RecyclerView
         mAdapter = createAdapter();
 
-        SortedList<Subscription> subscriptionsList = mLibrary.getLiveSubscriptions().getValue();
+        List<Subscription> subscriptionsList = mLibrary.getLiveSubscriptions().getValue();
         int listSize = subscriptionsList == null ? 0 : subscriptionsList.size();
         setSubscriptionFragmentLayout(listSize);
 
@@ -140,64 +143,50 @@ public class SubscriptionsFragment extends LifecycleFragment {
         mGridView.setLayoutManager(mGridLayoutmanager);
         mGridView.setAdapter(mAdapter);
 
-        mLibrary.getLiveSubscriptions().observe(this, new Observer<SortedList<Subscription>>() {
-            @Override
-            public void onChanged(@Nullable SortedList<Subscription> subscriptionSortedList) {
-                Log.v(TAG, "Recieved Subscription event: ");
-                if (subscriptionSortedList == null) {
-                    return;
-                }
+        mLibrary.getLiveSubscriptions().observe(this, subscriptionSortedList -> {
+            Log.v(TAG, "Recieved Subscription event: ");
+            if (subscriptionSortedList == null) {
+                return;
+            }
 
-                setSubscriptionFragmentLayout(subscriptionSortedList.size());
+            setSubscriptionFragmentLayout(subscriptionSortedList.size());
 
-                mGridLayoutmanager.setSpanCount(numberOfColumns());
-                mAdapter.setDataset(subscriptionSortedList);
+            mGridLayoutmanager.setSpanCount(numberOfColumns());
+            mAdapter.setDataset(subscriptionSortedList);
 
-                if (!mGridView.isComputingLayout()) {
-                    mAdapter.notifyDataSetChanged();
-                }
+            if (!mGridView.isComputingLayout()) {
+                mAdapter.notifyDataSetChanged();
             }
         });
 
-        mRxSubscriptionChanged = SoundWaves.getRxBus()
-                .toObserverable()
-                .onBackpressureBuffer(10000)
+        mRxSubscriptionChanged = SoundWaves.getRxBus2()
+                .toFlowableCommon()
                 .ofType(SubscriptionChanged.class)
-                .filter(new Func1<SubscriptionChanged, Boolean>() {
-                    @Override
-                    public Boolean call(SubscriptionChanged subscriptionChanged) {
-                        return subscriptionChanged.getAction() == SubscriptionChanged.CHANGED;
-                    }
-                })
-                .subscribe(new Action1<SubscriptionChanged>() {
-                    @Override
-                    public void call(SubscriptionChanged itemChangedEvent) {
-                        Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
-                        // Update the subscription fragment when a image is updated in an subscription
-                        SortedList<Subscription> subscriptions = mLibrary.getSubscriptions();
-                        Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
+                .filter(subscriptionChanged ->
+                        subscriptionChanged.getAction() == SubscriptionChanged.CHANGED ||
+                        subscriptionChanged.getAction() == SubscriptionChanged.LOADED)
+                .subscribe(itemChangedEvent -> {
+                    Log.v(TAG, "Refreshing Subscription: " + itemChangedEvent.getId());
+                    // Update the subscription fragment when a image is updated in an subscription
+                    List<Subscription> subscriptions = mLibrary.getLiveSubscriptions().getValue();
+                    Subscription subscription = mLibrary.getSubscription(itemChangedEvent.getId());
 
-                        int index = subscriptions.indexOf(subscription); // doesn't work
-                        for (int i = 0; i < subscriptions.size(); i++) {
-                            Subscription currentSubscription = subscriptions.get(i);
-                            if (subscription != null && subscription.equals(currentSubscription)) {
-                                index = i;
-                                break;
-                            }
-                        }
-
-                        if (!mGridView.isComputingLayout()) {
-                            mAdapter.notifyItemChanged(index);
+                    int index = subscriptions.indexOf(subscription); // doesn't work
+                    for (int i = 0; i < subscriptions.size(); i++) {
+                        Subscription currentSubscription = subscriptions.get(i);
+                        if (subscription != null && subscription.equals(currentSubscription)) {
+                            index = i;
+                            break;
                         }
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.handleException(throwable);
-                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
+
+                    if (!mGridView.isComputingLayout()) {
+                        mAdapter.notifyItemChanged(index);
                     }
+                }, throwable -> {
+                    VendorCrashReporter.handleException(throwable);
+                    Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                 });
-
 
         return mContainerView;
 
@@ -205,8 +194,8 @@ public class SubscriptionsFragment extends LifecycleFragment {
 
     @Override
     public void onDestroyView() {
-        if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isUnsubscribed()) {
-            mRxSubscriptionChanged.unsubscribe();
+        if (mRxSubscriptionChanged != null && !mRxSubscriptionChanged.isDisposed()) {
+            mRxSubscriptionChanged.dispose();
         }
         super.onDestroyView();
     }
@@ -220,19 +209,16 @@ public class SubscriptionsFragment extends LifecycleFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mEmptySubscrptionImportOPMLButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() instanceof TopActivity) {
-                    Intent i = new Intent(mActivity.getApplicationContext(), OPMLImportExportActivity.class);
-                    startActivityForResult(i, OPML_ACTIVITY_STATUS_CODE);
-                } else {
-                    Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
-                }
+        mEmptySubscrptionImportOPMLButton.setOnClickListener(v -> {
+            if (getActivity() instanceof TopActivity) {
+                Intent i = new Intent(mActivity.getApplicationContext(), OPMLImportExportActivity.class);
+                startActivityForResult(i, OPML_ACTIVITY_STATUS_CODE);
+            } else {
+                Log.wtf(TAG, "getActivity() is not an instance of TopActivity. Please investigate"); // NoI18N
             }
         });
 
-        mAdapter.setDataset(mLibrary.getSubscriptions());
+        mAdapter.setDataset(mLibrary.getLiveSubscriptions().getValue());
     }
 
     @Override
@@ -330,7 +316,7 @@ public class SubscriptionsFragment extends LifecycleFragment {
         mLibrary.setSubscriptionOrder(argSortOrder);
         item.setChecked(true);
 
-        mAdapter.setDataset(mLibrary.getSubscriptions());
+        mAdapter.setDataset(mLibrary.getLiveSubscriptions().getValue());
         mAdapter.notifyDataSetChanged();
     }
 

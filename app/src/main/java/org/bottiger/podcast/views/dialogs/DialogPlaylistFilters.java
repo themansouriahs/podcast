@@ -258,7 +258,7 @@ public class DialogPlaylistFilters extends DialogFragment {
     private void initSubscriptionFilter(@NonNull LayoutInflater argLayoutInflater, @NonNull View argView) {
         mSubscriptions.clear();
 
-        SortedList<Subscription> list = SoundWaves.getAppContext(getContext()).getLibraryInstance().getSubscriptions();
+        List<Subscription> list = SoundWaves.getAppContext(getContext()).getLibraryInstance().getLiveSubscriptions().getValue();
         for (int i = 0; i < list.size(); i++) {
             Subscription s = list.get(i);
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)

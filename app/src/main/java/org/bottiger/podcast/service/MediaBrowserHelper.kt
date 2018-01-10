@@ -84,13 +84,13 @@ class  MediaBrowserHelper(private var context: Context, private var library: Lib
         val items : MutableList<MediaBrowserCompat.MediaItem> = mutableListOf()
 
         // Add subscriptions
-        val subscriptions = library.getSubscriptions()
+        val subscriptions = library.liveSubscriptions.value
 
         var mediaSubscriptionDescriptionCompat: MediaDescriptionCompat.Builder
         var subscriptionDescription: MediaDescriptionCompat
         var subscription: Subscription
-        for (i in 0 until subscriptions.size()) {
-            subscription = subscriptions.get(i)
+        for (i in 0 until (subscriptions?.size ?: 0)) {
+            subscription = subscriptions!!.get(i)
 
             val episodeCount = subscription.episodeCount
             val episodesCountStr = res.getQuantityString(R.plurals.media_browser_playlist_subtitle, episodeCount, episodeCount)

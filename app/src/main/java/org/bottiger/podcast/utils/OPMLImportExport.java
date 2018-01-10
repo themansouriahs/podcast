@@ -194,7 +194,7 @@ public class OPMLImportExport {
 		}
 
 		OpmlWriter opmlWriter = new OpmlWriter();
-		SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
+		List<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getLiveSubscriptions().getValue();
 
 		try {
 			Log.i(TAG, "Writing output");
@@ -214,7 +214,7 @@ public class OPMLImportExport {
 		Writer writer = new StringWriter();
 		OpmlWriter opmlWriter = new OpmlWriter();
 
-		SortedList<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
+		List<Subscription> subscriptionList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getLiveSubscriptions().getValue();
 
 		try {
 			opmlWriter.writeDocument(subscriptionList, writer);

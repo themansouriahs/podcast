@@ -100,7 +100,7 @@ public class DialogPlaylistContent implements DialogInterface.OnMultiChoiceClick
      */
     public boolean performClick() {
         mSubscriptions.clear();
-        SortedList<Subscription> list = SoundWaves.getAppContext(mContext).getLibraryInstance().getSubscriptions();
+        List<Subscription> list = SoundWaves.getAppContext(mContext).getLibraryInstance().getLiveSubscriptions().getValue();
         for (int i = 0; i < list.size(); i++) {
             Subscription s = list.get(i);
             if (s.getStatus() == Subscription.STATUS_SUBSCRIBED)

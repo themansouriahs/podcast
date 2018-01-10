@@ -1,6 +1,7 @@
 package org.bottiger.podcast.adapters;
 
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
@@ -16,6 +17,7 @@ import com.bignerdranch.android.multiselector.MultiSelector;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ColorUtils;
 
@@ -39,17 +41,17 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
 
     @NonNull private Activity mActivity;
     @NonNull private MultiSelector mMultiSelector;
-    @NonNull private SubscriptionAdapter mAdapter;
+    @NonNull private Library mLibrary;
 
     @PinState private int mPinState;
 
     SubscriptionSelectorCallback(@NonNull Activity argActivity,
-                                        @NonNull SubscriptionAdapter argAdapter,
+                                        @NonNull Library argLibrary,
                                         @NonNull MultiSelector argMultiSelector) {
         super(argMultiSelector);
         mActivity = argActivity;
         mMultiSelector = argMultiSelector;
-        mAdapter = argAdapter;
+        mLibrary = argLibrary;
         mPinState = NONE;
     }
 
@@ -61,10 +63,8 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
         List<Integer> positions = mMultiSelector.getSelectedPositions();
-        SortedList<Subscription> subscriptions = mAdapter.getDataset();
-
-        if (subscriptions == null)
-            return false;
+        LiveData<List<Subscription>> liveSubscriptions = mLibrary.getLiveSubscriptions();
+        List<Subscription> subscriptions = liveSubscriptions.getValue();
 
         switch (menuItem.getItemId()) {
             case R.id.unsubscribe:
@@ -83,11 +83,7 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
 
                 for (int i = 0; i < toBeRemoved.size(); i++) {
                     Subscription subscription = toBeRemoved.get(i);
-                    subscription.unsubscribe("Unsubscribe:context");
-                }
-
-                if (toBeRemoved.size() > 0) {
-                    mAdapter.notifyDataSetChanged();
+                    mLibrary.removeSubscription(subscription);
                 }
 
                 mMultiSelector.clearSelections();
@@ -99,7 +95,7 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
 
                 // Run backwards to ensure that the positions will be correct
                 boolean changed = false;
-                mAdapter.getDataset().beginBatchedUpdates();
+                //mAdapter.getDataset().beginBatchedUpdates();
                 for (int i = 0; i < positions.size(); i++) {
                     int position = positions.get(i);
                     Subscription subscription = subscriptions.get(position);
@@ -112,11 +108,11 @@ class SubscriptionSelectorCallback extends ModalMultiSelectorCallback {
                     //mAdapter.notifyItemMoved(position, 0);
                     //mAdapter.pinSubscription(subscription, position, doPin);
                 }
-                mAdapter.getDataset().endBatchedUpdates();
+                //mAdapter.getDataset().endBatchedUpdates();
 
                 if (changed) {
                     SoundWaves.getAppContext(mActivity).getLibraryInstance().resetOrder();
-                    mAdapter.notifyDataSetChanged();
+                    //mAdapter.notifyDataSetChanged();
                 }
 
                 mMultiSelector.clearSelections();

@@ -16,7 +16,7 @@ import org.bottiger.podcast.provider.Subscription
  */
 class SubscriptionViewModel: AndroidViewModel {
 
-    val subscriptions : LiveData<SortedList<Subscription>>
+    val subscriptions : LiveData<List<Subscription>>
 
     constructor(application: SoundWaves) : super(application) {
          subscriptions = application.libraryInstance.liveSubscriptions;

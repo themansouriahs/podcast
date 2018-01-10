@@ -33,10 +33,12 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 
 import org.bottiger.podcast.R;
+import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.subscription.AuthenticationViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.ISubscriptionViewHolder;
 import org.bottiger.podcast.adapters.viewholders.subscription.SubscriptionViewHolder;
+import org.bottiger.podcast.model.Library;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.provider.base.BaseSubscription;
 import org.bottiger.podcast.utils.ColorExtractor;
@@ -67,7 +69,7 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     private Activity mActivity;
 
     @Nullable
-    private SortedList<Subscription> mSubscriptions = null;
+    private List<Subscription> mSubscriptions = null;
 
     private int numberOfColumns = 2;
     private int position = -1;
@@ -82,12 +84,13 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         numberOfColumns = argColumnsCount;
 
-        mActionModeCallback = new SubscriptionSelectorCallback(mActivity, this, mMultiSelector);
+        Library library = SoundWaves.getAppContext(mActivity).getLibraryInstance();
+        mActionModeCallback = new SubscriptionSelectorCallback(mActivity, library, mMultiSelector);
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.v(TAG, "onCreateViewHolder");
+        Log.v(TAG, "onCreateViewHolder"); // NoI18N
 
         RecyclerView.ViewHolder holder;
 
@@ -148,6 +151,8 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
     private void onBindDefaultHolder(@NonNull final SubscriptionViewHolder argHolder, @NonNull final Subscription argSubscription) {
         onBindBaseHolder(argHolder, argSubscription);
 
+        int position = argHolder.getAdapterPosition();
+
         final String logo = argSubscription.getImageURL();
         final Resources resources = mActivity.getResources();
 
@@ -157,7 +162,6 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         boolean hasImage = !TextUtils.isEmpty(logo);
         int visibility = hasNewEpisodes ? View.VISIBLE : GONE;
         Uri imageURI = hasImage ? Uri.parse(logo) : null;
-        int position = argHolder.getAdapterPosition();
 
         if (argSubscription.getLastItemUpdated() > 0 && argHolder.subTitle != null) {
             String reportDate = DateUtils.getRelativeTimeSpanString(argSubscription.getLastItemUpdated()).toString();
@@ -206,15 +210,15 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             String image = imageURI.toString();
             if (!TextUtils.isEmpty(image) && StrUtils.isValidUrl(image)) {
 
+                RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
+                options = options.centerCrop();
+
                 if (getItemViewType(position) == GRID_TYPE) {
-                    argHolder.setImagePlaceholderVisibility(VISIBLE);
+                    argHolder.setImagePlaceholderVisibility(GONE);
 
-
-                    RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
-                    options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
-                    options.centerCrop();
+                    options = options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
                     RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image, options);
-                    builder.listener(new RequestListener<Bitmap>() {
+                    builder = builder.listener(new RequestListener<Bitmap>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                             argHolder.setImagePlaceholderVisibility(VISIBLE);
@@ -233,15 +237,15 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
                     builder.into(new BitmapImageViewTarget(argHolder.image) {
                         @Override
                         protected void setResource(Bitmap resource) {
-                            argHolder.image.setImageBitmap(resource);
+                            if (resource != null) {
+                                argHolder.image.setImageBitmap(resource);
+                            }
                         }
                     });
                 } else {
-                    RequestOptions options =ImageLoaderUtils.getRequestOptions(mActivity);
-                    options.placeholder(R.drawable.generic_podcast);
-                    options.centerCrop();
-                    RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image);
-                    builder.apply(options);
+                    options = options.placeholder(R.drawable.generic_podcast);
+
+                    RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, image, options);
                     builder.into(new BitmapImageViewTarget(argHolder.image) {
                         @Override
                         protected void setResource(Bitmap resource) {
@@ -259,10 +263,10 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
             }
         } else {
             RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
-            options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
-            options.fitCenter();
+            options = options.placeholder(ColorUtils.getSubscriptionBackgroundColor(mActivity.getResources(), argSubscription));
+            options = options.fitCenter();
             RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, "");
-            builder.apply(options);
+            builder = builder.apply(options);
             builder.into(new BitmapImageViewTarget(argHolder.image) {
                 @Override
                 protected void setResource(Bitmap resource) {
@@ -288,38 +292,32 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
 
 
-        argHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mMultiSelector.tapSelection(argHolder)){
-                    // do whatever we want to do when not in selection mode
-                    // perhaps navigate to a detail screen
-                    FeedActivity.start(mActivity, argSubscription);
-                } else {
-                    onSubscriptionSelected();
-                }
+        argHolder.itemView.setOnClickListener(v -> {
+            if (!mMultiSelector.tapSelection(argHolder)){
+                // do whatever we want to do when not in selection mode
+                // perhaps navigate to a detail screen
+                FeedActivity.start(mActivity, argSubscription);
+            } else {
+                onSubscriptionSelected();
             }
         });
 
-        argHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
+        argHolder.itemView.setOnLongClickListener(v -> {
 
-                AppCompatActivity appCompatActivity = ((AppCompatActivity) argHolder.itemView.getContext());
-                mActionMode = appCompatActivity.startSupportActionMode(mActionModeCallback);
+            AppCompatActivity appCompatActivity = ((AppCompatActivity) argHolder.itemView.getContext());
+            mActionMode = appCompatActivity.startSupportActionMode(mActionModeCallback);
 
-                if (!mMultiSelector.isSelectable()) {
-                    mMultiSelector.setSelectable(true);
-                    mMultiSelector.setSelected(argHolder, true);
-                    return true;
-                }
-
-                mMultiSelector.tapSelection(argHolder);
-                onSubscriptionSelected();
-
+            if (!mMultiSelector.isSelectable()) {
+                mMultiSelector.setSelectable(true);
+                mMultiSelector.setSelected(argHolder, true);
                 return true;
-
             }
+
+            mMultiSelector.tapSelection(argHolder);
+            onSubscriptionSelected();
+
+            return true;
+
         });
     }
 
@@ -364,13 +362,13 @@ public class SubscriptionAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void setDataset(@NonNull SortedList<Subscription> argSubscriptions) {
+    public void setDataset(@NonNull List<Subscription> argSubscriptions) {
         mSubscriptions = argSubscriptions;
         notifyDataSetChanged();
     }
 
     @Nullable
-    SortedList<Subscription> getDataset() {
+    List<Subscription> getDataset() {
         return mSubscriptions;
     }
 

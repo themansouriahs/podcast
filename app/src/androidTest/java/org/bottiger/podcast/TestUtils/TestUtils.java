@@ -23,6 +23,7 @@ import org.bottiger.podcast.provider.SubscriptionColumns;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 
@@ -156,7 +157,7 @@ public class TestUtils {
     }
 
     public static void unsubscribeAll(@NonNull Activity argActivity) {
-        SortedList<Subscription> list = SoundWaves.getAppContext(argActivity).getLibraryInstance().getSubscriptions();
+        List<Subscription> list = SoundWaves.getAppContext(argActivity).getLibraryInstance().getLiveSubscriptions().getValue();
         for(int i = 0; i < list.size(); i++) {
             // get the object by the key.
             Subscription subscription = list.get(i);

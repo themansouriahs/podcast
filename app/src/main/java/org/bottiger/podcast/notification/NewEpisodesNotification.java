@@ -53,7 +53,7 @@ public class NewEpisodesNotification {
             NotificationChannels.INSTANCE.createEpisodesChannel(argContext);
         }
 
-        IEpisode episode = null;
+        IEpisode episode;
         boolean addedEpisode = false;
         for (int i = 0; i < argEpisodes.size(); i++) {
             episode = argEpisodes.get(i);
@@ -131,7 +131,9 @@ public class NewEpisodesNotification {
         NotificationManager mNotificationManager =
                 (NotificationManager) argContext.getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.notify(sProgressNotificationId, mBuilder.build());
+        if (mNotificationManager != null) {
+            mNotificationManager.notify(sProgressNotificationId, mBuilder.build());
+        }
     }
 
     public void removeNotification(@NonNull Context argContext) {
@@ -140,7 +142,9 @@ public class NewEpisodesNotification {
         NotificationManager mNotificationManager =
                 (NotificationManager) argContext.getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.cancel(sProgressNotificationId);
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(sProgressNotificationId);
+        }
     }
 
     private static boolean showEpisode(@NonNull IEpisode argEpisode, @NonNull Context argContext) {

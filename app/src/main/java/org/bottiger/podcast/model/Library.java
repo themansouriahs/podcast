@@ -49,6 +49,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.reactivex.ObservableEmitter;
@@ -110,84 +111,23 @@ public class Library {
     public io.reactivex.subjects.PublishSubject<Subscription> mSubscriptionsChangePublisher = io.reactivex.subjects.PublishSubject.create();
 
     @NonNull
-    private final SortedList<Subscription> mActiveSubscriptions;
+    private final List<Subscription> mActiveSubscriptions = new LinkedList<>();
+
     @NonNull
-    private final MutableLiveData<SortedList<Subscription>> mActiveLiveSubscriptions = new MutableLiveData<>();
+    private final MutableLiveData<List<Subscription>> mActiveLiveSubscriptions = new MutableLiveData<>();
     @NonNull
     private final ArrayMap<String, Subscription> mLiveSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
     private final ArrayMap<String, Subscription> mSubscriptionUrlLUT = new ArrayMap<>();
     @NonNull
     private final ArrayMap<Long, Subscription> mSubscriptionIdLUT = new ArrayMap<>();
-    @NonNull
-    private SortedList.Callback<Subscription> mSubscriptionsListCallback = new SortedList.Callback<Subscription>() {
 
-        /**
-         *
-         * @param o1
-         * @param o2
-         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second.
-         */
-        @Override
-        public int compare(Subscription o1, Subscription o2) {
-            return compareSubscriptions(o1, o2);
-        }
-
-        @Override
-        public void onInserted(int position, int count) {
-            Subscription subscription = mActiveSubscriptions.get(position);
-
-            if (subscription == null)
-                return;
-
-            notifySubscriptionChanged(subscription.getId(), SubscriptionChanged.ADDED, "SortedListInsert");
-        }
-
-        @Override
-        public void onRemoved(int position, int count) {
-            if (mActiveSubscriptions.size() >= position) {
-                // This is provoked by .clear()
-                //VendorCrashReporter.report("Library.onRemoved", "IndexOutOfBound");
-                return;
-            }
-
-            long subscriptionId = mActiveSubscriptions.get(position).getId();
-            notifySubscriptionChanged(subscriptionId, SubscriptionChanged.REMOVED, "SortedListRemoved");
-        }
-
-        @Override
-        public void onMoved(int fromPosition, int toPosition) {
-
-        }
-
-        @Override
-        public void onChanged(int position, int count) {
-            notifySubscriptionChanged(mActiveSubscriptions.get(position).getId(), SubscriptionChanged.CHANGED, "SortedListChanged");
-        }
-
-        @Override
-        public boolean areContentsTheSame(Subscription oldItem, Subscription newItem) {
-            return areItemsTheSame(oldItem, newItem);
-        }
-
-        @Override
-        public boolean areItemsTheSame(Subscription item1, Subscription item2) {
-            if (item1 == null && item2 == null)
-                return true;
-
-            if (item1 == null)
-                return false;
-
-            return item1.equals(item2);
-        }
-    };
 
     public Library(@NonNull Context argContext) {
         mContext = argContext.getApplicationContext();
 
         mLibraryPersistency = new LibraryPersistency(argContext, this);
 
-        mActiveSubscriptions = new SortedList<>(Subscription.class, mSubscriptionsListCallback);
         mActiveLiveSubscriptions.setValue(mActiveSubscriptions);
 
         mSubscriptionSortOrder = PreferenceHelper.getIntegerPreferenceValue(
@@ -239,16 +179,6 @@ public class Library {
                         }
                     }
                 });
-
-        /*
-, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        VendorCrashReporter.handleException(throwable);
-                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
-                    }
-                }
-         */
     }
 
     private void handleChangedEvent(SubscriptionChanged argSubscriptionChanged) {
@@ -266,7 +196,7 @@ public class Library {
         try {
             mSubscriptionLock.lock();
             if (!subscription.IsSubscribed() &&
-                mActiveSubscriptions.indexOf(subscription) != SortedList.INVALID_POSITION) {
+                mActiveSubscriptions.indexOf(subscription) != -1) {
                     Log.e("Unsubscribing", "from: " + subscription.getTitle() + ", tag:" + argSubscriptionChanged.getTag()); // NoI18N
                     mActiveSubscriptions.remove(subscription);
                     mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
@@ -277,12 +207,12 @@ public class Library {
         }
 
         switch (argSubscriptionChanged.getAction()) {
-            case SubscriptionChanged.CHANGED: {
+            case SubscriptionChanged.CHANGED:
+            case SubscriptionChanged.REMOVED: {
                 updateSubscription(subscription);
                 break;
             }
             case SubscriptionChanged.ADDED:
-            case SubscriptionChanged.REMOVED:
             case SubscriptionChanged.SUBSCRIBED:
             case SubscriptionChanged.LOADED:
                 break;
@@ -457,14 +387,17 @@ public class Library {
             if (argSubscription == null)
                 return;
 
-            if (mSubscriptionIdLUT.containsKey(argSubscription.getId()))
-                return;
+            if (mSubscriptionIdLUT.containsKey(argSubscription.getId())) {
+                // The ID LUT is not cleared when a subscription is removed
+                if (mSubscriptionUrlLUT.containsKey(argSubscription.getUrl()))
+                    return;
+            }
 
             mLiveSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
             mSubscriptionUrlLUT.put(argSubscription.getUrl(), argSubscription);
             mSubscriptionIdLUT.put(argSubscription.getId(), argSubscription);
 
-            if (mActiveSubscriptions.indexOf(argSubscription) == SortedList.INVALID_POSITION &&
+            if (mActiveSubscriptions.indexOf(argSubscription) == -1 &&
                     argSubscription.IsSubscribed()) {
                 mActiveSubscriptions.add(argSubscription);
                 mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
@@ -506,10 +439,12 @@ public class Library {
 
             VendorCrashReporter.report("remove", argSubscription.getUrl());
 
-            mSubscriptionIdLUT.remove(argSubscription.getId());
+            //mSubscriptionIdLUT.remove(argSubscription.getId());
             mSubscriptionUrlLUT.remove(argSubscription.getUrl());
             mActiveSubscriptions.remove(argSubscription);
             mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
+
+            argSubscription.unsubscribe("unsubscribe");
         } finally {
             mSubscriptionLock.unlock();
         }
@@ -537,12 +472,12 @@ public class Library {
     }
 
     @Deprecated
-    public SortedList<Subscription> getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return mActiveSubscriptions;
     }
 
     @NonNull
-    public LiveData<SortedList<Subscription>> getLiveSubscriptions() {
+    public LiveData<List<Subscription>> getLiveSubscriptions() {
         return mActiveLiveSubscriptions;
     }
 
@@ -776,16 +711,13 @@ public class Library {
         return counter;
     }
 
-    private Single<SortedList<Subscription>> mLoadedSubscriptionsObservable;
-    public Single<SortedList<Subscription>> getLoadedSubscriptions() {
+    private Single<List<Subscription>> mLoadedSubscriptionsObservable;
+    public Single<List<Subscription>> getLoadedSubscriptions() {
         if (mLoadedSubscriptionsObservable == null) {
-            mLoadedSubscriptionsObservable = io.reactivex.Observable.create(new ObservableOnSubscribe<SortedList<Subscription>>() {
-                @Override
-                public void subscribe(final ObservableEmitter<SortedList<Subscription>> e) throws Exception {
-                    loadSubscriptionsInternalSync(true);
-                    e.onNext(mActiveSubscriptions);
-                    e.onComplete();
-                }
+            mLoadedSubscriptionsObservable = io.reactivex.Observable.create((ObservableOnSubscribe<List<Subscription>>) e -> {
+                loadSubscriptionsInternalSync(true);
+                e.onNext(mActiveSubscriptions);
+                e.onComplete();
             }).replay(1).autoConnect().firstOrError();
         }
 
@@ -925,7 +857,6 @@ public class Library {
         if (subscription == null)
             return;
 
-        subscription.unsubscribe(argTag);
         updateSubscription(subscription);
         removeSubscription(subscription);
 
@@ -1132,7 +1063,7 @@ public class Library {
     }
 
     public void resetOrder() {
-        mActiveSubscriptions.beginBatchedUpdates();
+        //mActiveSubscriptions.beginBatchedUpdates();
         Subscription[] subscriptionsTmp = new Subscription[mActiveSubscriptions.size()];
         Subscription subTmp;
 
@@ -1147,7 +1078,7 @@ public class Library {
             mActiveSubscriptions.add(subTmp);
         }
 
-        mActiveSubscriptions.endBatchedUpdates();
+        //mActiveSubscriptions.endBatchedUpdates();
         mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
     }
 

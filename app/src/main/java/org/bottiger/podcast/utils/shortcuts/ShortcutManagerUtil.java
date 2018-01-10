@@ -78,28 +78,24 @@ public class ShortcutManagerUtil {
             otherShortcuts = 0;
         }
 
-        //argPlaylist.getLoadedPlaylist()
         SoundWaves.getAppContext(argContext).getLibraryInstance().getLoadedSubscriptions()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .map(new Function<SortedList<Subscription>, List<ShortcutInfo>>() {
-                    @Override
-                    public List<ShortcutInfo> apply(SortedList<Subscription> itemsList) throws Exception {
-                        List<ShortcutInfo> list = new LinkedList<>();
-                        List<IDbItem> items = new LinkedList<>();
-                        int numDynamicIcons = numDynamicShortcuts(shortcutManager) - otherShortcuts; //minus the download icon
-                        int numItems = itemsList.size() >= numDynamicShortcuts(shortcutManager) ? numDynamicIcons : itemsList.size();
+                .map(itemsList -> {
+                    List<ShortcutInfo> list = new LinkedList<>();
+                    List<IDbItem> items = new LinkedList<>();
+                    int numDynamicIcons = numDynamicShortcuts(shortcutManager) - otherShortcuts; //minus the download icon
+                    int numItems = itemsList.size() >= numDynamicShortcuts(shortcutManager) ? numDynamicIcons : itemsList.size();
 
-                        items.addAll(getSubscriptions(itemsList, numItems));
+                    items.addAll(getSubscriptions(itemsList, numItems));
 
-                        ShortcutInfo shortCut;
-                        for (int i = 0; i < numItems; i++) {
-                            shortCut = getShortCut(argContext, items.get(i));
-                            list.add(shortCut);
-                        }
-
-                        return list;
+                    ShortcutInfo shortCut;
+                    for (int i = 0; i < numItems; i++) {
+                        shortCut = getShortCut(argContext, items.get(i));
+                        list.add(shortCut);
                     }
+
+                    return list;
                 }).subscribe(new BaseSubscription.BasicColorExtractorObserver<List<ShortcutInfo>>() {
                     @Override
                     public void onSuccess(List<ShortcutInfo> argShortcuts) {
@@ -225,7 +221,7 @@ public class ShortcutManagerUtil {
         return argPlaylist.getItem(argNumItem);
     }
 
-    private static List<IPersistedSub> getSubscriptions(@NonNull SortedList<? extends IPersistedSub> argSubscriptions, int argNumItem) {
+    private static List<IPersistedSub> getSubscriptions(@NonNull List<? extends IPersistedSub> argSubscriptions, int argNumItem) {
         int numSubscription = argSubscriptions.size();
         List<IPersistedSub> subscriptionsList = new LinkedList<>();
         IPersistedSub subscription;

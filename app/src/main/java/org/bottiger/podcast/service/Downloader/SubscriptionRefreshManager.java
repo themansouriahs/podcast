@@ -186,7 +186,7 @@ public class SubscriptionRefreshManager {
 
         int subscriptionsAdded = 0;
 
-        SortedList<Subscription> subscriptions = SoundWaves.getAppContext(argContext).getLibraryInstance().getSubscriptions();
+        List<Subscription> subscriptions = SoundWaves.getAppContext(argContext).getLibraryInstance().getLiveSubscriptions().getValue();
         for (int i = 0; i < subscriptions.size(); i++) {
            addSubscriptionToQueue(argContext, subscriptions.get(i), argCallback);
            subscriptionsAdded++;

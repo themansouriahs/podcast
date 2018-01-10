@@ -11,6 +11,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 /** Writes OPML documents. */
 public class OpmlWriter {
@@ -81,7 +82,7 @@ public class OpmlWriter {
 	 * @throws IllegalArgumentException
 	 */
 	@Deprecated
-	public void writeDocument(SortedList<Subscription> feeds, Writer writer)
+	public void writeDocument(List<Subscription> feeds, Writer writer)
 			throws IllegalArgumentException, IllegalStateException, IOException {
 
 		Log.d(TAG, "Starting to write document");

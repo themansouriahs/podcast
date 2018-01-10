@@ -27,14 +27,14 @@ public class SubscriptionViewHolder extends BaseAnimatedSelectableViewHolder {
     public SubscriptionViewHolder(View itemView, MultiSelector argMultiSelector) {
         super(itemView, argMultiSelector);
 
-        container = itemView.findViewById(R.id.subscription_container);
-        title = (TextView) itemView.findViewById(R.id.grid_title);
-        subTitle = (TextView) itemView.findViewById(R.id.grid_subtitle);
-        image = (ImageViewTinted) itemView.findViewById(R.id.grid_image);
-        text_container = (FrameLayout)itemView.findViewById(R.id.subscription_text_container);
+        container               = itemView.findViewById(R.id.subscription_container);
+        title                   = itemView.findViewById(R.id.grid_title);
+        subTitle                = itemView.findViewById(R.id.grid_subtitle);
+        image                   = itemView.findViewById(R.id.grid_image);
+        text_container          = itemView.findViewById(R.id.subscription_text_container);
 
-        new_episodes_counter = (TextView) itemView.findViewById(R.id.new_episodes_counter);
-        new_episodes = (TextView) itemView.findViewById(R.id.new_episodes);
+        new_episodes_counter    = itemView.findViewById(R.id.new_episodes_counter);
+        new_episodes            = itemView.findViewById(R.id.new_episodes);
     }
 
     @NonNull

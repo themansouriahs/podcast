@@ -3,8 +3,10 @@ package org.bottiger.podcast.activities.discovery;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +16,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
@@ -22,13 +30,20 @@ import org.bottiger.podcast.activities.feedview.FeedActivity;
 import org.bottiger.podcast.adapters.viewholders.discovery.SearchResultViewHolder;
 import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.Subscription;
+import org.bottiger.podcast.utils.ColorUtils;
+import org.bottiger.podcast.utils.ErrorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
+import org.bottiger.podcast.utils.StrUtils;
 import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.utils.featured.FeaturedPodcastsUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * Created by apl on 15-04-2015.
@@ -73,40 +88,41 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
         holder.getDescription().setText(subscription.getDescription());
 
         try {
-            RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity);
-            options.centerCrop();
-            options.placeholder(R.drawable.generic_podcast);
-            ImageLoaderUtils.loadImageInto(holder.image, subscription.getImageURL(), ImageLoaderUtils.NETWORK, options);
+
+            String imageUrl = subscription.getImageURL();
+            if (StrUtils.isValidUrl(imageUrl)) {
+                RequestOptions options = ImageLoaderUtils.getRequestOptions(mActivity, ImageLoaderUtils.NETWORK);
+                options = options.centerCrop();
+                RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(mActivity, imageUrl, options);
+                builder.into(new BitmapImageViewTarget(holder.image) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        holder.image.setImageBitmap(resource);
+                    }
+                });
+            }
         } catch (NullPointerException npe) {
             holder.image.setBackgroundColor(mDefaultBackgroundColor);
         }
 
         final URL url = subscription.getURL();
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.itemView.setOnClickListener(v -> {
 
-                boolean isLocal = SoundWaves.getAppContext(mActivity).getLibraryInstance().containsSubscription(subscription);
-                ISubscription openSubscription = isLocal ?
-                        SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(subscription.getURLString()) :
-                        subscription;
+            boolean isLocal = SoundWaves.getAppContext(mActivity).getLibraryInstance().containsSubscription(subscription);
+            ISubscription openSubscription = isLocal ?
+                    SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscription(subscription.getURLString()) :
+                    subscription;
 
-                assert openSubscription != null;
-                FeedActivity.start(mActivity, openSubscription);
-            }
+            assert openSubscription != null;
+            FeedActivity.start(mActivity, openSubscription);
         });
 
         boolean isSubscribed = mSubscribedUrls.contains(url);
 
         holder.toggleSwitch.setOnCheckedChangeListener(null);
         holder.toggleSwitch.setChecked(isSubscribed);
-        holder.toggleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                toggleSubscriptionStatus(holder.itemView, subscription);
-            }
-        });
+        holder.toggleSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> toggleSubscriptionStatus(holder.itemView, subscription));
     }
 
     @Override
@@ -144,7 +160,7 @@ public class DiscoverySearchAdapter extends RecyclerView.Adapter<SearchResultVie
     }
 
     public void populateSubscribedUrls() {
-        SortedList<Subscription> subscriptionSortedList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getSubscriptions();
+        List<Subscription> subscriptionSortedList = SoundWaves.getAppContext(mActivity).getLibraryInstance().getLiveSubscriptions().getValue();
 
         mSubscribedUrls.clear();
 
