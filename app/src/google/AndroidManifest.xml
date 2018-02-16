@@ -10,10 +10,12 @@
             android:value="@integer/google_play_services_version" />
 
         <!-- Android auto -->
+        <!--
         <meta-data android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc"/>
         <meta-data android:name="com.google.android.gms.car.notification.SmallIcon"
             android:resource="@drawable/soundwaves" />
+            -->
 
 
         <meta-data android:name="com.google.android.backup.api_key"

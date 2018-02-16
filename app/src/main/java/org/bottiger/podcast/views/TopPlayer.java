@@ -403,25 +403,14 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
                 .ofType(RxBusSimpleEvents.PlaybackEngineChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(new Func1<RxBusSimpleEvents.PlaybackEngineChanged, Boolean>() {
-                    @Override
-                    public Boolean call(RxBusSimpleEvents.PlaybackEngineChanged playbackEngineChanged) {
-                        return mSpeedButton != null;
-                    }
-                })
-                .subscribe(new Action1<RxBusSimpleEvents.PlaybackEngineChanged>() {
-                    @Override
-                    public void call(RxBusSimpleEvents.PlaybackEngineChanged event) {
-                        assert  mSpeedButton != null;
+                .filter(playbackEngineChanged -> mSpeedButton != null)
+                .subscribe(event -> {
+                    assert  mSpeedButton != null;
 
-                        mSpeedButton.setText(getContext().getString(R.string.speed_multiplier, event.speed));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
+                    mSpeedButton.setText(getContext().getString(R.string.speed_multiplier, event.speed));
+                }, throwable -> {
+                    VendorCrashReporter.report("subscribeError" , throwable.toString());
+                    Log.d(TAG, "error: " + throwable.toString());
                 });
 
     }
@@ -592,14 +581,14 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             mDrivingLayout = inflater.inflate(R.layout.playlist_top_player_driving,
                     mControls, false);
 
-            mDrivingTitle = (TextView) mDrivingLayout.findViewById(R.id.player_title);
-            mDrivingSeekbar = (PlayerSeekbar) mDrivingLayout.findViewById(R.id.top_player_seekbar);
-            mDrivingCurrentTime = (TextViewObserver) mDrivingLayout.findViewById(R.id.current_time);
-            mDrivingTotalTime = (TextView) mDrivingLayout.findViewById(R.id.total_time);
-            mDrivingPlayPause = (PlayPauseButton) mDrivingLayout.findViewById(R.id.playpause);
-            mDrivingFastForward = (ImageView) mDrivingLayout.findViewById(R.id.top_player_fastforward);
-            mDrivingReverse = (ImageView) mDrivingLayout.findViewById(R.id.top_player_rewind);
-            mDrivingPhoto = (ImageView) mDrivingLayout.findViewById(R.id.session_photo);
+            mDrivingTitle       = mDrivingLayout.findViewById(R.id.player_title);
+            mDrivingSeekbar     = mDrivingLayout.findViewById(R.id.top_player_seekbar);
+            mDrivingCurrentTime = mDrivingLayout.findViewById(R.id.current_time);
+            mDrivingTotalTime   = mDrivingLayout.findViewById(R.id.total_time);
+            mDrivingPlayPause   = mDrivingLayout.findViewById(R.id.playpause);
+            mDrivingFastForward = mDrivingLayout.findViewById(R.id.top_player_fastforward);
+            mDrivingReverse     = mDrivingLayout.findViewById(R.id.top_player_rewind);
+            mDrivingPhoto       = mDrivingLayout.findViewById(R.id.session_photo);
 
             if (mCurrentEpisode != null) {
                 ISubscription iSubscription = mCurrentEpisode.getSubscription(getContext());
@@ -633,26 +622,18 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
         int hour_sleep = rightNow.get(Calendar.HOUR);
         int minute_sleep = rightNow.get(Calendar.MINUTE);
 
-        TimePickerDialog tpd = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePickerDialog view, int setHourOfDay, int setMinute, int setSecond) {
-                int hourDiff = setHourOfDay >= hourStart ? setHourOfDay - hourStart : setHourOfDay+24 - hourStart;
-                int minuteDiff = setMinute - minuteStart;
+        TimePickerDialog tpd = TimePickerDialog.newInstance((view, setHourOfDay, setMinute, setSecond) -> {
+            int hourDiff = setHourOfDay >= hourStart ? setHourOfDay - hourStart : setHourOfDay+24 - hourStart;
+            int minuteDiff = setMinute - minuteStart;
 
-                int setMinutes = hourDiff*60 + minuteDiff;
+            int setMinutes = hourDiff*60 + minuteDiff;
 
-                if (setMinutes > 0) {
-                    sleepButtonPressed(setMinutes);
-                }
+            if (setMinutes > 0) {
+                sleepButtonPressed(setMinutes);
             }
         }, hour_sleep, minute_sleep, false);
 
-        tpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                sleepButtonPressed(-1);
-            }
-        });
+        tpd.setOnCancelListener(dialogInterface -> sleepButtonPressed(-1));
 
         tpd.setCancelText(R.string.player_sleep_dialog_cancel_button);
         tpd.setOkText(R.string.player_sleep_dialog_ok_button);
@@ -988,12 +969,12 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
             View inflated = mMoreButtonsStub.inflate();
             mMoreButtonsStub = null;
 
-            mFullscreenButton = (PlayerButtonView) inflated.findViewById(R.id.fullscreen_button);
-            mSleepButton = (Button) inflated.findViewById(R.id.sleep_button);
-            mChapterButton = (ImageView) inflated.findViewById(R.id.chapter_button);
-            mSpeedButton = (Button) inflated.findViewById(R.id.speed_button);
-            mExpandedActionsBar = (LinearLayout) inflated.findViewById(R.id.expanded_action_bar);
-            mPlayerDownloadButton = (DownloadButtonView) findViewById(R.id.download);
+            mFullscreenButton       = inflated.findViewById(R.id.fullscreen_button);
+            mSleepButton            = inflated.findViewById(R.id.sleep_button);
+            mChapterButton          = inflated.findViewById(R.id.chapter_button);
+            mSpeedButton            = inflated.findViewById(R.id.speed_button);
+            mExpandedActionsBar     = inflated.findViewById(R.id.expanded_action_bar);
+            mPlayerDownloadButton   = findViewById(R.id.download);
 
             initExpandedButtons();
         }
@@ -1015,17 +996,20 @@ public class TopPlayer extends RelativeLayout implements ScrollingView, NestedSc
     }
 
     private void tintInflatedButtons() {
+        /*
         if (mSpeedButton != null) {
             ColorUtils.tintButton(mSpeedButton, mTextColor);
         }
 
         if (mFullscreenButton != null) {
             ColorUtils.tintButton(mFullscreenButton, mTextColor);
-        }
+        }*/
 
         if (mPlayerDownloadButton != null) {
-            ColorUtils.tintButton(mPlayerDownloadButton, mTextColor);
+            //ColorUtils.tintButton(mPlayerDownloadButton, mTextColor);
+            ColorUtils.tintButton(mPlayerDownloadButton, Color.BLACK);
         }
+
     }
 
     private void initExpandedButtons() {

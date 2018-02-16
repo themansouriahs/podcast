@@ -29,6 +29,7 @@ import org.bottiger.podcast.utils.ColorExtractor;
 import org.bottiger.podcast.utils.ColorUtils;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
 import org.bottiger.podcast.utils.StrUtils;
+import org.bottiger.podcast.utils.UIUtils;
 import org.bottiger.podcast.views.Overlay;
 import org.bottiger.podcast.views.PlayPauseButton;
 import org.bottiger.podcast.views.PlaylistViewHolder;
@@ -88,7 +89,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         }
 
         Context context = SoundWaves.getAppContext(mActivity);
-        int textColor = item.isMarkedAsListened() ? ColorUtils.getFadedTextColor(context) : ColorUtils.getTextColor(context);
+        int textColor = item.isMarkedAsListened() ? ColorUtils.getFadedTextColor(context) : UIUtils.attrColor(R.attr.themeTextColorPrimary, mActivity);
 
         viewHolder.setArtwork(null);
         ISubscription subscription = item.getSubscription(context);
@@ -156,12 +157,7 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
         keepOne.bind(viewHolder, dataPosition);
 
 
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                                                   @Override
-                                                   public void onClick(View v) {
-                                                       PlaylistAdapter.this.toggle(viewHolder);
-                                                   }
-                                               });
+        viewHolder.itemView.setOnClickListener(v -> PlaylistAdapter.this.toggle(viewHolder));
 
 
 
@@ -205,18 +201,15 @@ public class PlaylistAdapter extends AbstractPodcastAdapter<PlaylistViewHolder> 
                 });
 
 
-        holder.getRemoveButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlaylistAdapter.this.toggle(holder);
+        holder.getRemoveButton().setOnClickListener(v -> {
+            PlaylistAdapter.this.toggle(holder);
 
-                if (isFeedItem) { // FIXME
-                    feedItem.removeFromPlaylist(context.getContentResolver());
-                }
-
-                notifyDataSetChanged();
-                mPlaylist.removeItem(position + PLAYLIST_OFFSET);
+            if (isFeedItem) { // FIXME
+                feedItem.removeFromPlaylist(context.getContentResolver());
             }
+
+            notifyDataSetChanged();
+            mPlaylist.removeItem(position + PLAYLIST_OFFSET);
         });
     }
 

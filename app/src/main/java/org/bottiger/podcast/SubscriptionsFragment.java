@@ -49,11 +49,6 @@ import java.io.IOException;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Predicate;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 import static android.support.annotation.RestrictTo.Scope.TESTS;
 

@@ -68,8 +68,6 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
     @Nullable private TopPlayer mTopPlayer;
     @Nullable private ImageView mPhoto;
 
-    private GenericMediaPlayerInterface mPlayer;
-
     private RecyclerView mRecyclerView;
     private Overlay mOverlay;
 
@@ -414,7 +412,7 @@ public class PlaylistFragment extends AbstractEpisodeFragment {
             return;
 
         mTopPlayer  = (TopPlayer) mTopPlayerStub.inflate();
-        mPhoto      = (ImageView) view.findViewById(R.id.session_photo);
+        mPhoto      = view.findViewById(R.id.session_photo);
 
         assert mTopPlayer != null;
 

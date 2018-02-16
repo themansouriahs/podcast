@@ -77,9 +77,11 @@ class DownloadManagerAdapter extends RecyclerView.Adapter<DownloadItemViewHolder
 
         IEpisode episode = queueEpisode.getEpisode();
 
-        DownloadViewModel viewModel = new DownloadViewModel(mContext, this, (FeedItem)episode, position); // FIXME no type casting
-        viewModel.subscribe();
-        holder.getBinding().setVariable(BR.viewModel, viewModel);
+        if (episode instanceof FeedItem) {
+            DownloadViewModel viewModel = new DownloadViewModel(mContext, this, (FeedItem) episode, position); // FIXME no type casting
+            viewModel.subscribe();
+            holder.getBinding().setVariable(BR.viewModel, viewModel);
+        }
     }
 
     @Override
