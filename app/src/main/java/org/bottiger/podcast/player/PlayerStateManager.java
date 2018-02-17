@@ -11,6 +11,7 @@ import android.media.session.MediaSession;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -24,14 +25,19 @@ import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.model.datastructures.EpisodeList;
+import org.bottiger.podcast.model.search.SearchPodcast;
 import org.bottiger.podcast.notification.NotificationPlayer;
 import org.bottiger.podcast.provider.IDbItem;
 import org.bottiger.podcast.provider.IEpisode;
 import org.bottiger.podcast.provider.ISubscription;
+import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.receiver.HeadsetReceiver;
 import org.bottiger.podcast.service.MediaBrowserHelper;
 import org.bottiger.podcast.service.PlayerService;
 import org.bottiger.podcast.utils.ImageLoaderUtils;
+
+import java.util.List;
 
 /**
  * Created by apl on 12-02-2015.
@@ -184,48 +190,29 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
     @Override
     public void onPlayFromSearch(String query, Bundle extras) {
-        onPlay();
-        /*
-        if (TextUtils.isEmpty(query)) {
-            // The user provided generic string e.g. 'Play music'
-            // Build appropriate playlist queue
-        } else {
-            // Build a queue based on songs that match "query" or "extras" param
-            String mediaFocus = extras.getString(MediaStore.EXTRA_MEDIA_FOCUS);
-            if (TextUtils.equals(mediaFocus,
-                    MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE)) {
-                isArtistFocus = true;
-                artist = extras.getString(MediaStore.EXTRA_MEDIA_ARTIST);
-            } else if (TextUtils.equals(mediaFocus,
-                    MediaStore.Audio.Albums.ENTRY_CONTENT_TYPE)) {
-                isAlbumFocus = true;
-                album = extras.getString(MediaStore.EXTRA_MEDIA_ALBUM);
+        Log.d(TAG, "onPlayFromSearch  query=" + query + " extras=" + extras.toString());
+
+        IEpisode episode = null;
+        SearchPodcast searcher = new SearchPodcast(SoundWaves.getAppContext(mPlayerService).getLibraryInstance());
+
+        ISubscription subscription = searcher.findSubscription(query);
+        if (subscription != null) {
+            EpisodeList<IEpisode> subscriptionEpisodes = subscription.getLiveEpisodes().getValue();
+            if (subscriptionEpisodes != null && subscriptionEpisodes.size() > 0) {
+                episode = subscriptionEpisodes.get(0);
             }
-
-            // Implement additional "extras" param filtering
         }
 
-        // Implement your logic to retrieve the queue
-        if (isArtistFocus) {
-            result = searchMusicByArtist(artist);
-        } else if (isAlbumFocus) {
-            result = searchMusicByAlbum(album);
+        if (episode == null) {
+            IEpisode foundEpisode = searcher.findEpisode(query);
+            if (foundEpisode != null) {
+                episode = foundEpisode;
+            }
         }
 
-        if (result == null) {
-            // No focus found, search by query for song title
-            result = searchMusicBySongTitle(query);
+        if (episode != null) {
+            mPlayerService.play(episode, true);
         }
-
-        if (result != null && !result.isEmpty()) {
-            // Immediately start playing from the beginning of the search results
-            // Implement your logic to start playing music
-            playMusic(result);
-        } else {
-            // Handle no queue found. Stop playing if the app
-            // is currently playing a song
-        }
-        */
     }
 
     public void release() {
