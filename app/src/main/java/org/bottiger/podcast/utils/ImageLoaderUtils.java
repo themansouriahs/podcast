@@ -71,7 +71,7 @@ public class ImageLoaderUtils {
         boolean noNetwork = argAllowNetwork == NO_NETWORK || (argAllowNetwork != NETWORK && NetworkUtils.getNetworkStatus(argContext, false) != SoundWavesDownloadManager.NETWORK_OK);
 
         RequestOptions options = new RequestOptions();
-        options.onlyRetrieveFromCache(noNetwork);
+        options = options.onlyRetrieveFromCache(noNetwork);
 
         return options;
     }

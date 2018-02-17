@@ -40,8 +40,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import org.bottiger.podcast.ApplicationConfiguration;
@@ -172,13 +176,13 @@ public class FeedActivity extends TopActivity {
 
         mRxSubscription = subscribeToChanges(mSubscription, mAdapter);
 
-        mPhotoView = (FeedViewTopImage) findViewById(R.id.photo);
-        mNoEpisodesView = (LinearLayout) findViewById(R.id.feed_recycler_view_empty);
-        mNoEpisodesReason = (TextView) findViewById(R.id.feed_recycler_view_empty_body);
-        mMultiShrinkScroller = (MultiShrinkScroller) findViewById(R.id.multiscroller);
-        mFloatingButton = (FloatingActionButton) findViewById(R.id.feedview_fap_button);
-        mRevealLayout = (FrameLayout) findViewById(R.id.feed_activity_settings_container);
-        mRecyclerView = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
+        mPhotoView              = findViewById(R.id.photo);
+        mNoEpisodesView         = findViewById(R.id.feed_recycler_view_empty);
+        mNoEpisodesReason       = findViewById(R.id.feed_recycler_view_empty_body);
+        mMultiShrinkScroller    = findViewById(R.id.multiscroller);
+        mFloatingButton         = findViewById(R.id.feedview_fap_button);
+        mRevealLayout           = findViewById(R.id.feed_activity_settings_container);
+        mRecyclerView           = (FeedRecyclerView) findViewById(R.id.feed_recycler_view);
 
         setViewState(mSubscription);
 
@@ -186,19 +190,11 @@ public class FeedActivity extends TopActivity {
             SubscriptionSettingsUtils mSubscriptionSettingsUtils = new SubscriptionSettingsUtils(mRevealLayout, (Subscription) mSubscription);
             mAdapter.setExpanded(((Subscription) mSubscription).isShowDescription());
 
-            mSubscriptionSettingsUtils.setListOldestFirstListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
-                @Override
-                public void OnSettingsChanged(boolean isChecked) {
-                    mAdapter.setOrder(mAdapter.calcOrder());
-                }
-            });
+            mSubscriptionSettingsUtils.setListOldestFirstListener(isChecked -> mAdapter.setOrder(mAdapter.calcOrder()));
 
-            mSubscriptionSettingsUtils.setHideListenedListener(new SubscriptionSettingsUtils.OnSettingsChangedListener() {
-                @Override
-                public void OnSettingsChanged(boolean isChecked) {
-                    mAdapter.setShowListened(!isChecked); // HIDE listened vs DO SHOW listened
-                    mAdapter.notifyDataSetChanged();
-                }
+            mSubscriptionSettingsUtils.setHideListenedListener(isChecked -> {
+                mAdapter.setShowListened(!isChecked); // HIDE listened vs DO SHOW listened
+                mAdapter.notifyDataSetChanged();
             });
 
             @FeedViewAdapter.Order int sortOrder = mSubscription.isListOldestFirst(getResources()) ?  FeedViewAdapter.OLDEST_FIRST : FeedViewAdapter.RECENT_FIRST;
@@ -218,15 +214,10 @@ public class FeedActivity extends TopActivity {
 
         final View transparentView = findViewById(R.id.transparent_view);
         if (mMultiShrinkScroller != null) {
-            transparentView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mMultiShrinkScroller.scrollOffBottom();
-                }
-            });
+            transparentView.setOnClickListener(v -> mMultiShrinkScroller.scrollOffBottom());
         }
 
-        mToolbar = (Toolbar) findViewById(R.id.feed_view_toolbar);
+        mToolbar = findViewById(R.id.feed_view_toolbar);
 
         mToolbar.setTitle(mSubscription.getTitle());
         setSupportActionBar(mToolbar);
@@ -263,36 +254,30 @@ public class FeedActivity extends TopActivity {
         mMultiShrinkScroller.setTitle(mSubscription.getTitle());
 
         SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ true,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!mHasAlreadyBeenOpened) {
-                            // The initial scrim opacity must match the scrim opacity that would be
-                            // achieved by scrolling to the starting position.
-                            final float alphaRatio = mExtraMode == MODE_FULLY_EXPANDED ?
-                                    1 : mMultiShrinkScroller.getStartingTransparentHeightRatio();
-                            final int duration = getResources().getInteger(
-                                    android.R.integer.config_shortAnimTime);
-                            final int desiredAlpha = (int) (0xFF * alphaRatio);
-                            ObjectAnimator o = ObjectAnimator.ofInt(mWindowScrim, "alpha", 0,
-                                    desiredAlpha).setDuration(duration);
+                () -> {
+                    if (!mHasAlreadyBeenOpened) {
+                        // The initial scrim opacity must match the scrim opacity that would be
+                        // achieved by scrolling to the starting position.
+                        final float alphaRatio = mExtraMode == MODE_FULLY_EXPANDED ?
+                                1 : mMultiShrinkScroller.getStartingTransparentHeightRatio();
+                        final int duration = getResources().getInteger(
+                                android.R.integer.config_shortAnimTime);
+                        final int desiredAlpha = (int) (0xFF * alphaRatio);
+                        ObjectAnimator o = ObjectAnimator.ofInt(mWindowScrim, "alpha", 0,
+                                desiredAlpha).setDuration(duration);
 
-                            o.start();
-                        }
+                        o.start();
                     }
                 });
 
         if (savedInstanceState != null) {
             SchedulingUtils.doOnPreDraw(mMultiShrinkScroller, /* drawNextFrame = */ false,
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            // Need to wait for the pre draw before setting the initial scroll
-                            // value. Prior to pre draw all scroll values are invalid.
-                            if (mHasAlreadyBeenOpened) {
-                                mMultiShrinkScroller.setVisibility(View.VISIBLE);
-                                mMultiShrinkScroller.setScroll(mMultiShrinkScroller.getScrollNeededToBeFullScreen());
-                            }
+                    () -> {
+                        // Need to wait for the pre draw before setting the initial scroll
+                        // value. Prior to pre draw all scroll values are invalid.
+                        if (mHasAlreadyBeenOpened) {
+                            mMultiShrinkScroller.setVisibility(View.VISIBLE);
+                            mMultiShrinkScroller.setScroll(mMultiShrinkScroller.getScrollNeededToBeFullScreen());
                         }
                     });
         }
@@ -304,18 +289,24 @@ public class FeedActivity extends TopActivity {
         if (mPhotoView.getDrawable() == null) {
             ColorDrawable cd = new ColorDrawable(mSubscription.getPrimaryColor());
             RequestOptions options = ImageLoaderUtils.getRequestOptions(getApplicationContext());
-            options.placeholder(cd);
-            options.fitCenter();
+            options = options.placeholder(cd);
+            options = options.fitCenter();
             RequestBuilder<Bitmap> builder = ImageLoaderUtils.getGlide(getApplicationContext(), mUrl);
-            builder.apply(options);
-            builder.into(new SimpleTarget<Bitmap>() {
+            builder = builder.apply(options);
+            builder = builder.listener(new RequestListener<Bitmap>() {
                 @Override
-                public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                     boolean isWhite = WhitenessUtils.isBitmapWhiteAtTopOrBottom(resource);
                     mMultiShrinkScroller.setUseGradient(isWhite);
-                    mPhotoView.setImageBitmap(resource);
+                    return false;
                 }
             });
+            builder.into(mPhotoView);
         }
     }
 
@@ -543,26 +534,20 @@ public class FeedActivity extends TopActivity {
                 .ofType(SubscriptionChanged.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<SubscriptionChanged>() {
-                    @Override
-                    public void call(SubscriptionChanged subscriptionChanged) {
-                        @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
-                        boolean doUpdate =
-                                action == SubscriptionChanged.ADDED ||
-                                action == SubscriptionChanged.REMOVED ||
-                                action == SubscriptionChanged.LOADED;
+                .subscribe(subscriptionChanged -> {
+                    @SubscriptionChanged.Action int action = subscriptionChanged.getAction();
+                    boolean doUpdate =
+                            action == SubscriptionChanged.ADDED ||
+                            action == SubscriptionChanged.REMOVED ||
+                            action == SubscriptionChanged.LOADED;
 
-                        if (doUpdate) {
-                            setViewState(argSubscription);
-                            argAdapter.updateEpisoedsAndNotifyChanged();
-                        }
+                    if (doUpdate) {
+                        setViewState(argSubscription);
+                        argAdapter.updateEpisoedsAndNotifyChanged();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d("FeedViewAdapter", "error: " + throwable.toString());
-                    }
+                }, throwable -> {
+                    VendorCrashReporter.report("subscribeError" , throwable.toString());
+                    Log.d("FeedViewAdapter", "error: " + throwable.toString());
                 });
     }
 
@@ -631,91 +616,82 @@ public class FeedActivity extends TopActivity {
     }
 
     protected IDownloadCompleteCallback getIDownloadCompleteCallback() {
-        return new IDownloadCompleteCallback() {
-            @Override
-            public void complete(boolean argSucces, ISubscription argSubscription) {
-                mProgress.dismiss();
+        return (argSucces, argSubscription) -> {
+            mProgress.dismiss();
 
-                if (!argSucces)
-                    return;
+            if (!argSucces)
+                return;
 
-                if (argSubscription instanceof Subscription) {
-                    VendorCrashReporter.report(TAG, "Proper subscription recieved");
-                    return;
-                }
-
-                final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
-
-                setSubscription(argSubscription);
-
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        setViewState(slimSubscription);
-                        setNoEpisodesTextViewViewState(slimSubscription);
-                        mAdapter.setDataset(slimSubscription);
-                        setBackgroundImage(slimSubscription);
-                    }
-                });
+            if (argSubscription instanceof Subscription) {
+                VendorCrashReporter.report(TAG, "Proper subscription recieved");
+                return;
             }
+
+            final SlimSubscription slimSubscription = (SlimSubscription)argSubscription;
+
+            setSubscription(argSubscription);
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                setViewState(slimSubscription);
+                setNoEpisodesTextViewViewState(slimSubscription);
+                mAdapter.setDataset(slimSubscription);
+                setBackgroundImage(slimSubscription);
+            });
         };
     }
 
     private View.OnClickListener getFloatingOnClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // get the center for the clipping circle
-                int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
-                int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
+        return v -> {
+            // get the center for the clipping circle
+            int cx = (mRevealLayout.getLeft() + mRevealLayout.getRight());
+            int cy = (mRevealLayout.getTop() + mRevealLayout.getBottom());
 
-                // get the final radius for the clipping circle
-                int revealRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
+            // get the final radius for the clipping circle
+            int revealRadius = Math.max(mRevealLayout.getWidth(), mRevealLayout.getHeight());
 
 
-                if (mSettingsRevealed) {
-                    mMultiShrinkScroller.resetHeader();
-                    mRevealAnimator =
-                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, revealRadius, 0);
-                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
-                    mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart() {
-                        }
+            if (mSettingsRevealed) {
+                mMultiShrinkScroller.resetHeader();
+                mRevealAnimator =
+                        ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, revealRadius, 0);
+                mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
+                mRevealAnimator.addListener(new SupportAnimator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart() {
+                    }
 
-                        @Override
-                        public void onAnimationCancel() {
-                        }
+                    @Override
+                    public void onAnimationCancel() {
+                    }
 
-                        @Override
-                        public void onAnimationRepeat() {
-                        }
+                    @Override
+                    public void onAnimationRepeat() {
+                    }
 
-                        @Override
-                        public void onAnimationEnd() {
-                            mRevealLayout.setVisibility(View.INVISIBLE);
-                            setFABDrawable(R.drawable.ic_tune_white);
-                            mToolbar.setTitle(mSubscription.getTitle());
-                        }
-                    });
-                    mRevealAnimator.start();
-                } else {
-                    // Open Settings
-                    mMultiShrinkScroller.expandHeader();
-                    mRevealAnimator =
-                            ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, revealRadius);
-                    mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                    mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
+                    @Override
+                    public void onAnimationEnd() {
+                        mRevealLayout.setVisibility(View.INVISIBLE);
+                        setFABDrawable(R.drawable.ic_tune_white);
+                        mToolbar.setTitle(mSubscription.getTitle());
+                    }
+                });
+                mRevealAnimator.start();
+            } else {
+                // Open Settings
+                mMultiShrinkScroller.expandHeader();
+                mRevealAnimator =
+                        ViewAnimationUtils.createCircularReveal(mRevealLayout, cx, cy, 0, revealRadius);
+                mRevealAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                mRevealAnimator.setDuration(SETTINGS_REVEAL_DURATION);
 
-                    mRevealLayout.setVisibility(View.VISIBLE);
-                    setFABDrawable(R.drawable.ic_clear_white);
-                    mToolbar.setTitle(R.string.menu_settings);
-                    mRevealAnimator.start();
-                }
-                mSettingsRevealed = !mSettingsRevealed;
+                mRevealLayout.setVisibility(View.VISIBLE);
+                setFABDrawable(R.drawable.ic_clear_white);
+                mToolbar.setTitle(R.string.menu_settings);
+                mRevealAnimator.start();
             }
+            mSettingsRevealed = !mSettingsRevealed;
         };
     }
 

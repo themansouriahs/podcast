@@ -182,7 +182,7 @@ dependencies {
 
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
+    compile "com.squareup.okhttp3:okhttp:$okhttp_version"
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile('com.googlecode.json-simple:json-simple:1.1.1') {
@@ -246,7 +246,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:1.0.1'
     androidTestCompile 'com.android.support.test:rules:1.0.1'
     androidTestCompile 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
-    androidTestCompile 'com.squareup.okhttp3:okhttp:3.9.0'
+    androidTestCompile "com.squareup.okhttp3:okhttp:$okhttp_version"
     androidTestCompile("com.android.support.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'com.android.support'
     }

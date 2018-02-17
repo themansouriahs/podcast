@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
@@ -133,19 +135,12 @@ public class SubscriptionRefreshManager {
             return;
         }
 
-        final IDownloadCompleteCallback wrappedCallback = new IDownloadCompleteCallback() {
-            @Override
-            public void complete(final boolean argSucces, final ISubscription argSubscription) {
-
-                Runnable myRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (argCallback != null)
-                            argCallback.complete(argSucces, argSubscription);
-                    }
-                };
-                mainHandler.post(myRunnable);
-            }
+        final IDownloadCompleteCallback wrappedCallback = (argSucces, argSubscription1) -> {
+            Runnable myRunnable = () -> {
+                if (argCallback != null)
+                    argCallback.complete(argSucces, argSubscription1);
+            };
+            mainHandler.post(myRunnable);
         };
 
         argSubscription.setIsRefreshing(true);
@@ -166,6 +161,16 @@ public class SubscriptionRefreshManager {
             public void onSuccess(Request value) {
                 try {
                     Response response = executeRequest(value, credentials);
+                    handleHttpResponse(argContext, argSubscription, response, argCallback);
+                } catch (SSLHandshakeException ssle) {
+                    final Request request = getInsecureRequest(argSubscription);
+                    Response response = null;
+                    try {
+                        response = executeRequest(request, credentials);
+                    } catch (IOException e) {
+                        ErrorUtils.handleException(e);
+                        wrappedCallback.complete(false, argSubscription);
+                    }
                     handleHttpResponse(argContext, argSubscription, response, argCallback);
                 } catch (IOException e) {
                     ErrorUtils.handleException(e);
@@ -232,6 +237,13 @@ public class SubscriptionRefreshManager {
     private static Request getRequest(@NonNull ISubscription argSubscription) {
         return new Request.Builder()
                 .url(argSubscription.getURLString())
+                .build();
+    }
+
+    private static Request  getInsecureRequest(@NonNull ISubscription argSubscription) {
+        String url = argSubscription.getURLString().replaceFirst("https:", "http:");
+        return new Request.Builder()
+                .url(url)
                 .build();
     }
 
