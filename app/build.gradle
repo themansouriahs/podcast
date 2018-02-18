@@ -30,8 +30,8 @@ android {
         applicationId "org.bottiger.podcast"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 418        // even - release. Odd - development
-        versionName "0.160" // even - release. Odd - development
+        versionCode 422        // even - release. Odd - development
+        versionName "0.160.2" // even - release. Odd - development
         multiDexEnabled = true
 
         vectorDrawables.useSupportLibrary = true
@@ -203,11 +203,11 @@ dependencies {
     }
 
     // Glide
-    compile 'com.github.bumptech.glide:glide:4.4.0'
-    compile 'com.github.bumptech.glide:okhttp3-integration:4.4.0'
-    compile 'com.github.bumptech.glide:compiler:4.4.0'
-    compile "com.github.bumptech.glide:recyclerview-integration:4.4.0"
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
+    compile "com.github.bumptech.glide:glide:$glide_version"
+    compile "com.github.bumptech.glide:okhttp3-integration:$glide_version"
+    compile "com.github.bumptech.glide:compiler:$glide_version"
+    compile "com.github.bumptech.glide:recyclerview-integration:$glide_version"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
 
     compile 'net.steamcrafted:materialiconlib:1.1.2'
     compile 'org.whispersystems:libpastelog:1.0.7'

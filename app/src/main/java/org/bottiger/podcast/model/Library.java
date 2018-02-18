@@ -771,6 +771,14 @@ public class Library {
         }
     }
 
+    public void loadAllEpisodes() {
+        loadSubscriptionsInternalSync(false);
+        List<Subscription> subscriptions = getLiveSubscriptions().getValue();
+        for (Subscription subscription : subscriptions) {
+            loadEpisodes(subscription);
+        }
+    }
+
     public void loadEpisodes(@NonNull final Subscription argSubscription) {
         if (argSubscription.IsLoaded())
             return;
@@ -778,17 +786,9 @@ public class Library {
         String query = getAllEpisodes(argSubscription);
         Observable.just(query)
                 .observeOn(Schedulers.io())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String query) {
-                        loadEpisodesSync(argSubscription, query);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.report("subscribeError" , throwable.toString());
-                        Log.d(TAG, "error: " + throwable.toString());
-                    }
+                .subscribe(query1 -> loadEpisodesSync(argSubscription, query1), throwable -> {
+                    VendorCrashReporter.report("subscribeError" , throwable.toString());
+                    Log.d(TAG, "error: " + throwable.toString());
                 });
     }
 

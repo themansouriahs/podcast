@@ -205,7 +205,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
 
         if (episode == null) {
             IEpisode foundEpisode = searcher.findEpisode(query);
-            if (foundEpisode != null) {
+             if (foundEpisode != null) {
                 episode = foundEpisode;
             }
         }

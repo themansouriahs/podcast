@@ -268,7 +268,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements
 	public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @android.support.annotation.Nullable Bundle rootHints) {
 		Log.d(TAG, "onGetRoot");
 
-		SoundWaves.getAppContext(this).getLibraryInstance().loadSubscriptionsInternalSync(false);
+		//SoundWaves.getAppContext(this).getLibraryInstance().loadSubscriptionsInternalSync(false);
+		SoundWaves.getAppContext(this).getLibraryInstance().loadAllEpisodes();
 		SoundWaves.getAppContext(this).getPlaylist(true);
 
 		return new BrowserRoot(MediaBrowserHelper.BROWSER_ROOT_ID, null);
