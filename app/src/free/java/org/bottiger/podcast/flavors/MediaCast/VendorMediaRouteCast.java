@@ -8,6 +8,7 @@ import android.support.v7.media.MediaRouteSelector;
 import android.view.Menu;
 
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Player;
 
 import org.bottiger.podcast.MediaRouterPlaybackActivity;
 import org.bottiger.podcast.flavors.player.googlecast.GoogleCastPlayer;
@@ -87,7 +88,7 @@ public class VendorMediaRouteCast extends GoogleCastPlayer implements IMediaCast
     }
 
     @Override
-    public void addListener(ExoPlayer.EventListener listener) {
+    public void addListener(Player.EventListener listener) {
 
     }
 
@@ -98,11 +99,6 @@ public class VendorMediaRouteCast extends GoogleCastPlayer implements IMediaCast
 
     @Override
     public void stop() {
-
-    }
-
-    @Override
-    public void removeListener(ExoPlayer.EventListener listener) {
 
     }
 
@@ -164,6 +160,11 @@ public class VendorMediaRouteCast extends GoogleCastPlayer implements IMediaCast
     @Override
     public long seekTo(long msec) throws IllegalStateException {
         return 0;
+    }
+
+    @Override
+    public void removeListener(Player.EventListener listener) {
+
     }
 
     @Override
