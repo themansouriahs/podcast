@@ -45,6 +45,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -1071,14 +1072,15 @@ public class Library {
             subscriptionsTmp[i] = mActiveSubscriptions.get(i);
         }
 
+        Arrays.sort(subscriptionsTmp, this::compareSubscriptions);
+
         mActiveSubscriptions.clear();
 
-        for (int i = 0; i < subscriptionsTmp.length; i++) {
-            subTmp = subscriptionsTmp[i];
+        for (Subscription aSubscriptionsTmp : subscriptionsTmp) {
+            subTmp = aSubscriptionsTmp;
             mActiveSubscriptions.add(subTmp);
         }
 
-        //mActiveSubscriptions.endBatchedUpdates();
         mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
     }
 

@@ -46,6 +46,7 @@ import org.bottiger.podcast.utils.SDCardManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
@@ -54,12 +55,8 @@ import static android.support.annotation.RestrictTo.Scope.TESTS;
 
 public class SubscriptionsFragment extends Fragment {
 
-    private static final String TAG = "SubscriptionsFragment";
+    private static final String TAG = SubscriptionsFragment.class.getSimpleName();
 
-    private static final boolean SHARE_ANALYTICS_DEFAULT = !BuildConfig.LIBRE_MODE;
-    private static final boolean SHARE_CLOUD_DEFAULT = false;
-    private static final String EXTRAS_CODE = "path";
-    private static final String OPML_SUBS_LIST_EXTRA_CODE = "EXTRACODE_SUBS_LIST";
     public static final int RESULT_IMPORT = 201;
     public static final int RESULT_EXPORT = 202;
     public static final int RESULT_EXPORT_TO_CLIPBOARD = 203;
@@ -88,10 +85,8 @@ public class SubscriptionsFragment extends Fragment {
     private RelativeLayout mEmptySubscrptionList;
     private Button mEmptySubscrptionImportOPMLButton;
     private SubscriptionAdapter mAdapter;
-    private FrameLayout mGridContainerView;
 
     private Activity mActivity;
-    private FrameLayout mContainerView;
 
     private Disposable mRxSubscriptionChanged;
 
@@ -115,13 +110,11 @@ public class SubscriptionsFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        mContainerView = (FrameLayout) inflater.inflate(R.layout.subscription_fragment, container, false);
+        FrameLayout mContainerView = (FrameLayout) inflater.inflate(R.layout.subscription_fragment, container, false);
 
         // Empty View
         mEmptySubscrptionList = mContainerView.findViewById(R.id.subscription_empty);
         mEmptySubscrptionImportOPMLButton = mContainerView.findViewById(R.id.import_opml_button);
-
-        mGridContainerView = mContainerView.findViewById(R.id.subscription_grid_container);
 
         //RecyclerView
         mAdapter = createAdapter();
@@ -201,7 +194,7 @@ public class SubscriptionsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mEmptySubscrptionImportOPMLButton.setOnClickListener(v -> {
@@ -213,7 +206,12 @@ public class SubscriptionsFragment extends Fragment {
             }
         });
 
-        mAdapter.setDataset(mLibrary.getLiveSubscriptions().getValue());
+        List<Subscription> subscriptionsList = new LinkedList<>();
+        List<Subscription> subscriptions = mLibrary.getLiveSubscriptions().getValue();
+        if (subscriptions != null) {
+            subscriptionsList.addAll(subscriptions);
+        }
+        mAdapter.setDataset(subscriptionsList);
     }
 
     @Override
@@ -236,7 +234,7 @@ public class SubscriptionsFragment extends Fragment {
         inflater.inflate(R.menu.subscription_actionbar, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        @IdRes int idres = 0;
+        @IdRes int idres;
 
         switch (mLibrary.getSubscriptionOrder()) {
             case Library.ALPHABETICALLY: {
@@ -259,6 +257,9 @@ public class SubscriptionsFragment extends Fragment {
                 idres = R.id.menu_order_score;
                 break;
             }
+            case Library.DATE_NEW_FIRST:
+            case Library.DATE_OLD_FIRST:
+            case Library.NOT_SET:
             default: {
                 idres = R.id.menu_order_alphabetically;
             }
@@ -266,8 +267,6 @@ public class SubscriptionsFragment extends Fragment {
 
         MenuItem item = menu.findItem(idres);
         item.setChecked(true);
-
-        return;
     }
 
     @Override
@@ -279,7 +278,7 @@ public class SubscriptionsFragment extends Fragment {
                 break;
             }
             case R.id.menu_refresh_all_subscriptions: {
-                SoundWaves.getAppContext(getContext()).getRefreshManager().refreshAll();
+                SoundWaves.getAppContext(mActivity).getRefreshManager().refreshAll();
                 break;
             }
             case R.id.menu_order_alphabetically: {
@@ -311,7 +310,12 @@ public class SubscriptionsFragment extends Fragment {
         mLibrary.setSubscriptionOrder(argSortOrder);
         item.setChecked(true);
 
-        mAdapter.setDataset(mLibrary.getLiveSubscriptions().getValue());
+        List<Subscription> subscriptionsList = new LinkedList<>();
+        List<Subscription> subscriptions = mLibrary.getLiveSubscriptions().getValue();
+        if (subscriptions != null) {
+            subscriptionsList.addAll(subscriptions);
+        }
+        mAdapter.setDataset(subscriptionsList);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -395,7 +399,7 @@ public class SubscriptionsFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == OPML_ACTIVITY_STATUS_CODE) {
-            OPMLImportExportActivity.handleResult(getActivity(), requestCode, resultCode, data);
+            OPMLImportExportActivity.handleResult(mActivity, requestCode, resultCode, data);
         }
     }
 
