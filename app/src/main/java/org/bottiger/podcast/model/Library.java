@@ -65,6 +65,8 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
+import static org.bottiger.podcast.provider.Subscription.STATUS_SUBSCRIBED;
+
 /**
  * Created by aplb on 11-10-2015.
  */
@@ -142,25 +144,19 @@ public class Library {
                 .toObserverable()
                 .onBackpressureBuffer(BACKPREASURE_BUFFER_SIZE)
                 .ofType(ItemChanged.class)
-                .subscribe(new Action1<ItemChanged>() {
-                    @Override
-                    public void call(ItemChanged itemChangedEvent) {
-                        if (itemChangedEvent instanceof EpisodeChanged) {
-                            handleChangedEvent((EpisodeChanged) itemChangedEvent);
-                            return;
-                        }
+                .subscribe(itemChangedEvent -> {
+                    if (itemChangedEvent instanceof EpisodeChanged) {
+                        handleChangedEvent((EpisodeChanged) itemChangedEvent);
+                        return;
+                    }
 
-                        if (itemChangedEvent instanceof SubscriptionChanged) {
-                            handleChangedEvent((SubscriptionChanged) itemChangedEvent);
-                            return;
-                        }
+                    if (itemChangedEvent instanceof SubscriptionChanged) {
+                        handleChangedEvent((SubscriptionChanged) itemChangedEvent);
+                        return;
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        VendorCrashReporter.handleException(throwable);
-                        Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
-                    }
+                }, throwable -> {
+                    VendorCrashReporter.handleException(throwable);
+                    Log.wtf(TAG, "Missing back pressure. Should not happen anymore :(");
                 });
 
         SoundWaves.getRxBus2()
@@ -279,10 +275,7 @@ public class Library {
                 }
             }
 
-            //long start = System.currentTimeMillis();
             mLibraryPersistency.insert(mContext, unpersistedEpisodes);
-            //long end = System.currentTimeMillis();
-            //Log.d(TAG, "insert time: " + (end-start) + " ms (#" + unpersistedEpisodes.size() + ")");
 
             mNewEpisodesNotification.show(mContext, unpersistedEpisodes);
 
@@ -352,13 +345,10 @@ public class Library {
             if (isFeedItem) {
                 boolean updatedEpisode = false;
 
-                //long start = System.currentTimeMillis();
                 if (!item.isPersisted()) {
                     updateEpisode(item);
                     updatedEpisode = true;
                 }
-                //long end = System.currentTimeMillis();
-                //Log.d(TAG, "insert time: " + (end-start) + " ms");
 
                 mEpisodesIdLUT.put(item.getId(), item);
 
@@ -440,7 +430,6 @@ public class Library {
 
             VendorCrashReporter.report("remove", argSubscription.getUrl());
 
-            //mSubscriptionIdLUT.remove(argSubscription.getId());
             mSubscriptionUrlLUT.remove(argSubscription.getUrl());
             mActiveSubscriptions.remove(argSubscription);
             mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
@@ -561,7 +550,6 @@ public class Library {
             mEpisodeLock.unlock();
         }
 
-        //sortedList.addAll(mEpisodes);
         return sortedList;
     }
 
@@ -623,7 +611,6 @@ public class Library {
         builder.append(ItemColumns.TABLE_NAME + "." + ItemColumns.PUB_DATE + ">" + thresholdTimestamp + ") ");
         builder.append("AS " + SubscriptionColumns.NEW_EPISODES + " ");
         builder.append("FROM " + SubscriptionColumns.TABLE_NAME + " ");
-        //builder.append("WHERE " + SubscriptionColumns.STATUS + "==" + Subscription.STATUS_SUBSCRIBED);
 
         return builder.toString();
     }
@@ -653,18 +640,10 @@ public class Library {
 
         return Observable.just(query)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Action1<String>() {
-            @Override
-            public void call(String query) {
-                loadPlaylistInternal(query, argPlaylist);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                VendorCrashReporter.report("subscribeError" , throwable.toString());
-                Log.d(TAG, "error: " + throwable.toString());
-            }
-        });
+                .subscribe(query1 -> loadPlaylistInternal(query1, argPlaylist), throwable -> {
+                    VendorCrashReporter.report("subscribeError" , throwable.toString());
+                    Log.d(TAG, "error: " + throwable.toString());
+                });
     }
 
     @WorkerThread
@@ -735,9 +714,6 @@ public class Library {
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aBoolean -> {
-                    // This is done in the adapter instead.
-                    // The reason for this is that the adapter nows the size of the views
-                    //preloadImages();
                 });
     }
 
@@ -809,8 +785,6 @@ public class Library {
                 if (argQuery == null)
                     argQuery = getAllEpisodes(argSubscription);
 
-                //argQuery = "update " + SubscriptionColumns.TABLE_NAME + " set " + SubscriptionColumns.STATUS + "=" + Subscription.STATUS_SUBSCRIBED;
-
                 cursor = PodcastOpenHelper.runQuery(Library.this.mContext, argQuery);
 
                 start = System.currentTimeMillis();
@@ -880,20 +854,19 @@ public class Library {
     public void subscribe(@NonNull ISubscription argSubscription) {
         Observable
                 .just(argSubscription)
-                .map(new Func1<ISubscription, Subscription>() {
-                    @Override
-                    public Subscription call(ISubscription argSubscription) {
+                .map(argSubscription1 -> {
 
-                        Subscription subscription;
+                    Subscription subscription;
 
-                        mSubscriptionLock.lock();
-                        try {
-                            String key = getKey(argSubscription);
-                            subscription = mSubscriptionUrlLUT.containsKey(key) ?
-                                    mSubscriptionUrlLUT.get(key) :
-                                    new Subscription(PreferenceManager.getDefaultSharedPreferences(mContext),
-                                            argSubscription);
+                    mSubscriptionLock.lock();
+                    try {
+                        String key = getKey(argSubscription1);
+                        subscription = mSubscriptionUrlLUT.containsKey(key) ?
+                                mSubscriptionUrlLUT.get(key) :
+                                new Subscription(PreferenceManager.getDefaultSharedPreferences(mContext),
+                                        argSubscription1);
 
+                        if (subscription.getStatus() != STATUS_SUBSCRIBED) {
                             subscription.subscribe("Subscribe:from:Library.subscribe");
                             updateSubscription(subscription);
 
@@ -901,17 +874,17 @@ public class Library {
                             mSubscriptionIdLUT.put(subscription.getId(), subscription);
                             mActiveSubscriptions.add(subscription);
                             mActiveLiveSubscriptions.postValue(mActiveSubscriptions);
-                        } finally {
-                            mSubscriptionLock.unlock();
                         }
-
-                        EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argSubscription.getURLString(), null);
-                        mSubscriptionsChangePublisher.onNext(subscription);
-
-                        SoundWaves.getAppContext(mContext).getRefreshManager().refresh(subscription, null);
-
-                        return subscription;
+                    } finally {
+                        mSubscriptionLock.unlock();
                     }
+
+                    EventLogger.postEvent(mContext, EventLogger.SUBSCRIBE_PODCAST, null, argSubscription1.getURLString(), null);
+                    mSubscriptionsChangePublisher.onNext(subscription);
+
+                    SoundWaves.getAppContext(mContext).getRefreshManager().refresh(subscription, null);
+
+                    return subscription;
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -921,8 +894,6 @@ public class Library {
 
                     @Override
                     public void onCompleted() {
-                        //SoundWaves.sAnalytics.trackEvent(IAnalytics.EVENT_TYPE.SUBSCRIBE_TO_FEED);
-                        //notifySubscriptionChanged(mSubscription.getId(), SubscriptionChanged.ADDED);
                         addSubscription(mSubscription);
                     }
 
@@ -1004,8 +975,6 @@ public class Library {
                 break;
         }
 
-        // Default
-        //return s1.getTitle().compareTo(s2.getTitle());
         return compareTitle(s1, s2);
     }
 
@@ -1064,7 +1033,6 @@ public class Library {
     }
 
     public void resetOrder() {
-        //mActiveSubscriptions.beginBatchedUpdates();
         Subscription[] subscriptionsTmp = new Subscription[mActiveSubscriptions.size()];
         Subscription subTmp;
 

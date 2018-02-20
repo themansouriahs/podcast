@@ -41,6 +41,8 @@ public class OPMLImportExportActivity extends ToolbarActivity {
     The status codes can be changed, they just need to be the same in all activities, it doesn't matter the number,
         it just matters that reimains the same everywhere.
      */
+    public static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
+
     private static final int ACTIVITY_CHOOSE_FILE_STATUS_CODE = 99;
     private static final int INTERNAL_STORAGE_PERMISSION_REQUEST = 9;
     private static final String EXTRAS_CODE = "path";
@@ -98,73 +100,69 @@ public class OPMLImportExportActivity extends ToolbarActivity {
             The export one returns directly to SubscriptionFragment like the other one
          */
         Button importOPML = findViewById(R.id.bOPML_import);
-        importOPML.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.e(TAG, "Import OPML clicked");
-                Intent chooseFile;
-                Intent intent;
-                chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-                //Unless you have an external file manager, this not seems to work, the mimetype is wrong or something
+        importOPML.setOnClickListener(view -> {
+            Log.e(TAG, "Import OPML clicked");
+            Intent chooseFile;
+            Intent intent;
+            chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+            //Unless you have an external file manager, this not seems to work, the mimetype is wrong or something
 
-                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                chooseFile.setType("*/*");
-                //chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
-                //} else {
-                //    chooseFile.setType(MimeType);
-                //}
-                intent = Intent.createChooser(chooseFile, "Choose a file"); //this string is not important since is not shown
-                startActivityForResult(intent, ACTIVITY_CHOOSE_FILE_STATUS_CODE);
-            }
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            chooseFile.setType("*/*");
+            //chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, MIME_TYPES);
+            //} else {
+            //    chooseFile.setType(MimeType);
+            //}
+            intent = Intent.createChooser(chooseFile, "Choose a file"); //this string is not important since is not shown
+            startActivityForResult(intent, ACTIVITY_CHOOSE_FILE_STATUS_CODE);
         });
 
 
         Button exportOPML = findViewById(R.id.bOMPLexport);
-        exportOPML.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.e(TAG, "Export OPML to filesystem clicked");
-                //The return data is not checked in this particular case
+        exportOPML.setOnClickListener(view -> {
+            Log.e(TAG, "Export OPML to filesystem clicked");
+            //The return data is not checked in this particular case
 
-                String export_dir = "";
-                try {
-                    export_dir = SDCardManager.getExportDir();
-                } catch (SecurityException e) {
-                    VendorCrashReporter.report("EXPORT FAIL", "Cannot export OPML file");
-                } catch (IOException e) {
-                    VendorCrashReporter.report("EXPORT FAIL", "Cannot export OPML file");
-                }
-                Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
-                Log.d(TAG, "Export to: " + export_dir + EXPORT_FILENAME);// NoI18N
-                importExport.exportSubscriptions(new File(export_dir + EXPORT_FILENAME));
-
-                if (getParent() == null) {
-                    setResult(RESULT_EXPORT, null);
-                } else {
-                    getParent().setResult(RESULT_EXPORT, null);
-                }
-                finish();
+            String export_dir = "";
+            try {
+                export_dir = SDCardManager.getExportDir();
+            } catch (SecurityException e) {
+                VendorCrashReporter.report("EXPORT FAIL", "Cannot export OPML file");
+            } catch (IOException e) {
+                VendorCrashReporter.report("EXPORT FAIL", "Cannot export OPML file");
             }
+            Log.d(TAG, "EXPORT SUBSCRIPTIONS");// NoI18N
+            Log.d(TAG, "Export to: " + export_dir + EXPORT_FILENAME);// NoI18N
+            importExport.exportSubscriptions(new File(export_dir + EXPORT_FILENAME));
+
+            if (getParent() == null) {
+                setResult(RESULT_EXPORT, null);
+            } else {
+                getParent().setResult(RESULT_EXPORT, null);
+            }
+            finish();
         });
 
         Button exportClipboardOPML = findViewById(R.id.bOMPL_clipboard_export);
-        exportClipboardOPML.setOnClickListener(new View.OnClickListener() {
-            @Nullable
-            @Override
-            public void onClick(View view) {
-                Log.e(TAG, "Export OPML to clipboard clicked");
+        exportClipboardOPML.setOnClickListener(view -> {
+            Log.e(TAG, "Export OPML to clipboard clicked");
 
-                importExport.exportSubscriptionsToClipboard();
+            importExport.exportSubscriptionsToClipboard();
 
-                //The return data is not checked in this particular case
-                if (getParent() == null) {
-                    setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
-                } else {
-                    getParent().setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
-                }
-                finish();
+            //The return data is not checked in this particular case
+            if (getParent() == null) {
+                setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
+            } else {
+                getParent().setResult(RESULT_EXPORT_TO_CLIPBOARD, null);
             }
+            finish();
         });
+    }
+
+    public static void handleImportActivityResult(@NonNull Activity activity, int requestCode, int resultCode, Intent data) {
+        if (requestCode == OPML_ACTIVITY_STATUS_CODE) {
+            OPMLImportExportActivity.handleResult(activity, requestCode, resultCode, data);
+        }
     }
 
     public static void handleResult(@NonNull Activity argActivity, int requestCode, int resultCode, Intent data) {

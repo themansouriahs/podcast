@@ -52,6 +52,7 @@ import java.util.List;
 import io.reactivex.disposables.Disposable;
 
 import static android.support.annotation.RestrictTo.Scope.TESTS;
+import static org.bottiger.podcast.activities.openopml.OPMLImportExportActivity.OPML_ACTIVITY_STATUS_CODE;
 
 public class SubscriptionsFragment extends Fragment {
 
@@ -61,8 +62,6 @@ public class SubscriptionsFragment extends Fragment {
     public static final int RESULT_EXPORT = 202;
     public static final int RESULT_EXPORT_TO_CLIPBOARD = 203;
     public static final String EXPORT_FILENAME = "/podcast_export.opml";
-
-    private static final int OPML_ACTIVITY_STATUS_CODE = 999; //This number is needed but it can be any number ^^
 
     /**
      1 = Auto
@@ -398,9 +397,7 @@ public class SubscriptionsFragment extends Fragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OPML_ACTIVITY_STATUS_CODE) {
-            OPMLImportExportActivity.handleResult(mActivity, requestCode, resultCode, data);
-        }
+        OPMLImportExportActivity.handleResult(mActivity, requestCode, resultCode, data);
     }
 
     @RestrictTo(TESTS)

@@ -17,6 +17,7 @@ import android.view.View;
 import org.bottiger.podcast.R;
 import org.bottiger.podcast.SoundWaves;
 import org.bottiger.podcast.model.Library;
+import org.bottiger.podcast.provider.ISubscription;
 import org.bottiger.podcast.provider.SlimImplementations.SlimSubscription;
 import org.bottiger.podcast.provider.Subscription;
 import org.bottiger.podcast.utils.ErrorUtils;
@@ -51,7 +52,7 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_opml_import);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.opml_import_export_toolbar);
+        Toolbar toolbar = findViewById(R.id.opml_import_export_toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
@@ -104,7 +105,7 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
         mAdapter = new OpenOpmlAdapter(mSubscriptions);
         //mAdapter.setHasStableIds(true);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.opml_subscription_list);
+        mRecyclerView = findViewById(R.id.opml_subscription_list);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -113,7 +114,6 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
         Log.d(TAG, "importing selected"); // NoI18N
 
         boolean didImport = false;
-        Subscription newSubscription;
         SlimSubscription subscription;
         for (int i = 0; i < mSubscriptions.size(); i++) {
             subscription = mSubscriptions.get(i);
@@ -140,7 +140,10 @@ public class OpenOpmlFromIntentActivity extends AppCompatActivity {
 
     private void setAll(boolean argSetSubscribed) {
         for (int i = 0; i < mSubscriptions.size(); i++) {
-            mSubscriptions.get(i).markForSubscription(argSetSubscribed);
+            ISubscription subscription = mSubscriptions.get(i);
+            if (!mLibrary.containsSubscription(subscription)) {
+                mSubscriptions.get(i).markForSubscription(argSetSubscribed);
+            }
         }
         mAdapter.notifyDataSetChanged();
     }

@@ -136,10 +136,6 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     @Override
     public void onStop() {
         Log.d(TAG, "onStop");
-        // Reset the delayed stop handler, so after STOP_DELAY it will be executed again,
-        // potentially stopping the service.
-        //mDelayedStopHandler.removeCallbacksAndMessages(null);
-        //mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
 
         mPlayerService.dis_notifyStatus();
         mPlayerService.stopForeground(true);
@@ -249,7 +245,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
                 });
     }
 
-    public void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
+    void updateState(@PlaybackStateCompat.State int argState, long argPosition, float argPlaybackSpeed) {
         Log.d(TAG, "Update State:" + argState); // NoI18N
 
         PlaybackStateCompat.Builder stateBuilder = getPlaybackState(argState, argPosition, argPlaybackSpeed);
@@ -269,8 +265,7 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
     public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
         Log.d(TAG, "onMediaButtonEvent");
         KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-        boolean wasHandled = HeadsetReceiver.handleMediaButtonEvent(event, mPlayerService);
-        return wasHandled;
+        return HeadsetReceiver.handleMediaButtonEvent(event, mPlayerService);
     }
 
     public static void populateFastMediaMetadata(@NonNull MediaMetadataCompat.Builder mMetaBuilder,
@@ -310,13 +305,11 @@ public class PlayerStateManager extends MediaSessionCompat.Callback {
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
 
-        //long features = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH;
-        long features = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID;
+        long features = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH;
 
         long currentState = actions | features;
 
         stateBuilder.setActions(currentState);
-        //stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f);
         stateBuilder.setState(argState, argPosition, argPlaybackSpeed, SystemClock.elapsedRealtime());
 
         return stateBuilder;

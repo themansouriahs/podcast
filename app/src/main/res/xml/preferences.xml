@@ -254,20 +254,12 @@
                 android:key="@string/pref_import_opml_key"
                 android:title="@string/pref_import_opml_title"
                 android:summary="@string/pref_import_opml_summary">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:targetPackage="org.bottiger.podcast"
-                    android:targetClass="org.bottiger.podcast.activities.openopml.OPMLImportExportActivity" />
             </Preference>
 
             <Preference
                 android:key="@string/pref_export_opml_key"
                 android:title="@string/pref_export_opml_title"
                 android:summary="@string/pref_export_opml_summary">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:targetPackage="org.bottiger.podcast"
-                    android:targetClass="org.bottiger.podcast.activities.openopml.OPMLImportExportActivity" />
             </Preference>
 
         </PreferenceCategory>

@@ -32,30 +32,13 @@ public class SettingsActivity extends ToolbarActivity implements SharedPreferenc
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
-		// This is bizar, but works:
-		// http://stackoverflow.com/questions/11751498/how-to-change-preferenceactivity-theme
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this.getApplicationContext());
-
         DARK_THEME_KEY = getResources().getString(R.string.pref_dark_theme_key);
-        String defaultValue = getResources().getString(R.string.pref_theme_default);
-        String lightTheme = prefs.getString(DARK_THEME_KEY, defaultValue);
-        int lightThemeInt = Integer.parseInt(lightTheme);
-        //int style = lightTheme || System.currentTimeMillis() > 0 ? R.style.PreferenceTheme : R.style.PreferenceThemeDark;
-
-        //setTheme(style);
 
         super.onCreate(savedInstanceState);
 
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new SoundWavesPreferenceFragment()).commit();
 
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        mToolbar.setNavigationOnClickListener(v -> finish());
 	}
 	
 	@Override

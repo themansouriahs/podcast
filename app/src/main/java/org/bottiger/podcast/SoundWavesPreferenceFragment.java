@@ -21,14 +21,14 @@ import org.bottiger.podcast.utils.SDCardManager;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.bottiger.podcast.activities.openopml.OPMLImportExportActivity.OPML_ACTIVITY_STATUS_CODE;
+
 /**
  * Created by apl on 13-02-2015.
  */
 public class SoundWavesPreferenceFragment extends PreferenceFragment {
 
     private static final String TAG = SoundWavesPreferenceFragment.class.getSimpleName();
-
-    public static final String CURRENT_VERSION = "pref_current_version";
 
     private Context mContext;
 
@@ -55,6 +55,21 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
             PreferenceCategory category = (PreferenceCategory) findPreference("pref_network_category_storage");
             category.removePreference(saveOnSdCardPreference);
         }
+
+
+        String key = getResources().getString(R.string.pref_import_opml_key);
+        Preference pref = findPreference(key);
+        pref.setOnPreferenceClickListener(preference -> {
+            startActivityForResult(preference.getIntent(), OPML_ACTIVITY_STATUS_CODE);
+            return true;
+        });
+
+        String keyExport = getResources().getString(R.string.pref_export_opml_key);
+        Preference prefExport = findPreference(keyExport);
+        prefExport.setOnPreferenceClickListener(preference -> {
+            startActivityForResult(preference.getIntent(), OPML_ACTIVITY_STATUS_CODE);
+            return true;
+        });
     }
 
     @Override
@@ -146,5 +161,10 @@ public class SoundWavesPreferenceFragment extends PreferenceFragment {
         searchEngineListPreference.setTitle(R.string.pref_webservices_discovery_title);
 
         targetCategory.addPreference(searchEngineListPreference);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        OPMLImportExportActivity.handleResult(getActivity(), requestCode, resultCode, data);
     }
 }
