@@ -217,7 +217,20 @@ public abstract class SoundWavesPlayerBase implements org.bottiger.podcast.playe
 
     private long seekDirection(@Nullable IEpisode argItem, boolean isFastSeeking, @OnTouchSeekListener.Direction int argDirection) {
 
-        String amount = PreferenceHelper.getStringPreferenceValue(mContext, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
+        String amount;
+
+        switch (argDirection) {
+            case OnTouchSeekListener.BACKWARDS: {
+                amount = PreferenceHelper.getStringPreferenceValue(mContext, R.string.pref_player_backward_amount_key, R.string.player_rewind_default);
+                break;
+            }
+            case OnTouchSeekListener.FORWARD:
+            default:{
+                amount = PreferenceHelper.getStringPreferenceValue(mContext, R.string.pref_player_forward_amount_key, R.string.player_fast_forward_default);
+                break;
+            }
+        }
+
         long seekAmountMs = Integer.parseInt(amount)*1000; // to ms
 
         if (argItem == null)
