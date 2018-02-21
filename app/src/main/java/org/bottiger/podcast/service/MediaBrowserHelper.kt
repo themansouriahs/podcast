@@ -14,6 +14,7 @@ import org.bottiger.podcast.provider.IDbItem
 import org.bottiger.podcast.provider.IEpisode
 import org.bottiger.podcast.provider.ISubscription
 import org.bottiger.podcast.provider.Subscription
+import org.bottiger.podcast.utils.ErrorUtils
 import org.bottiger.podcast.utils.StrUtils
 import org.bottiger.podcast.views.PlaylistScrollerParent
 import javax.inject.Inject
@@ -34,6 +35,12 @@ class  MediaBrowserHelper(private var context: Context, private var library: Lib
 
         fun parseMediaId(mediaId: String, library: Library) : IDbItem? {
             val parts = mediaId.split(BROWSER_DELIMITER.toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+
+            if (parts.size < 2) {
+                ErrorUtils.handleException(IllegalArgumentException(), "mediaID: " + mediaId)
+                return null;
+            }
+
             val type = parts[0]
             val url = parts[1]
             val id = if (TextUtils.isDigitsOnly(parts[1])) java.lang.Long.parseLong(parts[1]) else 0

@@ -71,6 +71,7 @@ public class SDCardManager {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    @Nullable
     public static File getRemovableDownloadDir(@NonNull Context argContext) throws SecurityException {
 
         if (sSdCardDir != null) {
@@ -85,7 +86,7 @@ public class SDCardManager {
 
         // The SD card is probably the second in the array.
         // But to be sure we find the path with the shortest common prefix with the local dir
-        if (dirs.length > 1) {
+        if (dirs.length > 1 && localDir != null) {
             for (int i = 0; i < dirs.length; i++) {
                 File sdcardDirTest = dirs[i];
 
